@@ -24,6 +24,8 @@ import { LandingPage } from './components/LandingPage';
 import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
 import { Contacts } from './components/Contacts';
 import { Shopping } from './components/Shopping';
+import { Finance } from './components/Finance';
+import { Profile } from './components/Profile';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
@@ -147,6 +149,14 @@ function App() {
       setActiveTab('compras');
       return;
     }
+    if (title === 'Financeiro') {
+      setActiveTab('financeiro');
+      return;
+    }
+    if (title === 'Meu Perfil') {
+      setActiveTab('perfil');
+      return;
+    }
     setMenuTitle(title);
     setActiveTab('placeholder');
   };
@@ -163,6 +173,8 @@ function App() {
       case 'library': return <CalculatorLibrary key="library" />;
       case 'contatos': return <Contacts key="contatos" />;
       case 'compras': return <Shopping key="compras" />;
+      case 'financeiro': return <Finance key="financeiro" />;
+      case 'perfil': return <Profile key="perfil" />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
       case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => setActiveTab('menu')} />;
       default: return <DashboardRouter key="default" onNavigate={setActiveTab} />;
