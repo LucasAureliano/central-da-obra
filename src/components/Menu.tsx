@@ -21,7 +21,8 @@ import {
   RefreshCw,
   FileText,
   Calculator,
-  Sparkles
+  Sparkles,
+  ShoppingCart
 } from 'lucide-react';
 
 interface MenuProps {
@@ -74,6 +75,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
   const getGestaoItems = () => {
     const items = [
       { icon: <Wallet size={20} />, label: 'Financeiro', color: '#10B981', action: () => onMenuSelect('Financeiro') },
+      { icon: <ShoppingCart size={20} />, label: 'Lista de Compras', color: '#8B5CF6', action: () => onMenuSelect('Compras') },
       { icon: <Users size={20} />, label: 'Contatos', color: '#3B82F6', action: () => onMenuSelect('Contatos') }
     ];
 
