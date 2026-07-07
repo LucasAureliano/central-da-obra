@@ -46,21 +46,28 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
   const handlePrev = () => setStep(s => s - 1);
 
   // Math
-  const netAreaCalc = () => {
+  const getBaseArea = () => {
     let baseArea = 0;
     if (inputMethod === 'area') {
       baseArea = parseFloat(area) || 0;
     } else {
       baseArea = (parseFloat(width) || 0) * (parseFloat(height) || 0);
     }
-    
+    return baseArea;
+  };
+
+  const getOpeningsArea = () => {
     let desc = 0;
     if (hasOpenings) {
       openings.forEach(op => {
         desc += (parseFloat(op.w) || 0) * (parseFloat(op.h) || 0) * (parseInt(op.qty) || 1);
       });
     }
-    return Math.max(0, baseArea - desc);
+    return desc;
+  };
+
+  const netAreaCalc = () => {
+    return Math.max(0, getBaseArea() - getOpeningsArea());
   };
 
   const calculateResults = () => {
@@ -336,12 +343,19 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
               </button>
             </div>
           ))}
+          
+          {getOpeningsArea() > getBaseArea() && (
+            <div style={{ padding: 16, borderRadius: 12, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+              Erro: A área dos vãos ({getOpeningsArea().toFixed(2)} m²) é maior que a área total a ser pintada ({getBaseArea().toFixed(2)} m²). Reduza os vãos ou aumente a área.
+            </div>
+          )}
+
           <button onClick={addOpening} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16, borderRadius: 16, border: '1px dashed var(--border-strong)', backgroundColor: 'transparent', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600 }}>
             <FilePlus size={20} /> Adicionar outro vão
           </button>
         </div>
       ),
-      isValid: openings.every(op => parseFloat(op.w) > 0 && parseFloat(op.h) > 0 && parseInt(op.qty) > 0) || openings.length === 0
+      isValid: (openings.every(op => parseFloat(op.w) > 0 && parseFloat(op.h) > 0 && parseInt(op.qty) > 0) || openings.length === 0) && getOpeningsArea() <= getBaseArea()
     } : null,
     {
       id: 'loss_rate',

@@ -226,12 +226,19 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
               </button>
             </div>
           ))}
+          
+          {openingsArea > parsedBaseArea && (
+            <div style={{ padding: 16, borderRadius: 12, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+              Erro: A área dos vãos ({openingsArea.toFixed(2)} m²) é maior que a área total da parede ({parsedBaseArea.toFixed(2)} m²). Reduza os vãos ou aumente a área.
+            </div>
+          )}
+
           <button onClick={addOpening} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16, borderRadius: 16, border: '1px dashed var(--border-strong)', backgroundColor: 'transparent', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600 }}>
             <Plus size={20} /> Adicionar Vão
           </button>
         </div>
       ),
-      isValid: true
+      isValid: openingsArea <= parsedBaseArea
     } : null,
     {
       id: 'mortar_type',
