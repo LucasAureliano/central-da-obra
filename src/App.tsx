@@ -22,6 +22,7 @@ import { CustomLogo } from './components/CustomLogo';
 import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
 import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
+import { Contacts } from './components/Contacts';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
@@ -137,6 +138,10 @@ function App() {
       setActiveTab('library');
       return;
     }
+    if (title === 'Contatos') {
+      setActiveTab('contatos');
+      return;
+    }
     setMenuTitle(title);
     setActiveTab('placeholder');
   };
@@ -151,6 +156,7 @@ function App() {
       case 'obras': return <Works key="obras" onWorkSelect={(id) => setSelectedWorkId(id)} />;
       case 'ferramentas': return <SmartAssistant key="ferramentas" onBack={() => setActiveTab('inicio')} />;
       case 'library': return <CalculatorLibrary key="library" />;
+      case 'contatos': return <Contacts key="contatos" />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
       case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => setActiveTab('menu')} />;
       default: return <DashboardRouter key="default" onNavigate={setActiveTab} />;
