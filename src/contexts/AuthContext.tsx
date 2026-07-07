@@ -40,6 +40,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let unsubscribeProfile: () => void;
 
+    const checkLocalGuest = () => {
+      const localGuestUid = sessionStorage.getItem('localGuestUid');
+      if (localGuestUid) {
+        const fakeUser = {
+          uid: localGuestUid,
+          email: 'Visitante',
+          displayName: 'Visitante',
+          isAnonymous: true,
+        } as unknown as User;
+        
+        setUser(fakeUser);
+        setProfile({
+          uid: localGuestUid,
+          email: 'Visitante',
+          name: 'Visitante',
+          photoURL: null,
+          role: (localStorage.getItem('pendingRole') as UserRole) || 'owner',
+          createdAt: new Date(),
+          plan: 'free',
+          hasSeenWelcome: sessionStorage.getItem('guestHasSeenWelcome') === 'true'
+        });
+        setLocalGuest(true);
+        setLoading(false);
+        return true;
+      }
+      return false;
+    };
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
@@ -92,9 +120,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
           }
         } else {
-          setUser(null);
-          setProfile(null);
-          setLoading(false);
+          if (!checkLocalGuest()) {
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
         }
       } catch (err) {
         console.error("Error in onAuthStateChanged:", err);
@@ -128,6 +158,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error signing in anonymously:", error);
       // Fallback for when Firebase Anonymous Auth is not enabled
+      const localGuestUid = 'guest_' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('localGuestUid', localGuestUid);
+      
+      const fakeUser = {
+        uid: localGuestUid,
+        email: 'Visitante',
+        displayName: 'Visitante',
+        isAnonymous: true,
+      } as unknown as User;
+      
+      setUser(fakeUser);
+      setProfile({
+        uid: localGuestUid,
+        email: 'Visitante',
+        name: 'Visitante',
+        photoURL: null,
+        role: (localStorage.getItem('pendingRole') as UserRole) || 'owner',
+        createdAt: new Date(),
+        plan: 'free',
+        hasSeenWelcome: false
+      });
       setLocalGuest(true);
     } finally {
       setLoading(false);
@@ -136,6 +187,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      sessionStorage.removeItem('localGuestUid');
+      sessionStorage.removeItem('guestHasSeenWelcome');
+      setLocalGuest(false);
+      setUser(null);
+      setProfile(null);
       await firebaseSignOut(auth);
     } catch (error) {
       console.error("Error signing out:", error);
