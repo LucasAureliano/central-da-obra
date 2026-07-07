@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: 'Visitante',
           name: 'Visitante',
           photoURL: null,
-          role: (localStorage.getItem('pendingRole') as UserRole) || 'owner',
+          role: (localStorage.getItem('pendingRole') as UserRole) || null,
           createdAt: new Date(),
           plan: 'free',
           hasSeenWelcome: sessionStorage.getItem('guestHasSeenWelcome') === 'true'
@@ -174,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: 'Visitante',
         name: 'Visitante',
         photoURL: null,
-        role: (localStorage.getItem('pendingRole') as UserRole) || 'owner',
+        role: (localStorage.getItem('pendingRole') as UserRole) || null,
         createdAt: new Date(),
         plan: 'free',
         hasSeenWelcome: false
