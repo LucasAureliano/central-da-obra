@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { CustomLogo } from './CustomLogo';
+import { Logo } from './ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SplashScreenProps {
@@ -17,7 +17,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <AnimatePresence>
       <motion.div 
-        initial={{ opacity: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="app-container" 
@@ -25,7 +26,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           alignItems: 'center', 
           justifyContent: 'center', 
           flexDirection: 'column', 
-          gap: 32,
+          gap: 40,
           background: 'var(--bg-base)',
           zIndex: 9999,
           position: 'fixed',
@@ -35,15 +36,15 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         <div style={{ position: 'relative' }}>
           {/* Ambient Glow */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: [0, 0.5, 0.2], scale: [0.5, 1.2, 1] }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: [0, 0.6, 0.4], scale: [0.8, 1.2, 1] }}
             transition={{ duration: 2, ease: "easeInOut" }}
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: 150,
-              height: 150,
+              width: 180,
+              height: 180,
               transform: 'translate(-50%, -50%)',
               background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)',
               filter: 'blur(20px)',
@@ -52,24 +53,22 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           />
           
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, rotateX: -15, y: 20 }}
-            animate={{ scale: 1.5, opacity: 1, rotateX: 0, y: 0 }}
+            initial={{ scale: 0.96, opacity: 0 }}
+            animate={{ scale: 1.00, opacity: 1 }}
             transition={{ 
-              type: "spring",
-              stiffness: 200,
-              damping: 20,
-              duration: 1.2 
+              duration: 0.6, // Entre 500ms e 700ms
+              ease: [0.22, 1, 0.36, 1]
             }}
             style={{ transformOrigin: 'center', position: 'relative', zIndex: 1 }}
           >
-            <CustomLogo theme="dark" />
+            <Logo variant="splash" theme="dark" size={120} />
           </motion.div>
         </div>
         
         <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
           style={{
             width: 120,
             display: 'flex',
@@ -116,7 +115,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           <motion.span 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.5 }}
+            transition={{ delay: 1, duration: 0.4 }}
             style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase' }}
           >
             Carregando

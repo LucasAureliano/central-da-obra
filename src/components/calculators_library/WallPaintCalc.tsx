@@ -3,24 +3,24 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Paintbrush2, FilePlus, X, Info } from 'lucide-react';
+import { Paintbrush2, FilePlus, X, Info, Home, Building, Square, PaintRoller, Brush, Shield, Layers } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 // Tinta rendimento base
 const targetOptions: SelectOption[] = [
-  { id: 'interna', title: 'Pintura Interna (Paredes)', subtitle: 'Padrão para salas, quartos, corredores', category: 'Ambientes', isFavorite: true },
-  { id: 'externa', title: 'Pintura Externa', subtitle: 'Paredes externas expostas ao tempo', category: 'Ambientes', isFavorite: true },
-  { id: 'fachada', title: 'Fachada', subtitle: 'Pintura de alta resistência / Textura', category: 'Ambientes' },
-  { id: 'muro', title: 'Muro', subtitle: 'Pintura de contorno do terreno', category: 'Ambientes' },
-  { id: 'teto', title: 'Teto / Forro', subtitle: 'Pintura sobre laje ou gesso', category: 'Superfícies Específicas' },
-  { id: 'piso', title: 'Piso', subtitle: 'Tinta Epóxi ou PU de alta resistência', category: 'Superfícies Específicas' },
-  { id: 'madeira', title: 'Madeira', subtitle: 'Portas, janelas, pergolados', category: 'Materiais Especiais' },
-  { id: 'metal', title: 'Metal', subtitle: 'Portões, grades, estruturas metálicas', category: 'Materiais Especiais' }
+  { id: 'interna', title: 'Pintura Interna (Paredes)', subtitle: 'Padrão para salas, quartos, corredores', category: 'Ambientes', isFavorite: true, icon: <Square size={18} color="#8B5CF6" /> },
+  { id: 'externa', title: 'Pintura Externa', subtitle: 'Paredes externas expostas ao tempo', category: 'Ambientes', isFavorite: true, icon: <Home size={18} color="#3B82F6" /> },
+  { id: 'fachada', title: 'Fachada', subtitle: 'Pintura de alta resistência / Textura', category: 'Ambientes', icon: <Building size={18} color="#10B981" /> },
+  { id: 'muro', title: 'Muro', subtitle: 'Pintura de contorno do terreno', category: 'Ambientes', icon: <Square size={18} color="#F59E0B" /> },
+  { id: 'teto', title: 'Teto / Forro', subtitle: 'Pintura sobre laje ou gesso', category: 'Superfícies Específicas', icon: <Layers size={18} color="#64748B" /> },
+  { id: 'piso', title: 'Piso', subtitle: 'Tinta Epóxi ou PU de alta resistência', category: 'Superfícies Específicas', icon: <PaintRoller size={18} color="#EF4444" /> },
+  { id: 'madeira', title: 'Madeira', subtitle: 'Portas, janelas, pergolados', category: 'Materiais Especiais', icon: <Brush size={18} color="#D97706" /> },
+  { id: 'metal', title: 'Metal', subtitle: 'Portões, grades, estruturas metálicas', category: 'Materiais Especiais', icon: <Shield size={18} color="#94A3B8" /> }
 ];
 
-export function WallPaintCalc({ onBack }: { onBack: () => void }) {
+export function WallPaintCalc({ onBack, onNavigate }: { onBack: () => void, onNavigate?: (tab: string, param?: string) => void }) {
   const [step, setStep] = useState(0);
 
   // States
@@ -145,18 +145,24 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
       metrics.push({ label: 'Fundo/Selador', value: 'Recomendado', unit: 'obrigatório' });
     }
 
+    // Constants
+    const PUTTY_YIELD_M2_KG = 2.5;
+    const PUTTY_BAG_KG = 25;
+    const ROLLER_YIELD_M2 = 100;
+    const MASKING_TAPE_YIELD_M2 = 50;
+
     if (needsPutty) {
       const puttyArea = netArea * puttyRatio;
-      const puttyKg = puttyArea / 2.5; // Rendimento médio 2.5m² por Kg (2 demãos)
-      const puttyBags = Math.ceil(puttyKg / 25); // Barricas de 25kg ou 28kg
+      const puttyKg = puttyArea / PUTTY_YIELD_M2_KG;
+      const puttyBags = Math.ceil(puttyKg / PUTTY_BAG_KG);
       
       const pName = (target?.id === 'interna' || target?.id === 'teto') ? 'Massa Corrida PVA (Barrica 25kg)' : 'Massa Acrílica (Barrica 25kg)';
       materials.push({ name: pName, quantity: puttyBags > 0 ? puttyBags : 1, unit: 'Barrica(s)' });
     }
 
     // Fitas e Rolos
-    materials.push({ name: 'Rolo de Lã (Anti-respingo) 23cm', quantity: Math.ceil(netArea / 100), unit: 'unid.' });
-    materials.push({ name: 'Fita Crepe (Rolo 50m)', quantity: Math.ceil(netArea / 50), unit: 'rolos' });
+    materials.push({ name: 'Rolo de Lã (Anti-respingo) 23cm', quantity: Math.ceil(netArea / ROLLER_YIELD_M2), unit: 'unid.' });
+    materials.push({ name: 'Fita Crepe (Rolo 50m)', quantity: Math.ceil(netArea / MASKING_TAPE_YIELD_M2), unit: 'rolos' });
 
     return { metrics, materials };
   };
@@ -204,7 +210,7 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
               onClick={() => { setSurfaceType(opt.id); handleNext(); }}
               className={surfaceType === opt.id ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'}
               style={{
-                padding: 16, borderRadius: 16, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4,
+                padding: 24, borderRadius: 16, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4,
                 backgroundColor: surfaceType === opt.id ? 'var(--color-primary-alpha)' : 'var(--bg-surface)',
                 border: `1px solid ${surfaceType === opt.id ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
                 cursor: 'pointer'
@@ -236,7 +242,7 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
                   key={opt.n}
                   onClick={() => { setCoats(opt.n); handleNext(); }}
                   style={{ 
-                    padding: '16px 12px', borderRadius: 16, 
+                    padding: '24px 12px', borderRadius: 16, 
                     backgroundColor: coats === opt.n ? 'var(--color-primary)' : 'var(--bg-surface)', 
                     color: coats === opt.n ? '#fff' : 'var(--text-main)', 
                     border: `1px solid ${coats === opt.n ? 'var(--color-primary)' : 'var(--border-subtle)'}`, 
@@ -282,17 +288,17 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'area' ? (
             <div className="input-group">
               <label>Área Total (m²)</label>
-              <input type="number" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 50" />
+              <input type="number" className="input-premium" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 50" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Comprimento Total (m)</label>
-                <input type="number" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 10" />
+                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 10" />
               </div>
               <div className="input-group">
                 <label>Altura / Pé-direito (m)</label>
-                <input type="number" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ex: 2.8" />
+                <input type="number" className="input-premium" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ex: 2.8" />
               </div>
             </>
           )}
@@ -305,10 +311,10 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
       title: 'Existem portas ou janelas nesta área?',
       content: (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <button onClick={() => { setHasOpenings(true); handleNext(); }} className={hasOpenings === true ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 20, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === true ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === true ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === true ? 'var(--color-primary)' : 'var(--text-main)' }}>
+          <button onClick={() => { setHasOpenings(true); handleNext(); }} className={hasOpenings === true ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 24, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === true ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === true ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === true ? 'var(--color-primary)' : 'var(--text-main)' }}>
             Sim
           </button>
-          <button onClick={() => { setHasOpenings(false); handleNext(); }} className={hasOpenings === false ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 20, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === false ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === false ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === false ? 'var(--color-primary)' : 'var(--text-main)' }}>
+          <button onClick={() => { setHasOpenings(false); handleNext(); }} className={hasOpenings === false ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 24, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === false ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === false ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === false ? 'var(--color-primary)' : 'var(--text-main)' }}>
             Não
           </button>
         </div>
@@ -327,15 +333,15 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Larg. (m)</label>
-                  <input type="number" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', background: 'var(--bg-main)', color: 'var(--text-main)' }} value={op.w} onChange={e => { const n = [...openings]; n[i].w = e.target.value; setOpenings(n); }} placeholder="0.80" />
+                  <input type="number" className="input-premium" value={op.w} onChange={e => { const n = [...openings]; n[i].w = e.target.value; setOpenings(n); }} placeholder="0.80" />
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Alt. (m)</label>
-                  <input type="number" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', background: 'var(--bg-main)', color: 'var(--text-main)' }} value={op.h} onChange={e => { const n = [...openings]; n[i].h = e.target.value; setOpenings(n); }} placeholder="2.10" />
+                  <input type="number" className="input-premium" value={op.h} onChange={e => { const n = [...openings]; n[i].h = e.target.value; setOpenings(n); }} placeholder="2.10" />
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Qtd</label>
-                  <input type="number" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-strong)', background: 'var(--bg-main)', color: 'var(--text-main)' }} value={op.qty} onChange={e => { const n = [...openings]; n[i].qty = e.target.value; setOpenings(n); }} placeholder="1" />
+                  <input type="number" className="input-premium" value={op.qty} onChange={e => { const n = [...openings]; n[i].qty = e.target.value; setOpenings(n); }} placeholder="1" />
                 </div>
               </div>
               <button onClick={() => removeOpening(op.id)} style={{ padding: 8, borderRadius: 8, background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', border: 'none', cursor: 'pointer' }}>
@@ -364,7 +370,7 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Segurança (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -410,6 +416,8 @@ export function WallPaintCalc({ onBack }: { onBack: () => void }) {
       onPrev={handlePrev}
       onCancel={onBack}
       onFinish={() => setShowResults(true)}
+      guideId="pintura-dicas"
+      onOpenGuide={onNavigate ? (id) => onNavigate('central-tecnica', id) : undefined}
     />
   );
 }

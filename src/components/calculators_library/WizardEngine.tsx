@@ -21,6 +21,8 @@ interface WizardEngineProps {
   onPrev: () => void;
   onFinish: () => void;
   onCancel: () => void;
+  guideId?: string;
+  onOpenGuide?: (id: string) => void;
 }
 
 export function WizardEngine({ 
@@ -31,7 +33,9 @@ export function WizardEngine({
   onNext, 
   onPrev, 
   onFinish,
-  onCancel
+  onCancel,
+  guideId,
+  onOpenGuide
 }: WizardEngineProps) {
   
   const step = steps[currentStep];
@@ -40,9 +44,9 @@ export function WizardEngine({
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '100vh', backgroundColor: 'var(--bg-main)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '100vh', backgroundColor: 'var(--bg-base)' }}>
       {/* Header */}
-      <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--border-subtle)', position: 'sticky', top: 0, backgroundColor: 'var(--bg-main)', zIndex: 10 }}>
+      <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--border-subtle)', position: 'sticky', top: 0, backgroundColor: 'var(--bg-base)', zIndex: 10 }}>
         <button onClick={onCancel} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <ArrowLeft size={24} />
         </button>
@@ -53,6 +57,22 @@ export function WizardEngine({
           <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>{title}</h2>
           <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Etapa {currentStep + 1} de {steps.length}</p>
         </div>
+        
+        <div style={{ flex: 1 }} />
+        
+        {guideId && onOpenGuide && (
+          <button 
+            onClick={() => onOpenGuide(guideId)} 
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: 6, 
+              backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', 
+              padding: '6px 12px', borderRadius: 100, border: '1px solid var(--color-primary)', 
+              fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 
+            }}
+          >
+            📚 Guia
+          </button>
+        )}
       </div>
 
       {/* Progress Bar */}
@@ -87,11 +107,7 @@ export function WizardEngine({
 
       {/* Footer Nav */}
       {!step.hideNextButton && (
-        <div style={{ 
-          position: 'fixed', bottom: 0, left: 0, right: 0, padding: 20, 
-          backgroundColor: 'var(--bg-main)', borderTop: '1px solid var(--border-subtle)',
-          display: 'flex', justifyContent: 'space-between', gap: 16, zIndex: 10
-        }}>
+        <div className="wizard-footer">
           {!isFirst ? (
             <button 
               onClick={onPrev}

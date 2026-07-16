@@ -15,7 +15,7 @@ export const OnboardingConclusion: React.FC<OnboardingConclusionProps> = ({ role
       case 'service': return "Você está pronto para criar seu primeiro orçamento profissional e conquistar novos clientes.";
       case 'architect': return "Sua área técnica está pronta para organizar projetos, cronogramas e relatórios.";
       case 'builder': return "Sua plataforma está preparada para gerenciar múltiplas obras e equipes.";
-      default: return "Sua Central da Obra está preparada para você.";
+      default: return "Suo CentralObra está preparada para você.";
     }
   };
 

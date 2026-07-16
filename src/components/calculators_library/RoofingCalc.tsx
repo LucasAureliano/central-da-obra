@@ -3,26 +3,26 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Home, Info } from 'lucide-react';
+import { Home, Info, Square, Layers, Sparkles, Building, Briefcase } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 const roofTileOptions: SelectOption[] = [
-  { id: 'ceramica', title: 'Telha Cerâmica (Barro)', subtitle: 'Romana, Portuguesa, Francesa. Alto peso e caimento.', category: 'Tradicionais', isFavorite: true },
-  { id: 'concreto', title: 'Telha de Concreto', subtitle: 'Maior resistência e durabilidade. Alto peso.', category: 'Tradicionais' },
-  { id: 'fibrocimento', title: 'Telha de Fibrocimento', subtitle: 'Leve e econômica. Baixo caimento.', category: 'Econômicas', isFavorite: true },
-  { id: 'termoacustica', title: 'Telha Metálica Termoacústica (Sanduíche)', subtitle: 'Isolamento térmico e acústico. Estrutura leve.', category: 'Metálicas' },
-  { id: 'shingle', title: 'Telha Shingle', subtitle: 'Estética premium. Requer compensado.', category: 'Premium' }
+  { id: 'ceramica', title: 'Telha Cerâmica (Barro)', subtitle: 'Romana, Portuguesa, Francesa. Alto peso e caimento.', category: 'Tradicionais', isFavorite: true, icon: <Layers size={18} color="#F59E0B" /> },
+  { id: 'concreto', title: 'Telha de Concreto', subtitle: 'Maior resistência e durabilidade. Alto peso.', category: 'Tradicionais', icon: <Square size={18} color="#64748B" /> },
+  { id: 'fibrocimento', title: 'Telha de Fibrocimento', subtitle: 'Leve e econômica. Baixo caimento.', category: 'Econômicas', isFavorite: true, icon: <Sparkles size={18} color="#94A3B8" /> },
+  { id: 'termoacustica', title: 'Telha Metálica Termoacústica (Sanduíche)', subtitle: 'Isolamento térmico e acústico. Estrutura leve.', category: 'Metálicas', icon: <Building size={18} color="#3B82F6" /> },
+  { id: 'shingle', title: 'Telha Shingle', subtitle: 'Estética premium. Requer compensado.', category: 'Premium', icon: <Briefcase size={18} color="#10B981" /> }
 ];
 
 const scopeOptions: SelectOption[] = [
-  { id: 'both', title: 'Telhas + Estrutura', subtitle: 'Cálculo completo do telhado', category: 'Escopo', isFavorite: true },
-  { id: 'tiles', title: 'Apenas Telhas', subtitle: 'Não incluir vigas/caibros/ripas', category: 'Escopo' },
-  { id: 'structure', title: 'Apenas Estrutura', subtitle: 'Não incluir telhas', category: 'Escopo' }
+  { id: 'both', title: 'Telhas + Estrutura', subtitle: 'Cálculo completo do telhado', category: 'Escopo', isFavorite: true, icon: <Home size={18} color="#8B5CF6" /> },
+  { id: 'tiles', title: 'Apenas Telhas', subtitle: 'Não incluir vigas/caibros/ripas', category: 'Escopo', icon: <Layers size={18} color="#F59E0B" /> },
+  { id: 'structure', title: 'Apenas Estrutura', subtitle: 'Não incluir telhas', category: 'Escopo', icon: <Building size={18} color="#10B981" /> }
 ];
 
-export function RoofingCalc({ onBack }: { onBack: () => void }) {
+export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavigate?: (tab: string, param?: string) => void }) {
   const [step, setStep] = useState(0);
 
   // States
@@ -64,9 +64,11 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
       const totalL = l + (beiral * 2);
       
       // Fator multiplicador de inclinação média
-      let inclFactor = 1.05; // ~30% inclinação (Cerâmica, Concreto, Shingle)
+      const INCLINATION_FACTOR_HIGH = 1.05;
+      const INCLINATION_FACTOR_LOW = 1.01;
+      let inclFactor = INCLINATION_FACTOR_HIGH; // ~30% inclinação (Cerâmica, Concreto, Shingle)
       if (tileType?.id === 'fibrocimento' || tileType?.id === 'termoacustica') {
-        inclFactor = 1.01; // ~10% inclinação
+        inclFactor = INCLINATION_FACTOR_LOW; // ~10% inclinação
       }
       
       roofArea = (totalW * totalL) * inclFactor;
@@ -75,6 +77,20 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
   };
 
   const calculateResults = () => {
+    // Constants
+    const CONCRETO_YIELD_UN_M2 = 10.5;
+    const RIDGE_TILES_PER_M_CERAMIC = 3;
+    const RIDGE_TILES_PER_M_OTHER = 1;
+    const FIXATION_KIT_M2 = 4;
+    const FIXATION_KIT_UN = 2;
+    const PREGOS_KG_M2_HEAVY = 0.15;
+    const PREGOS_KG_M2_SHINGLE = 0.20;
+    const PREGOS_KG_M2_LIGHT = 0.05;
+    const SHINGLE_VIGA_ML_M2 = 1.0;
+    const SHINGLE_CAIBRO_ML_M2 = 2.5;
+    const SHINGLE_OSB_AREA_M2 = 2.88;
+    const LIGHT_VIGA_ML_M2 = 1.5;
+
     const roofArea = netAreaCalc();
     const loss = 1 + ((parseFloat(lossRate) || 0) / 100);
     const areaWithLoss = roofArea * loss;
@@ -96,7 +112,7 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
 
       switch(tileType?.id) {
         case 'ceramica': yieldUn = Coefficients.roof.tiles.ceramic.yieldUnPerM2; tileName = 'Telha Cerâmica'; break;
-        case 'concreto': yieldUn = 10.5; tileName = 'Telha de Concreto'; break;
+        case 'concreto': yieldUn = CONCRETO_YIELD_UN_M2; tileName = 'Telha de Concreto'; break;
         case 'fibrocimento': yieldUn = Coefficients.roof.tiles.fibrocement.yieldUnPerM2; tileName = 'Telha Fibrocimento 2.44x1.10m'; break; // ~0.4 chapas por m2
         case 'termoacustica': yieldUn = 1; tileName = 'Telha Termoacústica'; isM2 = true; unit = 'm²'; break;
         case 'shingle': yieldUn = 1; tileName = 'Pacote Telha Shingle'; isM2 = true; unit = 'm²'; break; // Vende por pacote que faz X m2
@@ -112,16 +128,16 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
         
         let ridgeTiles = 0;
         if (tileType?.id === 'ceramica' || tileType?.id === 'concreto') {
-          ridgeTiles = Math.ceil(maxDim * 3 * loss); // ~3 por metro linear
+          ridgeTiles = Math.ceil(maxDim * RIDGE_TILES_PER_M_CERAMIC * loss);
         } else {
-          ridgeTiles = Math.ceil(maxDim * 1 * loss); // Peças maiores (1m)
+          ridgeTiles = Math.ceil(maxDim * RIDGE_TILES_PER_M_OTHER * loss);
         }
         materials.push({ name: 'Cumeeiras', quantity: ridgeTiles, unit: 'und' });
       }
 
       // Fixação
       if (tileType?.id === 'fibrocimento' || tileType?.id === 'termoacustica') {
-        materials.push({ name: 'Kit Fixação (Parafuso)', quantity: Math.ceil(totalTiles * (isM2 ? 4 : 2)), unit: 'unid.' });
+        materials.push({ name: 'Kit Fixação (Parafuso)', quantity: Math.ceil(totalTiles * (isM2 ? FIXATION_KIT_M2 : FIXATION_KIT_UN)), unit: 'unid.' });
       }
     }
 
@@ -137,18 +153,18 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
         vigaMl = Math.ceil(areaWithLoss * Coefficients.roof.wood.vigaMlPerM2);
         caibroMl = Math.ceil(areaWithLoss * Coefficients.roof.wood.caibroMlPerM2);
         ripaMl = Math.ceil(areaWithLoss * Coefficients.roof.wood.ripaMlPerM2);
-        pregosKg = Math.ceil(areaWithLoss * 0.15); // 150g por m2
+        pregosKg = Math.ceil(areaWithLoss * PREGOS_KG_M2_HEAVY);
       } else if (tileType?.id === 'shingle') {
         // Shingle usa OSB/Compensado
-        vigaMl = Math.ceil(areaWithLoss * 1.0);
-        caibroMl = Math.ceil(areaWithLoss * 2.5);
-        materials.push({ name: 'Chapas OSB/Compensado (15mm)', quantity: Math.ceil(areaWithLoss / 2.88), unit: 'chapas' });
+        vigaMl = Math.ceil(areaWithLoss * SHINGLE_VIGA_ML_M2);
+        caibroMl = Math.ceil(areaWithLoss * SHINGLE_CAIBRO_ML_M2);
+        materials.push({ name: 'Chapas OSB/Compensado (15mm)', quantity: Math.ceil(areaWithLoss / SHINGLE_OSB_AREA_M2), unit: 'chapas' });
         materials.push({ name: 'Subcobertura Asfáltica', quantity: Math.ceil(areaWithLoss), unit: 'm²' });
-        pregosKg = Math.ceil(areaWithLoss * 0.20);
+        pregosKg = Math.ceil(areaWithLoss * PREGOS_KG_M2_SHINGLE);
       } else {
         // Estrutura leve (termoacustica, fibrocimento)
-        vigaMl = Math.ceil(areaWithLoss * 1.5); // Apenas terças/vigas espaçadas
-        pregosKg = Math.ceil(areaWithLoss * 0.05);
+        vigaMl = Math.ceil(areaWithLoss * LIGHT_VIGA_ML_M2); // Apenas terças/vigas espaçadas
+        pregosKg = Math.ceil(areaWithLoss * PREGOS_KG_M2_LIGHT);
       }
 
       if (vigaMl > 0) materials.push({ name: 'Vigas / Terças (Madeira ou Perfil Metálico)', quantity: vigaMl, unit: 'ml' });
@@ -214,17 +230,17 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'area' ? (
             <div className="input-group">
               <label>Área em Planta (m²)</label>
-              <input type="number" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 50" />
+              <input type="number" className="input-premium" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 50" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Comprimento Externo (m)</label>
-                <input type="number" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 10" />
+                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 10" />
               </div>
               <div className="input-group">
                 <label>Largura Externa (m)</label>
-                <input type="number" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 5" />
+                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 5" />
               </div>
             </>
           )}
@@ -238,10 +254,10 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <button onClick={() => { setHasEaves(true); handleNext(); }} className={hasEaves === true ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 20, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasEaves === true ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasEaves === true ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasEaves === true ? 'var(--color-primary)' : 'var(--text-main)' }}>
+            <button onClick={() => { setHasEaves(true); handleNext(); }} className={hasEaves === true ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 24, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasEaves === true ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasEaves === true ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasEaves === true ? 'var(--color-primary)' : 'var(--text-main)' }}>
               Sim
             </button>
-            <button onClick={() => { setHasEaves(false); handleNext(); }} className={hasEaves === false ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 20, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasEaves === false ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasEaves === false ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasEaves === false ? 'var(--color-primary)' : 'var(--text-main)' }}>
+            <button onClick={() => { setHasEaves(false); handleNext(); }} className={hasEaves === false ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 24, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasEaves === false ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasEaves === false ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasEaves === false ? 'var(--color-primary)' : 'var(--text-main)' }}>
               Não
             </button>
           </div>
@@ -262,7 +278,7 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
       content: (
         <div className="input-group">
           <label>Tamanho do beiral (m)</label>
-          <input type="number" value={eaves} onChange={e => setEaves(e.target.value)} placeholder="Ex: 0.60" step="0.1" />
+          <input type="number" className="input-premium" value={eaves} onChange={e => setEaves(e.target.value)} placeholder="Ex: 0.60" step="0.1" />
         </div>
       ),
       isValid: parseFloat(eaves) > 0
@@ -300,7 +316,7 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Perda (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -321,6 +337,7 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
         title="Assistente de Cobertura"
         description="Cálculo detalhado de telhas e estrutura do telhado."
         icon={<Home size={24} />}
+        structuralWarning={true}
         onBack={() => setShowResults(false)}
         results={{
           mainMetrics: metrics,
@@ -346,6 +363,8 @@ export function RoofingCalc({ onBack }: { onBack: () => void }) {
       onPrev={handlePrev}
       onCancel={onBack}
       onFinish={() => setShowResults(true)}
+      guideId="telhado"
+      onOpenGuide={onNavigate ? (id) => onNavigate('central-tecnica', id) : undefined}
     />
   );
 }

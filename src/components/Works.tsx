@@ -1,67 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   MapPin, 
   Plus,
   MoreVertical,
   Briefcase
 } from 'lucide-react';
-import { EmptyState3D } from './EmptyState3D';
+import { EmptyState } from './EmptyState';
 import { NewWorkModal } from './NewWorkModal';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../lib/firebase';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { useWorks } from '../contexts/WorksContext';
 
 interface WorksProps {
   onWorkSelect: (id: string | null) => void;
 }
 
 export function Works({ onWorkSelect }: WorksProps) {
-  const { user, isGuest } = useAuth();
-  const [works, setWorks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { works, isLoadingWorks: loading } = useWorks();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
 
-  useEffect(() => {
-    if (!user || isGuest) {
-      setWorks([]);
-      setLoading(false);
-      return;
-    }
-
-    const q = query(
-      collection(db, 'works'),
-      where('userId', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const worksData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setWorks(worksData);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching works:", error);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user, isGuest]);
-
   const filteredWorks = works.filter(w => {
     if (filter === 'all') return true;
-    if (filter === 'ongoing') return w.progress < 100;
-    if (filter === 'completed') return w.progress === 100;
+    const progress = w.progress || 0;
+    if (filter === 'ongoing') return progress < 100;
+    if (filter === 'completed') return progress === 100;
     return true;
   });
 
   return (
-    <div className="screen-content animate-fade-in" style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, gap: 24, paddingBottom: 100 }}>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 0 20px' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-main)' }}>Obras</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn-primary" style={{ padding: '0 16px', height: 40, borderRadius: 12 }} onClick={() => setIsModalOpen(true)}>
@@ -79,7 +48,7 @@ export function Works({ onWorkSelect }: WorksProps) {
         </div>
       ) : works.length === 0 ? (
         <div style={{ marginTop: 32 }}>
-          <EmptyState3D 
+          <EmptyState 
             icon={<Briefcase size={40} />}
             title="Nenhuma obra iniciada"
             description="Você ainda não possui obras cadastradas. Adicione seu primeiro projeto para começar a gerenciar custos e cronograma."
@@ -91,24 +60,24 @@ export function Works({ onWorkSelect }: WorksProps) {
         <>
           {/* Tabs */}
           <div style={{ display: 'flex', gap: 12, borderBottom: '1px solid var(--border-subtle)', paddingBottom: 16 }}>
-            <div 
+            <button 
               onClick={() => setFilter('all')}
-              style={{ fontSize: 14, cursor: 'pointer', fontWeight: filter === 'all' ? 700 : 600, color: filter === 'all' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: filter === 'all' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 4 }}
+              style={{ background: 'none', border: 'none', fontSize: 14, cursor: 'pointer', fontWeight: filter === 'all' ? 700 : 600, color: filter === 'all' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: filter === 'all' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 4 }}
             >
               Todas ({works.length})
-            </div>
-            <div 
+            </button>
+            <button 
               onClick={() => setFilter('ongoing')}
-              style={{ fontSize: 14, cursor: 'pointer', fontWeight: filter === 'ongoing' ? 700 : 600, color: filter === 'ongoing' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: filter === 'ongoing' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 4 }}
+              style={{ background: 'none', border: 'none', fontSize: 14, cursor: 'pointer', fontWeight: filter === 'ongoing' ? 700 : 600, color: filter === 'ongoing' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: filter === 'ongoing' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 4 }}
             >
               Em Andamento
-            </div>
-            <div 
+            </button>
+            <button 
               onClick={() => setFilter('completed')}
-              style={{ fontSize: 14, cursor: 'pointer', fontWeight: filter === 'completed' ? 700 : 600, color: filter === 'completed' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: filter === 'completed' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 4 }}
+              style={{ background: 'none', border: 'none', fontSize: 14, cursor: 'pointer', fontWeight: filter === 'completed' ? 700 : 600, color: filter === 'completed' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: filter === 'completed' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 4 }}
             >
               Concluídas
-            </div>
+            </button>
           </div>
 
           {/* List of Works */}
@@ -130,7 +99,7 @@ export function Works({ onWorkSelect }: WorksProps) {
                   
                   <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFF' }}>{work.name}</h3>
-                    <span className={`status-chip ${work.progress === 100 ? 'status-active' : work.progress > 50 ? 'status-warning' : 'status-danger'}`} style={{ backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', color: '#FFF' }}>
+                    <span className={`status-chip ${(work.progress || 0) === 100 ? 'status-active' : (work.progress || 0) > 50 ? 'status-warning' : 'status-danger'}`} style={{ backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', color: '#FFF' }}>
                       {work.status}
                     </span>
                   </div>
@@ -146,7 +115,9 @@ export function Works({ onWorkSelect }: WorksProps) {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
                     <div>
                       <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Orçamento</p>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{work.budget || 'N/A'}</p>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>
+                        {typeof work.budget === 'number' ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(work.budget) : (work.budget || 'N/A')}
+                      </p>
                     </div>
                     <div>
                       <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Prazo Final</p>
@@ -157,11 +128,35 @@ export function Works({ onWorkSelect }: WorksProps) {
                   {/* Progress */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>
-                      <span>Progresso</span>
+                      <span>
+                        {(() => {
+                          const p = work.progress || 0;
+                          if (p === 0) return 'Planejamento';
+                          if (p <= 25) return 'Fundação';
+                          if (p <= 60) return 'Estrutura';
+                          if (p < 100) return 'Acabamento';
+                          return 'Concluída';
+                        })()}
+                      </span>
                       <span>{work.progress || 0}%</span>
                     </div>
-                    <div style={{ height: 6, backgroundColor: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{ width: `${work.progress || 0}%`, height: '100%', backgroundColor: work.progress === 100 ? 'var(--color-success)' : 'var(--color-primary)', borderRadius: 3, transition: 'width 1s ease-out' }} />
+                    <div style={{ display: 'flex', gap: 4, height: 6 }}>
+                      {/* Foundation block (0-25%) */}
+                      <div style={{ flex: 25, backgroundColor: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(100, Math.max(0, ((work.progress || 0) / 25) * 100))}%`, height: '100%', backgroundColor: '#8B5CF6', transition: 'width 1s ease-out' }} />
+                      </div>
+                      {/* Structure block (25-60%) */}
+                      <div style={{ flex: 35, backgroundColor: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(100, Math.max(0, (((work.progress || 0) - 25) / 35) * 100))}%`, height: '100%', backgroundColor: '#3B82F6', transition: 'width 1s ease-out' }} />
+                      </div>
+                      {/* Finishing block (60-99%) */}
+                      <div style={{ flex: 39, backgroundColor: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(100, Math.max(0, (((work.progress || 0) - 60) / 39) * 100))}%`, height: '100%', backgroundColor: '#F59E0B', transition: 'width 1s ease-out' }} />
+                      </div>
+                      {/* Final block (100%) */}
+                      <div style={{ flex: 1, backgroundColor: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: (work.progress || 0) === 100 ? '100%' : '0%', height: '100%', backgroundColor: '#10B981', transition: 'width 1s ease-out' }} />
+                      </div>
                     </div>
                   </div>
                 </div>

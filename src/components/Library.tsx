@@ -35,10 +35,24 @@ export const Library: React.FC = () => {
 
   const handleDownload = (id: string) => {
     setDownloadingId(id);
-    // Simulate network download
     setTimeout(() => {
       setDownloadingId(null);
+      const link = document.createElement('a');
+      link.href = 'data:application/pdf;base64,JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nDPQM1Qo5ypUMFAwALJMLU31jBQsTAz1LBSKikBkzIKRhYGhgYGBuQGQZGxkaGZsYWBiZmZhZmQAAAMhAqkKZW5kc3RyZWFtCmVuZG9iagozIDAgb2JqCjQ4CmVuZG9iago0IDAgb2JqCjw8L1R5cGUvUGFnZS9NZWRpYUJveFswIDAgNTk1IDg0Ml0vUmVzb3VyY2VzPDwvRm9udDw8L0YxIDEgMCBSPj4+Pi9Db250ZW50cyAyIDAgUi9QYXJlbnQgNSAwIFI+PgplbmRvYmoKMSAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9IZWx2ZXRpY2E+PgplbmRvYmoKNSAwIG9iago8PC9UeXBlL0VnZXMvS2lkc1s0IDAgUl0vQ291bnQgMT4+CmVuZG9iago2IDAgb2JqCjw8L1R5cGUvQ2F0YWxvZy9QYWdlcyA1IDAgUj4+CmVuZG9iago3IDAgb2JqCjw8L1Byb2R1Y2VyKEdob3N0c2NyaXB0IDkuNTMpL0NyZWF0aW9uRGF0ZShEOjIwMjEwOTA1MjIyMzA0WikvTW9kRGF0ZShEOjIwMjEwOTA1MjIyMzA0Wik+PgplbmRvYmoKeHJlZgowIDgKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMjQ5IDAwMDAwIG4gCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDExMCAwMDAwMCBuIAowMDAwMDAwMTI5IDAwMDAwIG4gCjAwMDAwMDAzMzcgMDAwMDAgbiAKMDAwMDAwMDM5NCAwMDAwMCBuIAowMDAwMDAwNDQzIDAwMDAwIG4gCnRyYWlsZXIKPDwvU2l6ZSA4L1Jvb3QgNiAwIFIvSW5mbyA3IDAgUj4+CnN0YXJ0eHJlZgo1NjgKJSVFT0YK';
+      link.download = `Documento_${id}.pdf`;
+      link.click();
     }, 1500);
+  };
+
+  const handleDownloadAll = () => {
+    setDownloadingId('all');
+    setTimeout(() => {
+      setDownloadingId(null);
+      const link = document.createElement('a');
+      link.href = 'data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA=='; // Empty zip
+      link.download = `Pacote_Normas_CentralObra.zip`;
+      link.click();
+    }, 2000);
   };
 
   const toggleBookmark = (id: string) => {
@@ -54,17 +68,27 @@ export const Library: React.FC = () => {
           <p className="text-xs text-muted">Acesse normas, manuais e guias de segurança na palma da mão.</p>
         </div>
 
-        {/* Search Bar */}
-        <div style={{ position: 'relative' }}>
-          <Search size={18} className="text-muted" style={{ position: 'absolute', left: 16, top: 13 }} />
-          <input 
-            type="text" 
-            placeholder="Pesquisar por NBR, NR ou termo..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-field" 
-            style={{ paddingLeft: 44, borderRadius: 24, backgroundColor: 'var(--bg-surface-hover)' }} 
-          />
+        {/* Search Bar and Download All */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={18} className="text-muted" style={{ position: 'absolute', left: 16, top: 13 }} />
+            <input 
+              type="text" 
+              placeholder="Pesquisar por NBR, NR ou termo..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input-field" 
+              style={{ paddingLeft: 44, borderRadius: 24, backgroundColor: 'var(--bg-surface-hover)' }} 
+            />
+          </div>
+          <button 
+            onClick={handleDownloadAll}
+            disabled={downloadingId === 'all'}
+            className="btn-primary"
+            style={{ padding: '12px 16px', borderRadius: 24, display: 'flex', justifyContent: 'center', gap: 8, fontSize: 14, backgroundColor: 'var(--color-primary-dark)' }}
+          >
+            {downloadingId === 'all' ? 'Preparando Pacote ZIP...' : <><Download size={18} /> Baixar Pacote Completo (.ZIP)</>}
+          </button>
         </div>
       </div>
 

@@ -111,7 +111,7 @@ export function AppSettings({ onBack }: { onBack: () => void }) {
             <div style={{ width: 64, height: 64, borderRadius: 16, backgroundColor: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)' }}>
               <Info size={32} color="#FFF" />
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>Central da Obra</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>CentralObra</h3>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>Versão 1.0.0 Premium</p>
             
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>

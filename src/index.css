@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap');
 @import './styles/landing.css';
 
 
@@ -7,8 +7,9 @@
   /* Dark Mode Default (Premium Dark) */
   --bg-base: #0B0B0B;
   --bg-surface: #1A1A1A;
-  --bg-glass: rgba(26, 26, 26, 0.75);
-  --bg-elevated: #262626;
+  --bg-surface-solid: #222222;
+  --bg-glass: rgba(26, 26, 26, 0.95);
+  --bg-elevated: #2A2A2A;
   
   --color-primary: #FF6B00;
   --color-primary-hover: #E66000;
@@ -40,7 +41,8 @@
 [data-theme='light'] {
   --bg-base: #F7F8F9;
   --bg-surface: #FFFFFF;
-  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-surface-solid: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.95);
   --bg-elevated: #F0F2F4;
   
   --color-primary: #FF6B00;
@@ -71,24 +73,29 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
+  max-width: 100vw;
   overflow-x: hidden;
   background-color: var(--bg-base);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overscroll-behavior-y: none;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: column;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  letter-spacing: -0.02em;
+  font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   margin: 0;
 }
 
@@ -100,6 +107,8 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   overflow: hidden;
   position: relative;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 .main-content {
@@ -113,7 +122,10 @@ h1, h2, h3, h4, h5, h6 {
 .screen-content {
   display: flex;
   flex-direction: column;
-  padding-bottom: 96px; /* Space for Bottom Nav */
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 @media (min-width: 769px) {
@@ -145,10 +157,10 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
   border: none;
   color: var(--text-muted);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
+  cursor: poRoboto;
   transition: all 0.2s;
   width: 100%;
 }
@@ -232,7 +244,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 0; left: 0; right: 0;
   height: 100%;
   background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
-  pointer-events: none;
+  poRoboto-events: none;
 }
 
 .text-3d {
@@ -242,16 +254,16 @@ h1, h2, h3, h4, h5, h6 {
     0px 4px 4px rgba(0, 0, 0, 0.2);
 }
 
-.card-premium-interactive {
+.card-premium-Robotoactive {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.card-premium-interactive:hover {
+.card-premium-Robotoactive:hover {
   transform: translateY(-4px) scale(1.02);
   border-color: var(--border-strong);
-  cursor: pointer;
+  cursor: poRoboto;
   box-shadow: 0 16px 40px rgba(0,0,0,0.2);
 }
-.card-premium-interactive:active {
+.card-premium-Robotoactive:active {
   transform: scale(0.95) translateY(0);
 }
 
@@ -259,7 +271,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary {
   background-color: var(--color-primary);
   color: var(--text-inverse);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-weight: 600;
   font-size: 16px;
   border-radius: 16px;
@@ -271,7 +283,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease, background-color 0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -311,7 +323,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-secondary {
   background-color: transparent;
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-weight: 600;
   font-size: 16px;
   border-radius: 16px;
@@ -323,7 +335,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-secondary:hover {
@@ -353,7 +365,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background-color 0.2s ease;
 }
 
 .btn-icon:hover {
@@ -374,7 +386,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 16px 12px;
   border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
 }
 .btn-action:hover {
   transform: translateY(-2px);
@@ -413,7 +425,7 @@ h1, h2, h3, h4, h5, h6 {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px; /* larger touch area */
+  height: calc(80px + env(safe-area-inset-bottom, 0px));
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -429,6 +441,26 @@ h1, h2, h3, h4, h5, h6 {
   .bottom-nav { display: none; }
 }
 
+.wizard-footer {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background-color: var(--bg-base);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 40;
+}
+
+@media (min-width: 769px) {
+  .wizard-footer {
+    bottom: 0;
+  }
+}
+
 .nav-item {
   display: flex;
   flex-direction: column;
@@ -441,14 +473,17 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.2s ease;
   min-width: 0;
+}
+.nav-item:active {
+  transform: scale(0.95);
 }
 
 .nav-item span {
   font-size: 11px;
   font-weight: 500;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .nav-item.active {
@@ -458,6 +493,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-item.active .nav-icon-container {
   background-color: var(--color-primary-alpha);
   color: var(--color-primary);
+  transform: scale(1.15);
 }
 
 .nav-icon-container {
@@ -467,10 +503,23 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 .input-premium {
   width: 100%;
   height: 56px;
@@ -481,9 +530,9 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 16px;
   padding: 0 16px;
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .input-premium:hover {
@@ -509,10 +558,10 @@ h1, h2, h3, h4, h5, h6 {
   scrollbar-width: none;
 }
 .animate-fade-in {
-  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.4s cubic-bezier(0.2, 0, 0, 1) both;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -537,7 +586,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 200%;
   height: 200%;
   background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1), transparent 60%);
-  pointer-events: none;
+  poRoboto-events: none;
 }
 
 /* Horizontal Scroll (Swimlanes) */

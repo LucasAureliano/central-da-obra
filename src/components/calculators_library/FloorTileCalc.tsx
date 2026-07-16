@@ -3,30 +3,30 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Grid3X3, Info } from 'lucide-react';
+import { Grid3X3, Info, Grid, Square, Maximize, PaintBucket } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 const tileOptions: SelectOption[] = [
-  { id: 'ceramica', title: 'Cerâmica', subtitle: 'Piso cerâmico comum', category: 'Frios', isFavorite: true },
-  { id: 'porcelanato', title: 'Porcelanato', subtitle: 'Piso de alta resistência e acabamento', category: 'Frios', isFavorite: true },
-  { id: 'vinilico', title: 'Piso Vinílico', subtitle: 'Em manta ou régua', category: 'Quentes', isRecent: true },
-  { id: 'laminado', title: 'Piso Laminado', subtitle: 'Madeira processada', category: 'Quentes' },
-  { id: 'granito', title: 'Granito', subtitle: 'Pedra natural', category: 'Pedras Naturais' },
-  { id: 'marmore', title: 'Mármore', subtitle: 'Pedra nobre', category: 'Pedras Naturais' },
-  { id: 'fulget', title: 'Fulget', subtitle: 'Granilha lavada', category: 'Especiais' },
-  { id: 'cimento', title: 'Cimento Queimado', subtitle: 'Acabamento rústico', category: 'Especiais' },
-  { id: 'pedra', title: 'Pedra Miracema/São Tomé', subtitle: 'Pedras rústicas externas', category: 'Pedras Naturais' },
+  { id: 'ceramica', title: 'Cerâmica', subtitle: 'Piso cerâmico comum', category: 'Frios', isFavorite: true, icon: <Grid size={18} color="#8B5CF6" /> },
+  { id: 'porcelanato', title: 'Porcelanato', subtitle: 'Piso de alta resistência e acabamento', category: 'Frios', isFavorite: true, icon: <Grid3X3 size={18} color="#3B82F6" /> },
+  { id: 'vinilico', title: 'Piso Vinílico', subtitle: 'Em manta ou régua', category: 'Quentes', isRecent: true, icon: <Square size={18} color="#F59E0B" /> },
+  { id: 'laminado', title: 'Piso Laminado', subtitle: 'Madeira processada', category: 'Quentes', icon: <Square size={18} color="#F97316" /> },
+  { id: 'granito', title: 'Granito', subtitle: 'Pedra natural', category: 'Pedras Naturais', icon: <Grid size={18} color="#64748B" /> },
+  { id: 'marmore', title: 'Mármore', subtitle: 'Pedra nobre', category: 'Pedras Naturais', icon: <Grid size={18} color="#475569" /> },
+  { id: 'fulget', title: 'Fulget', subtitle: 'Granilha lavada', category: 'Especiais', icon: <Grid size={18} color="#10B981" /> },
+  { id: 'cimento', title: 'Cimento Queimado', subtitle: 'Acabamento rústico', category: 'Especiais', icon: <PaintBucket size={18} color="#6B7280" /> },
+  { id: 'pedra', title: 'Pedra Miracema/São Tomé', subtitle: 'Pedras rústicas externas', category: 'Pedras Naturais', icon: <Grid size={18} color="#94A3B8" /> },
 ];
 
 const sizeOptions: SelectOption[] = [
-  { id: '60x60', title: '60 × 60 cm', category: 'Comuns', isFavorite: true },
-  { id: '80x80', title: '80 × 80 cm', category: 'Comuns', isFavorite: true },
-  { id: '90x90', title: '90 × 90 cm', category: 'Grandes Formatos' },
-  { id: '120x120', title: '120 × 120 cm', category: 'Grandes Formatos' },
-  { id: '20x120', title: '20 × 120 cm (Régua)', category: 'Amadeirados' },
-  { id: '30x30', title: '30 × 30 cm', category: 'Pequenos' }
+  { id: '60x60', title: '60 × 60 cm', category: 'Comuns', isFavorite: true, icon: <Maximize size={18} color="#3B82F6" /> },
+  { id: '80x80', title: '80 × 80 cm', category: 'Comuns', isFavorite: true, icon: <Maximize size={18} color="#3B82F6" /> },
+  { id: '90x90', title: '90 × 90 cm', category: 'Grandes Formatos', icon: <Maximize size={18} color="#10B981" /> },
+  { id: '120x120', title: '120 × 120 cm', category: 'Grandes Formatos', icon: <Maximize size={18} color="#10B981" /> },
+  { id: '20x120', title: '20 × 120 cm (Régua)', category: 'Amadeirados', icon: <Maximize size={18} color="#F59E0B" /> },
+  { id: '30x30', title: '30 × 30 cm', category: 'Pequenos', icon: <Maximize size={18} color="#8B5CF6" /> }
 ];
 
 export function FloorTileCalc({ onBack }: { onBack: () => void }) {
@@ -177,17 +177,17 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'area' ? (
             <div className="input-group">
               <label>Área Total (m²)</label>
-              <input type="number" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 50" />
+              <input type="number" className="input-premium" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 50" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Comprimento (m)</label>
-                <input type="number" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 5" />
+                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 5" />
               </div>
               <div className="input-group">
                 <label>Largura (m)</label>
-                <input type="number" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 4" />
+                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 4" />
               </div>
             </>
           )}
@@ -231,11 +231,11 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16, padding: 16, backgroundColor: 'var(--bg-surface)', borderRadius: 16 }}>
               <div className="input-group">
                 <label>Largura (cm)</label>
-                <input type="number" value={customTileW} onChange={e => setCustomTileW(e.target.value)} placeholder="Ex: 15" />
+                <input type="number" className="input-premium" value={customTileW} onChange={e => setCustomTileW(e.target.value)} placeholder="Ex: 15" />
               </div>
               <div className="input-group">
                 <label>Comprimento (cm)</label>
-                <input type="number" value={customTileL} onChange={e => setCustomTileL(e.target.value)} placeholder="Ex: 90" />
+                <input type="number" className="input-premium" value={customTileL} onChange={e => setCustomTileL(e.target.value)} placeholder="Ex: 90" />
               </div>
             </div>
           )}
@@ -294,11 +294,11 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16, backgroundColor: 'var(--bg-surface)', padding: 16, borderRadius: 16 }}>
               <div className="input-group">
                 <label>Altura do rodapé (cm)</label>
-                <input type="number" value={skirtHeight} onChange={e => setSkirtHeight(e.target.value)} placeholder="10" />
+                <input type="number" className="input-premium" value={skirtHeight} onChange={e => setSkirtHeight(e.target.value)} placeholder="10" />
               </div>
               <div className="input-group">
                 <label>Comprimento do rodapé (m) - Opcional</label>
-                <input type="number" value={skirtLength} onChange={e => setSkirtLength(e.target.value)} placeholder="Deixe em branco para aprox." />
+                <input type="number" className="input-premium" value={skirtLength} onChange={e => setSkirtLength(e.target.value)} placeholder="Deixe em branco para aprox." />
                 <span style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Se vazio, o sistema estimará o perímetro.</span>
               </div>
             </div>
@@ -332,7 +332,7 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
           <div className="input-group">
             <label>Tamanho da Junta de Dilatação (mm)</label>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 8 }}>Exemplo: 2mm para porcelanato retificado, 5mm para cerâmica comum.</p>
-            <input type="number" value={groutJoint} onChange={e => setGroutJoint(e.target.value)} placeholder="Ex: 2" />
+            <input type="number" className="input-premium" value={groutJoint} onChange={e => setGroutJoint(e.target.value)} placeholder="Ex: 2" />
           </div>
         </div>
       ),
@@ -345,7 +345,7 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Perda/Recorte (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />

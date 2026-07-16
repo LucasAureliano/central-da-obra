@@ -75,7 +75,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onFinishOnboarding }) =>
             <HardHat size={28} className="text-primary" />
           </div>
           <h2 className="text-2xl font-bold">Bem-vindo de volta</h2>
-          <p className="text-sm text-muted">Acesse seu painel da Central da Obra</p>
+          <p className="text-sm text-muted">Acesse seu painel do CentralObra</p>
         </div>
 
         <form onSubmit={(e) => { e.preventDefault(); setStep('profile-select'); }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

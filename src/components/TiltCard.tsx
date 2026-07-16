@@ -54,9 +54,10 @@ export function TiltCard({ children, onClick, style, className }: TiltCardProps)
           height: '100%',
           borderRadius: style?.borderRadius || 24,
         }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.02, boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}
+        whileTap={{ scale: 0.97, boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}
         className="glass-panel card-premium-interactive"
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
       >
         <div style={{ transform: "translateZ(30px)", width: '100%', height: '100%', padding: style?.padding }}>
           {children}

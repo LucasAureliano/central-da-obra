@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { BaseCalculatorLayout, type CalcResultItem, type CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
-import { Sparkles, Layers } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { InputMethodSelector } from './InputMethodSelector';
+import { WizardEngine, type WizardStep } from './WizardEngine';
 
 export function IsolatedFootingCalc({ onBack }: { onBack: () => void }) {
+  const [step, setStep] = useState(0);
+
   const [method, setMethod] = useState<'dimensions'|'direct'>('dimensions');
   const [w, setW] = useState('');
   const [l, setL] = useState('');
@@ -12,7 +15,11 @@ export function IsolatedFootingCalc({ onBack }: { onBack: () => void }) {
   const [directVol, setDirectVol] = useState('');
   const [qty, setQty] = useState('1');
   
+  const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<any>(null);
+
+  const handleNext = () => setStep(s => s + 1);
+  const handlePrev = () => setStep(s => s - 1);
 
   const calculate = () => {
     let singleVolume = 0;
@@ -22,27 +29,21 @@ export function IsolatedFootingCalc({ onBack }: { onBack: () => void }) {
       const width = parseFloat(w) || 0;
       const length = parseFloat(l) || 0;
       const height = parseFloat(h) || 0;
-      if (width === 0 || length === 0 || height === 0) return;
       
       singleVolume = width * length * height;
       singleFormArea = (width + length) * 2 * height;
     } else {
       singleVolume = parseFloat(directVol) || 0;
-      // Aproximação conservadora para área de fôrma se temos apenas o volume
       singleFormArea = Coefficients.structure.woodFormSqMPerM3 * singleVolume;
     }
-
-    if (singleVolume <= 0) return;
 
     const count = parseInt(qty) || 1;
     const totalVolume = singleVolume * count;
     const totalFormArea = singleFormArea * count;
     
-    // Perda padrão do concreto
     const volWithLoss = totalVolume * Coefficients.losses.concrete;
     const totalSteel = volWithLoss * Coefficients.structure.steelKgPerM3;
 
-    // Calcular materiais básicos para o concreto (traço 25MPa padrão)
     const ratio = Coefficients.concrete.mixes['25'];
     const cement = Math.ceil(volWithLoss * ratio.cement);
     const sand = (volWithLoss * ratio.sand).toFixed(2);
@@ -71,61 +72,104 @@ export function IsolatedFootingCalc({ onBack }: { onBack: () => void }) {
         `Taxa de aço estimada: ${Coefficients.structure.steelKgPerM3}kg/m³.`
       ]
     });
+    
+    setShowResults(true);
   };
 
-  return (
-    <BaseCalculatorLayout
-      title="Sapata Isolada"
-      description="Calcule escavação, fôrma, concreto e aço para fundações diretas."
-      icon={<Layers size={32} />}
-      tip="A quantidade de aço é uma estimativa baseada em taxas médias (80kg/m³). Siga sempre o projeto estrutural."
-      onBack={onBack}
-      results={results}
-    >
-      <div className="glass-panel" style={{ padding: 20, borderRadius: 24 }}>
+  if (showResults && results) {
+    return (
+      <BaseCalculatorLayout
+        title="Sapata Isolada"
+        description="Fundações diretas"
+        icon={<Layers size={24} />}
+        tip="As taxas de aço são estimativas. Siga o projeto estrutural."
+        structuralWarning={true}
+        onBack={() => setShowResults(false)}
+        results={results}
+      >
+        <div />
+      </BaseCalculatorLayout>
+    );
+  }
+
+  const isDimValid = method === 'direct' || (parseFloat(w) > 0 && parseFloat(l) > 0 && parseFloat(h) > 0);
+  const isVolValid = method === 'dimensions' || parseFloat(directVol) > 0;
+  
+  const steps: WizardStep[] = [
+    {
+      id: 'method',
+      title: 'Método de cálculo',
+      subtitle: 'Como deseja informar os dados da sapata?',
+      isValid: true,
+      content: (
         <InputMethodSelector 
           value={method} 
-          onChange={setMethod} 
-          title="Como deseja informar as medidas de cada sapata?"
+          onChange={m => { setMethod(m); setTimeout(handleNext, 300); }} 
+          title=""
           dimLabel="Informar dimensões (L × C × A)"
           dirLabel="Já possuo o volume (m³)"
         />
-
-        {method === 'dimensions' ? (
-          <>
-            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: 'var(--text-main)' }}>Dimensões de 1 Sapata (Base)</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Largura (m)</label>
-                <input type="number" className="input-premium" value={w} onChange={e => setW(e.target.value)} placeholder="Ex: 0.8" />
+      ),
+      hideNextButton: true
+    },
+    {
+      id: 'dimensions',
+      title: method === 'dimensions' ? 'Dimensões da Sapata' : 'Volume da Sapata',
+      subtitle: 'Informe as medidas de UMA unidade base.',
+      isValid: method === 'dimensions' ? isDimValid : isVolValid,
+      content: (
+        <div>
+          {method === 'dimensions' ? (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Largura (m)</label>
+                  <input type="number" className="input-premium" value={w} onChange={e => setW(e.target.value)} placeholder="0.8" autoFocus />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Comprimento (m)</label>
+                  <input type="number" className="input-premium" value={l} onChange={e => setL(e.target.value)} placeholder="0.8" />
+                </div>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={l} onChange={e => setL(e.target.value)} placeholder="Ex: 0.8" />
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Altura do Rodapé/Base (m)</label>
+                <input type="number" className="input-premium" value={h} onChange={e => setH(e.target.value)} placeholder="0.4" />
               </div>
-            </div>
+            </>
+          ) : (
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Altura do Rodapé/Base (m)</label>
-              <input type="number" className="input-premium" value={h} onChange={e => setH(e.target.value)} placeholder="Ex: 0.4" />
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Volume de 1 Sapata (m³)</label>
+              <input type="number" className="input-premium" value={directVol} onChange={e => setDirectVol(e.target.value)} placeholder="0.25" autoFocus />
             </div>
-          </>
-        ) : (
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Volume de 1 Sapata (m³)</label>
-            <input type="number" className="input-premium" value={directVol} onChange={e => setDirectVol(e.target.value)} placeholder="Ex: 0.25" />
-          </div>
-        )}
-
-        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: 'var(--text-main)' }}>Multiplicador</h3>
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Quantidade de Sapatas Iguais</label>
-          <input type="number" className="input-premium" value={qty} onChange={e => setQty(e.target.value)} placeholder="Ex: 12" />
+          )}
         </div>
+      )
+    },
+    {
+      id: 'qty',
+      title: 'Quantidade',
+      subtitle: 'Quantas sapatas iguais a essa existem no projeto?',
+      isValid: parseInt(qty) > 0,
+      nextLabel: 'Calcular',
+      content: (
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Quantidade de Sapatas</label>
+          <input type="number" className="input-premium" value={qty} onChange={e => setQty(e.target.value)} placeholder="12" autoFocus />
+        </div>
+      )
+    }
+  ];
 
-        <button className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, display: 'flex', justifyContent: 'center', gap: 8 }} onClick={calculate}>
-          <Sparkles size={20} /> Calcular Sapata
-        </button>
-      </div>
-    </BaseCalculatorLayout>
+  return (
+    <WizardEngine
+      title="Cálculo de Sapata"
+      icon={<Layers size={24} />}
+      steps={steps}
+      currentStep={step}
+      onNext={handleNext}
+      onPrev={handlePrev}
+      onCancel={onBack}
+      onFinish={calculate}
+    />
   );
 }

@@ -1,45 +1,53 @@
 import { useState, useEffect } from 'react';
-import { 
-  Home,
-  Sparkles, 
-  Briefcase, 
-  Menu as MenuIcon,
-  X,
-  Search,
-  Bell,
-  Sun,
-  Moon
-} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-
 import { DashboardRouter } from './components/DashboardRouter';
 import { Works } from './components/Works';
 import { WorkDetails } from './components/WorkDetails';
 import { CalculatorLibrary } from './components/calculators_library/CalculatorLibrary';
-import { SmartAssistant } from './components/assistant/SmartAssistant';
-import { Menu } from './components/Menu';
-import { CustomLogo } from './components/CustomLogo';
+import { TechnicalCentral } from './components/library/TechnicalCentral';
+import { InsightsCentral } from './components/insights/InsightsCentral';
+import { Menu as MenuIcon, Home, Briefcase, Calculator, LogIn, X } from 'lucide-react';
 import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
 import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
-import { Contacts } from './components/Contacts';
 import { Shopping } from './components/Shopping';
 import { Finance } from './components/Finance';
+import { Menu } from './components/Menu';
+import { CustomLogo } from './components/CustomLogo';
+import { CalculatorsWizard } from './components/calculators_library/CalculatorsWizard';
 import { Profile } from './components/Profile';
+import { Reports } from './components/Reports';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { PlaceholderScreen } from './components/PlaceholderScreen';
+import { SharedWorkView } from './components/SharedWorkView';
+import { CustomToaster } from './components/ui/Toast';
+import { GlobalHeader } from './components/ui/GlobalHeader';
+import { CommercialQuotes } from './components/provider/CommercialQuotes';
+import { ClientsManager } from './components/provider/ClientsManager';
+import { Agenda } from './components/Agenda';
+import { ProjectControl } from './components/architect/ProjectControl';
+import { TechnicalPendings } from './components/architect/TechnicalPendings';
+import { OperationsCenter } from './components/builder/OperationsCenter';
+import { ExecutiveTimeline } from './components/builder/ExecutiveTimeline';
+import { EquipmentControl } from './components/builder/EquipmentControl';
+import { OperationsHR } from './components/builder/OperationsHR';
+import { QuoteWizard } from './components/provider/QuoteWizard';
 
 function App() {
   const { user, profile, loading, isGuest } = useAuth();
-  const { showAuthModal, closeAuthModal, openAuthModal } = useAuthModal();
+  const { showAuthModal, closeAuthModal, openAuthModal, showGuestAlert, closeGuestAlert } = useAuthModal();
   const [activeTab, setActiveTab] = useState('inicio');
+  const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
+  const [activeWizardQuery, setActiveWizardQuery] = useState<string | null>(null);
   const [selectedWorkId, setSelectedWorkId] = useState<string | null>(null);
   const [menuTitle, setMenuTitle] = useState('');
-  const [showSplash, setShowSplash] = useState(true);
+  const [hasShownAppSplash, setHasShownAppSplash] = useState(() => {
+    return sessionStorage.getItem('hasShownAppSplash') === 'true';
+  });
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
   const [forceOnboarding, setForceOnboarding] = useState(false);
 
@@ -47,13 +55,25 @@ function App() {
     return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
   });
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedWorkId = urlParams.get('shared');
+  const isPreview = urlParams.get('preview');
+
+  if (sharedWorkId) {
+    return <SharedWorkView workId={sharedWorkId} theme={theme} />;
+  }
+
+  if (isPreview === 'true') {
+    return <DashboardRouter onNavigate={() => {}} />;
+  }
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
   useEffect(() => {
-    if ((user || isGuest) && showAuthModal) {
+    if (user && !isGuest && showAuthModal) {
       closeAuthModal();
     }
   }, [user, isGuest, showAuthModal, closeAuthModal]);
@@ -62,8 +82,9 @@ function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  if (showSplash || loading) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  if (loading) {
+    // Show a plain background while Firebase restores session
+    return <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-base)' }} />;
   }
 
   // PRE-AUTH FLOW
@@ -112,6 +133,14 @@ function App() {
     );
   }
 
+  // APP ENTRANCE SPLASH SCREEN
+  if (!hasShownAppSplash) {
+    return <SplashScreen onComplete={() => {
+      sessionStorage.setItem('hasShownAppSplash', 'true');
+      setHasShownAppSplash(true);
+    }} />;
+  }
+
   // POST-AUTH ONBOARDING FLOW
   if (user && profile) {
     if (!profile.role) {
@@ -137,12 +166,12 @@ function App() {
   }
 
   const handleMenuSelect = (title: string) => {
-    if (title === 'Assistentes') {
-      setActiveTab('library');
+    if (title === 'Cálculos') {
+      setActiveTab('calculos');
       return;
     }
-    if (title === 'Contatos') {
-      setActiveTab('contatos');
+    if (title === 'Relatórios') {
+      setActiveTab('relatorios');
       return;
     }
     if (title === 'Compras') {
@@ -153,12 +182,67 @@ function App() {
       setActiveTab('financeiro');
       return;
     }
+    if (title === 'Biblioteca & Normas') {
+      setActiveTab('central-tecnica');
+      return;
+    }
     if (title === 'Meu Perfil') {
       setActiveTab('perfil');
       return;
     }
+    if (title === 'Clientes') {
+      setActiveTab('clientes');
+      return;
+    }
+    if (title === 'Orçamentos') {
+      setActiveTab('orcamentos');
+      return;
+    }
+    if (title === 'Agenda') {
+      setActiveTab('agenda-completa');
+      return;
+    }
+    if (title === 'Pendências Técnicas') {
+      setActiveTab('pendencias-tecnicas');
+      return;
+    }
+    if (title === 'Centro de Operações') {
+      setActiveTab('centro-operacoes');
+      return;
+    }
+    if (title === 'Cronograma') {
+      setActiveTab('cronograma-geral');
+      return;
+    }
+    if (title === 'Equipamentos') {
+      setActiveTab('equipamentos');
+      return;
+    }
+    if (title === 'Produtividade & RH') {
+      setActiveTab('rh-produtividade');
+      return;
+    }
+    if (title === 'Novo Orçamento') {
+      setActiveTab('novo-orcamento');
+      return;
+    }
     setMenuTitle(title);
     setActiveTab('placeholder');
+  };
+
+  const handleNavigate = (tab: string, param?: string) => {
+    setActiveTab(tab);
+    if (tab === 'central-tecnica' && param) {
+      setActiveArticleId(param);
+    } else {
+      setActiveArticleId(null);
+    }
+    
+    if (tab === 'calculos' && param) {
+      setActiveWizardQuery(param);
+    } else {
+      setActiveWizardQuery(null);
+    }
   };
 
   const renderContent = () => {
@@ -167,22 +251,36 @@ function App() {
     }
 
     switch(activeTab) {
-      case 'inicio': return <DashboardRouter key="inicio" onNavigate={setActiveTab} />;
+      case 'inicio': return <DashboardRouter key="inicio" onNavigate={handleNavigate} />;
       case 'obras': return <Works key="obras" onWorkSelect={(id) => setSelectedWorkId(id)} />;
-      case 'ferramentas': return <SmartAssistant key="ferramentas" onBack={() => setActiveTab('inicio')} />;
-      case 'library': return <CalculatorLibrary key="library" />;
-      case 'contatos': return <Contacts key="contatos" />;
+      case 'ferramentas': return <CalculatorsWizard key="ferramentas" onNavigate={handleNavigate} initialQuery={activeWizardQuery || undefined} />;
+      case 'calculos': return <CalculatorsWizard key="calculos" onNavigate={handleNavigate} initialQuery={activeWizardQuery || undefined} />;
+      case 'library': return <CalculatorLibrary key="library" onNavigate={handleNavigate} />;
+      case 'insights': return <InsightsCentral key="insights" onBack={() => handleNavigate('inicio')} onNavigate={handleNavigate} />;
+      case 'central-tecnica': return <TechnicalCentral key="central" onNavigate={handleNavigate} initialArticleId={activeArticleId || undefined} />;
+      case 'relatorios': return <Reports key="relatorios" />;
       case 'compras': return <Shopping key="compras" />;
+      case 'orcamentos': return profile?.role === 'service' ? <CommercialQuotes key="orcamentos" /> : <PlaceholderScreen key="orcamentos" title="Orçamentos" onBack={() => handleNavigate('inicio')} />;
+      case 'clientes': return <ClientsManager key="clientes" />;
+      case 'agenda-completa': return <Agenda key="agenda" />;
+      case 'controle-projetos': return <ProjectControl key="projetos" />;
+      case 'pendencias-tecnicas': return <TechnicalPendings key="pendencias" />;
+      case 'centro-operacoes': return <OperationsCenter key="operacoes" />;
+      case 'cronograma-geral': return <ExecutiveTimeline key="cronograma" />;
+      case 'equipamentos': return <EquipmentControl key="equipamentos" />;
+      case 'rh-produtividade': return <OperationsHR key="rh" />;
+      case 'novo-orcamento': return <QuoteWizard key="novo-orcamento" onFinish={() => setActiveTab('orcamentos')} />;
       case 'financeiro': return <Finance key="financeiro" />;
       case 'perfil': return <Profile key="perfil" />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
-      case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => setActiveTab('menu')} />;
-      default: return <DashboardRouter key="default" onNavigate={setActiveTab} />;
+      case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => handleNavigate('menu')} />;
+      default: return <DashboardRouter key="default" onNavigate={handleNavigate} />;
     }
   };
 
   return (
     <div className="app-container">
+      <CustomToaster />
       
       {/* Desktop Sidebar Navigation */}
       <aside className="sidebar-nav glass-panel">
@@ -207,11 +305,11 @@ function App() {
           </button>
 
           <button 
-            className={`nav-item-desktop ${activeTab === 'ferramentas' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ferramentas')}
+            className={`nav-item-desktop ${activeTab === 'calculos' ? 'active' : ''}`}
+            onClick={() => setActiveTab('calculos')}
           >
-            <Sparkles size={20} />
-            <span>Assistente</span>
+            <Calculator size={20} />
+            <span>Cálculos</span>
           </button>
 
           <button 
@@ -247,65 +345,21 @@ function App() {
       </aside>
 
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
-        {/* Global Smart Topbar */}
-        <header 
-          className="mobile-header glass-panel"
-          style={{ display: 'flex', padding: '0 20px', zIndex: 40 }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
-            <div className="desktop-hidden">
-              <CustomLogo theme={theme} />
-            </div>
-            
-            <div className="mobile-hidden" style={{ flex: 1, maxWidth: 400, position: 'relative' }}>
-              <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
-              <input 
-                type="text"
-                placeholder="Pesquisar..."
-                className="input-premium"
-                style={{ height: 44, paddingLeft: 44, borderRadius: 22, fontSize: 14 }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20 }} onClick={toggleTheme}>
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, position: 'relative' }}>
-              <Bell size={18} />
-              {!isGuest && <div style={{ position: 'absolute', top: 0, right: 0, width: 10, height: 10, borderRadius: 5, backgroundColor: 'var(--color-primary)', border: '2px solid var(--bg-base)' }} />}
-            </button>
-            <div style={{ 
-              width: 36, 
-              height: 36, 
-              borderRadius: 18, 
-              backgroundColor: user ? 'var(--color-primary)' : 'var(--bg-glass)',
-              color: user ? '#FFF' : 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: 14,
-              border: '1px solid var(--border-subtle)',
-              cursor: 'pointer'
-            }}
-            onClick={() => setActiveTab('menu')}
-            >
-              {user && user.email ? user.email[0].toUpperCase() : 'U'}
-            </div>
-          </div>
-        </header>
+        <GlobalHeader 
+          theme={theme} 
+          toggleTheme={toggleTheme} 
+          onOpenMenu={() => setActiveTab('menu')} 
+        />
 
         {/* Main Content Area */}
         <main className="main-content hide-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              initial={{ opacity: 0, y: 15, scale: 0.98, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -15, scale: 0.98, filter: 'blur(4px)' }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               style={{ minHeight: '100%' }}
             >
               {renderContent()}
@@ -337,13 +391,13 @@ function App() {
         </button>
 
         <button 
-          className={`nav-item ${activeTab === 'ferramentas' ? 'active' : ''}`}
-          onClick={() => setActiveTab('ferramentas')}
+          className={`nav-item ${activeTab === 'calculos' ? 'active' : ''}`}
+          onClick={() => setActiveTab('calculos')}
         >
           <div className="nav-icon-container">
-            <Sparkles size={22} />
+            <Calculator size={22} />
           </div>
-          <span>Assistente</span>
+          <span>Cálculos</span>
         </button>
 
         <button 
@@ -381,6 +435,66 @@ function App() {
               {authView === 'login' 
                 ? <Login onGoToRegister={() => setAuthView('register')} theme={theme} /> 
                 : <Register onGoToLogin={() => setAuthView('login')} theme={theme} />}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Guest Alert Modal */}
+      <AnimatePresence>
+        {showGuestAlert && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
+          }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="glass-panel"
+              style={{ width: '100%', maxWidth: 400, padding: 24, borderRadius: 24, position: 'relative' }}
+            >
+              <button 
+                onClick={closeGuestAlert}
+                style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+              
+              <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <LogIn size={24} />
+              </div>
+
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
+                Modo Visitante Limitado
+              </h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.5, marginBottom: 24 }}>
+                Você está utilizando a plataforma como visitante. Para salvar projetos, obras e orçamentos de forma definitiva, você precisa criar uma conta gratuita.
+                <br /><br />
+                Deseja criar uma conta ou fazer login agora para ter acesso total?
+              </p>
+              
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button 
+                  onClick={closeGuestAlert}
+                  className="btn-secondary"
+                  style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600 }}
+                >
+                  Continuar
+                </button>
+                <button 
+                  onClick={() => {
+                    closeGuestAlert();
+                    setAuthView('login');
+                    openAuthModal();
+                  }}
+                  className="btn-primary"
+                  style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600 }}
+                >
+                  Fazer Login
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

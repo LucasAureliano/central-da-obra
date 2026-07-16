@@ -3,32 +3,28 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Droplet, Info } from 'lucide-react';
+import { Layers, Frame, Box, HardHat, Droplet, Info, Gauge } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 const concreteElements: SelectOption[] = [
-  { id: 'pilar', title: 'Pilar', category: 'Estrutura Vertical', isFavorite: true },
-  { id: 'viga', title: 'Viga', category: 'Estrutura Horizontal', isFavorite: true },
-  { id: 'laje', title: 'Laje', category: 'Estrutura Horizontal', isFavorite: true },
-  { id: 'radier', title: 'Radier', category: 'Fundação' },
-  { id: 'baldrame', title: 'Baldrame', category: 'Fundação' },
-  { id: 'sapata', title: 'Sapata', category: 'Fundação' },
-  { id: 'bloco', title: 'Bloco de Coroamento', category: 'Fundação' },
-  { id: 'escada', title: 'Escada', category: 'Estrutura Inclinada' },
-  { id: 'piso', title: 'Piso / Contrapiso', category: 'Pavimentação' }
+  { id: 'laje_maciça', title: 'Laje Maciça', subtitle: 'Piso ou teto estrutural', category: 'Lajes', isFavorite: true, icon: <Layers size={18} color="#8B5CF6" /> },
+  { id: 'viga', title: 'Viga', subtitle: 'Elemento horizontal de suporte', category: 'Estrutura Principal', isFavorite: true, icon: <Frame size={18} color="#F59E0B" /> },
+  { id: 'pilar', title: 'Pilar / Coluna', subtitle: 'Elemento vertical de suporte', category: 'Estrutura Principal', icon: <Box size={18} color="#10B981" /> },
+  { id: 'sapata', title: 'Sapata', subtitle: 'Fundação isolada ou corrida', category: 'Fundações', icon: <HardHat size={18} color="#64748B" /> },
+  { id: 'contrapiso', title: 'Contrapiso / Calçada', subtitle: 'Camada de regularização', category: 'Pisos', icon: <Droplet size={18} color="#3B82F6" /> }
 ];
 
 const fckOptions: SelectOption[] = [
-  { id: '15', title: '15 MPa', subtitle: 'Calçadas e contrapisos leves', category: 'Concreto Magro/Leve' },
-  { id: '20', title: '20 MPa', subtitle: 'Muros e estruturas simples', category: 'Estrutural Básico' },
-  { id: '25', title: '25 MPa', subtitle: 'Vigas, pilares e lajes de residências', category: 'Estrutural Padrão', isFavorite: true },
-  { id: '30', title: '30 MPa', subtitle: 'Sobrados e pequenos prédios', category: 'Estrutural Superior' },
-  { id: '35', title: '35 MPa', subtitle: 'Estruturas de maior exigência', category: 'Alta Resistência' }
+  { id: '15', title: '15 MPa (Magro)', subtitle: 'Calçadas, contrapisos não estruturais', category: 'Baixa Resistência', icon: <Gauge size={18} color="#94A3B8" /> },
+  { id: '20', title: '20 MPa', subtitle: 'Fundação de pequeno porte, pisos leves', category: 'Estrutural Básico', isFavorite: true, icon: <Gauge size={18} color="#3B82F6" /> },
+  { id: '25', title: '25 MPa', subtitle: 'Vigas, pilares e lajes residenciais', category: 'Estrutural Padrão', isFavorite: true, icon: <Gauge size={18} color="#10B981" /> },
+  { id: '30', title: '30 MPa', subtitle: 'Estruturas de múltiplos pavimentos', category: 'Alta Resistência', icon: <Gauge size={18} color="#F59E0B" /> },
+  { id: '35', title: '35 MPa', subtitle: 'Obras de grande porte e pontes', category: 'Alta Resistência', icon: <Gauge size={18} color="#EF4444" /> }
 ];
 
-export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
+export function ConcreteMixCalc({ onBack, onNavigate }: { onBack: () => void, onNavigate?: (tab: string, param?: string) => void }) {
   const [step, setStep] = useState(0);
 
   // States
@@ -46,7 +42,7 @@ export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
   const [fck, setFck] = useState<SelectOption | null>(null);
   
   const [isReadyMix, setIsReadyMix] = useState<boolean | null>(null);
-  const [lossRate, setLossRate] = useState('5'); // 5%
+  const [lossRate, setLossRate] = useState(String(Math.round(Coefficients.losses.concrete * 100 - 100))); // linked to coefficients
 
   const [showResults, setShowResults] = useState(false);
 
@@ -150,21 +146,21 @@ export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'volume' ? (
             <div className="input-group">
               <label>Volume Total (m³)</label>
-              <input type="number" value={volume} onChange={e => setVolume(e.target.value)} placeholder="Ex: 5.5" />
+              <input type="number" className="input-premium" value={volume} onChange={e => setVolume(e.target.value)} placeholder="Ex: 5.5" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Comprimento (m)</label>
-                <input type="number" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 10" />
+                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 10" />
               </div>
               <div className="input-group">
                 <label>Largura (m)</label>
-                <input type="number" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 0.15" />
+                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 0.15" />
               </div>
               <div className="input-group">
                 <label>Altura / Profundidade (m)</label>
-                <input type="number" value={thickness} onChange={e => setThickness(e.target.value)} placeholder="Ex: 0.40" />
+                <input type="number" className="input-premium" value={thickness} onChange={e => setThickness(e.target.value)} placeholder="Ex: 0.40" />
               </div>
             </>
           )}
@@ -187,7 +183,7 @@ export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
           {fck?.id === 'custom' && (
             <div className="input-group" style={{ marginTop: 16, backgroundColor: 'var(--bg-surface)', padding: 16, borderRadius: 16 }}>
               <label>FCK Personalizado (MPa)</label>
-              <input type="number" onChange={e => setFck({ id: e.target.value || 'custom', title: `${e.target.value} MPa` })} placeholder="Ex: 45" />
+              <input type="number" className="input-premium" onChange={e => setFck({ id: e.target.value || 'custom', title: `${e.target.value} MPa` })} placeholder="Ex: 45" />
             </div>
           )}
         </div>
@@ -220,7 +216,7 @@ export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Perda (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -242,6 +238,7 @@ export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
         title="Assistente de Concretagem"
         description="Cálculo detalhado de concreto estrutural."
         icon={<Droplet size={24} />}
+        structuralWarning={true}
         onBack={() => setShowResults(false)}
         results={{
           mainMetrics: metrics,
@@ -267,6 +264,8 @@ export function ConcreteMixCalc({ onBack }: { onBack: () => void }) {
       onPrev={handlePrev}
       onCancel={onBack}
       onFinish={() => setShowResults(true)}
+      guideId="concreto-armado"
+      onOpenGuide={onNavigate ? (id) => onNavigate('central-tecnica', id) : undefined}
     />
   );
 }

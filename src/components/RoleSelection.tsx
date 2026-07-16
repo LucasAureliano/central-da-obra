@@ -12,7 +12,7 @@ interface RoleSelectionProps {
 
 const ROLES = [
   { id: 'owner', title: 'Proprietário', icon: Home, desc: 'Acompanhe sua obra de forma simples' },
-  { id: 'service', title: 'Prestador de Serviço', icon: HardHat, desc: 'Gestão de clientes, orçamentos e diário de obra' },
+  { id: 'service', title: 'Prestador de Serviço', icon: HardHat, desc: 'Gestão de clientes e orçamentos' },
   { id: 'architect', title: 'Arquiteto / Engenheiro', icon: DraftingCompass, desc: 'Projetos, cronograma e acompanhamento' },
   { id: 'builder', title: 'Construtora', icon: Building2, desc: 'Dashboard executivo, financeiro e equipes' }
 ];
@@ -64,7 +64,7 @@ export function RoleSelection({ onSelect }: RoleSelectionProps) {
       >
         <div style={{ textAlign: 'center', marginBottom: 16 }}>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>
-            Bem-vindo à Central da Obra
+            Bem-vindo ao CentralObra
           </h1>
           <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>
             Para personalizarmos sua experiência, como você utilizará a plataforma?

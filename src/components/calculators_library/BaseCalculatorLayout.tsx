@@ -8,6 +8,7 @@ import { useAuthModal } from '../../contexts/AuthModalContext';
 import { db } from '../../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { SelectWorkModal } from './SelectWorkModal';
+import { useWorks } from '../../contexts/WorksContext';
 
 export type CalcResultItem = {
   label: string;
@@ -27,6 +28,7 @@ export interface BaseCalculatorProps {
   description: string;
   icon?: React.ReactNode;
   tip?: string;
+  structuralWarning?: boolean;
   onBack: () => void;
   children: React.ReactNode; // The form inputs
   results?: {
@@ -58,6 +60,7 @@ export function BaseCalculatorLayout({
   description,
   icon,
   tip,
+  structuralWarning,
   onBack,
   children,
   results
@@ -66,7 +69,8 @@ export function BaseCalculatorLayout({
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [pdfSuccess, setPdfSuccess] = useState(false);
   const { user, isGuest } = useAuth();
-  const { openAuthModal } = useAuthModal();
+  const { triggerGuestAlert } = useAuthModal();
+  const { activeWork } = useWorks();
   
   const [prices, setPrices] = useState<Record<string, number>>({});
 
@@ -86,7 +90,7 @@ export function BaseCalculatorLayout({
 
   const handleSaveGeneric = async () => {
     if (isGuest || !user) {
-      openAuthModal();
+      triggerGuestAlert();
       return;
     }
     setIsSaving(true);
@@ -146,7 +150,7 @@ export function BaseCalculatorLayout({
 
   const openWorkSelection = () => {
     if (isGuest || !user) {
-      openAuthModal();
+      triggerGuestAlert();
       return;
     }
     setIsWorkModalOpen(true);
@@ -154,18 +158,25 @@ export function BaseCalculatorLayout({
 
   const handleAddToShopping = async () => {
     if (isGuest || !user) {
-      openAuthModal();
+      triggerGuestAlert();
       return;
     }
     if (!results) return;
+    if (!activeWork) {
+      alert("Por favor, selecione uma obra ativa para adicionar à lista de compras da obra.");
+      return;
+    }
 
     setIsAddingShopping(true);
     try {
       const promises = results.materials.map(mat => {
-        return addDoc(collection(db, 'users', user.uid, 'shoppingList'), {
+        const price = prices[mat.name] || 0;
+        return addDoc(collection(db, 'works', activeWork.id, 'shopping'), {
           name: mat.name,
-          quantity: `${mat.quantity} ${mat.unit}`,
-          checked: false,
+          quantity: mat.quantity,
+          unit: mat.unit,
+          unitPrice: price,
+          isPurchased: false,
           addedAt: serverTimestamp()
         });
       });
@@ -255,6 +266,15 @@ export function BaseCalculatorLayout({
         </div>
       )}
 
+      {structuralWarning && (
+        <div className="glass-panel" style={{ padding: 16, borderRadius: 16, marginBottom: 24, display: 'flex', gap: 12, backgroundColor: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
+          <Info size={20} color="#EF4444" style={{ flexShrink: 0 }} />
+          <p style={{ fontSize: 13, color: 'var(--text-main)', lineHeight: 1.5 }}>
+            <strong style={{ color: '#EF4444' }}>Aviso Importante:</strong> Esta calculadora fornece estimativas de referência e não substitui de forma alguma o projeto estrutural elaborado por um engenheiro calculista habilitado.
+          </p>
+        </div>
+      )}
+
       {/* INPUTS (Children) */}
       <div style={{ marginBottom: 32 }}>
         {children}
@@ -281,7 +301,7 @@ export function BaseCalculatorLayout({
                     <Calculator size={16} color="#FFF" />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Central da Obra</h3>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>CentralObra</h3>
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>Relatório Técnico de Materiais</p>
                   </div>
                 </div>

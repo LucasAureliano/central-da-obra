@@ -2,9 +2,13 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to read and write their own profile
+    // Allow users to read and write their own profile and shopping lists
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      match /shopping/{itemId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Allow users to read and write their own works
@@ -14,7 +18,12 @@ service cloud.firestore {
       
       // Allow users to read and write calculations inside their works
       match /calculations/{calcId} {
-        allow read, write: if request.auth != null;
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/works/$(workId)).data.userId == request.auth.uid;
+      }
+
+      // Allow users to read and write expenses inside their works
+      match /expenses/{expenseId} {
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/works/$(workId)).data.userId == request.auth.uid;
       }
     }
 
@@ -22,6 +31,12 @@ service cloud.firestore {
     match /calculations/{calcId} {
       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // Feedbacks collection (Users can create, only admin/owner can read - for now anyone authenticated can create)
+    match /feedbacks/{feedbackId} {
+      allow create: if request.auth != null;
+      allow read: if false; // Only accessible via Firebase Console for now
     }
   }
 }

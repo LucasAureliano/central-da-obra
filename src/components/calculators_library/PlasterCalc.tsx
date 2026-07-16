@@ -126,17 +126,17 @@ export function PlasterCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'area' ? (
             <div className="input-group">
               <label>Área Total (m²)</label>
-              <input type="number" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 15.5" />
+              <input type="number" className="input-premium" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 15.5" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Largura (m)</label>
-                <input type="number" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 3.5" />
+                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 3.5" />
               </div>
               <div className="input-group">
                 <label>Comprimento (m)</label>
-                <input type="number" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 4.5" />
+                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 4.5" />
               </div>
             </>
           )}
@@ -185,7 +185,7 @@ export function PlasterCalc({ onBack }: { onBack: () => void }) {
           <div className="input-group">
             <label>Taxa de Perda (%)</label>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 8 }}>Recomendamos 8% para quebras no transporte e recortes das plaquinhas.</p>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
 
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>

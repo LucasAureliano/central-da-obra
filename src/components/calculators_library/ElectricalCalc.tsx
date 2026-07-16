@@ -3,21 +3,21 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Zap, Info } from 'lucide-react';
+import { Zap, Info, Battery, BatteryMedium, BatteryFull, Layers, Box, Cable } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 const levelOptions: SelectOption[] = [
-  { id: 'basic', title: 'Padrão Básico (Econômico)', subtitle: 'Média de 5 pontos por cômodo (1 interr., 3 tomadas, 1 teto)', category: 'Padrão', isFavorite: true },
-  { id: 'standard', title: 'Padrão Médio (Padrão)', subtitle: 'Média de 7 pontos por cômodo (interruptores duplos, 5 tomadas)', category: 'Padrão', isFavorite: true },
-  { id: 'high', title: 'Padrão Alto (Conforto)', subtitle: 'Média de 12 pontos por cômodo (paralelos, 8 tomadas, arandelas)', category: 'Padrão' }
+  { id: 'basic', title: 'Padrão Básico (Econômico)', subtitle: 'Média de 5 pontos por cômodo (1 interr., 3 tomadas, 1 teto)', category: 'Padrão', isFavorite: true, icon: <Battery size={18} color="#94A3B8" /> },
+  { id: 'standard', title: 'Padrão Médio (Padrão)', subtitle: 'Média de 7 pontos por cômodo (interruptores duplos, 5 tomadas)', category: 'Padrão', isFavorite: true, icon: <BatteryMedium size={18} color="#3B82F6" /> },
+  { id: 'high', title: 'Padrão Alto (Conforto)', subtitle: 'Média de 12 pontos por cômodo (paralelos, 8 tomadas, arandelas)', category: 'Padrão', icon: <BatteryFull size={18} color="#10B981" /> }
 ];
 
 const scopeOptions: SelectOption[] = [
-  { id: 'all', title: 'Instalação Completa', subtitle: 'Eletrodutos, cabos, e caixinhas', category: 'Escopo', isFavorite: true },
-  { id: 'infra', title: 'Apenas Infraestrutura', subtitle: 'Eletrodutos e caixinhas (sem cabos)', category: 'Escopo' },
-  { id: 'cabling', title: 'Apenas Cabeamento', subtitle: 'Apenas fios e cabos', category: 'Escopo' }
+  { id: 'all', title: 'Instalação Completa', subtitle: 'Eletrodutos, cabos, e caixinhas', category: 'Escopo', isFavorite: true, icon: <Layers size={18} color="#8B5CF6" /> },
+  { id: 'infra', title: 'Apenas Infraestrutura', subtitle: 'Eletrodutos e caixinhas (sem cabos)', category: 'Escopo', icon: <Box size={18} color="#F59E0B" /> },
+  { id: 'cabling', title: 'Apenas Cabeamento', subtitle: 'Apenas fios e cabos', category: 'Escopo', icon: <Cable size={18} color="#EF4444" /> }
 ];
 
 export function ElectricalCalc({ onBack }: { onBack: () => void }) {
@@ -150,7 +150,7 @@ export function ElectricalCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'rooms' ? (
             <>
               <label>Número Total de Cômodos</label>
-              <input type="number" value={rooms} onChange={e => setRooms(e.target.value)} placeholder="Ex: 8" />
+              <input type="number" className="input-premium" value={rooms} onChange={e => setRooms(e.target.value)} placeholder="Ex: 8" />
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
                 Conte salas, quartos, banheiros, cozinhas, corredores, etc.
               </p>
@@ -158,7 +158,7 @@ export function ElectricalCalc({ onBack }: { onBack: () => void }) {
           ) : (
             <>
               <label>Total de Pontos (Tomadas + Interruptores + Teto)</label>
-              <input type="number" value={directPoints} onChange={e => setDirectPoints(e.target.value)} placeholder="Ex: 45" />
+              <input type="number" className="input-premium" value={directPoints} onChange={e => setDirectPoints(e.target.value)} placeholder="Ex: 45" />
             </>
           )}
         </div>
@@ -172,7 +172,7 @@ export function ElectricalCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Perda (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />

@@ -4,19 +4,26 @@ interface AuthModalContextType {
   showAuthModal: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  showGuestAlert: boolean;
+  triggerGuestAlert: () => void;
+  closeGuestAlert: () => void;
 }
 
 const AuthModalContext = createContext<AuthModalContextType | undefined>(undefined);
 
 export function AuthModalProvider({ children }: { children: React.ReactNode }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showGuestAlert, setShowGuestAlert] = useState(false);
 
   return (
     <AuthModalContext.Provider 
       value={{ 
         showAuthModal, 
         openAuthModal: () => setShowAuthModal(true), 
-        closeAuthModal: () => setShowAuthModal(false) 
+        closeAuthModal: () => setShowAuthModal(false),
+        showGuestAlert,
+        triggerGuestAlert: () => setShowGuestAlert(true),
+        closeGuestAlert: () => setShowGuestAlert(false)
       }}
     >
       {children}

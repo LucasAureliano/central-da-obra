@@ -3,16 +3,16 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Droplets, Info } from 'lucide-react';
+import { Droplets, Info, Droplet, Flame, ThermometerSun, Trash2 } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 const systemOptions: SelectOption[] = [
-  { id: 'cold', title: 'Água Fria (PVC Soldável)', subtitle: 'Tubulação marrom padrão para água fria', category: 'Sistemas', isFavorite: true },
-  { id: 'hot_cpvc', title: 'Água Quente (CPVC/Aquatherm)', subtitle: 'Tubulação bege para água quente', category: 'Sistemas' },
-  { id: 'hot_ppr', title: 'Água Quente (PPR)', subtitle: 'Tubulação verde termofundida', category: 'Sistemas' },
-  { id: 'sewer', title: 'Esgoto Sanitário (PVC Branco)', subtitle: 'Tubulação branca para esgoto e ventilação', category: 'Sistemas', isFavorite: true }
+  { id: 'cold', title: 'Água Fria (PVC Soldável)', subtitle: 'Tubulação marrom padrão para água fria', category: 'Sistemas', isFavorite: true, icon: <Droplet size={18} color="#3B82F6" /> },
+  { id: 'hot_cpvc', title: 'Água Quente (CPVC/Aquatherm)', subtitle: 'Tubulação bege para água quente', category: 'Sistemas', icon: <ThermometerSun size={18} color="#F59E0B" /> },
+  { id: 'hot_ppr', title: 'Água Quente (PPR)', subtitle: 'Tubulação verde termofundida', category: 'Sistemas', icon: <Flame size={18} color="#EF4444" /> },
+  { id: 'sewer', title: 'Esgoto Sanitário (PVC Branco)', subtitle: 'Tubulação branca para esgoto e ventilação', category: 'Sistemas', isFavorite: true, icon: <Trash2 size={18} color="#94A3B8" /> }
 ];
 
 export function PlumbingCalc({ onBack }: { onBack: () => void }) {
@@ -149,21 +149,21 @@ export function PlumbingCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'points' ? (
             <div className="input-group">
               <label>Quantidade de Pontos ({system?.title})</label>
-              <input type="number" value={directPoints} onChange={e => setDirectPoints(e.target.value)} placeholder="Ex: 15" />
+              <input type="number" className="input-premium" value={directPoints} onChange={e => setDirectPoints(e.target.value)} placeholder="Ex: 15" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Banheiros Completos</label>
-                <input type="number" value={bathrooms} onChange={e => setBathrooms(e.target.value)} placeholder="Ex: 2" />
+                <input type="number" className="input-premium" value={bathrooms} onChange={e => setBathrooms(e.target.value)} placeholder="Ex: 2" />
               </div>
               <div className="input-group">
                 <label>Cozinhas</label>
-                <input type="number" value={kitchens} onChange={e => setKitchens(e.target.value)} placeholder="Ex: 1" />
+                <input type="number" className="input-premium" value={kitchens} onChange={e => setKitchens(e.target.value)} placeholder="Ex: 1" />
               </div>
               <div className="input-group">
                 <label>Lavanderias / Área de Serviço</label>
-                <input type="number" value={laundries} onChange={e => setLaundries(e.target.value)} placeholder="Ex: 1" />
+                <input type="number" className="input-premium" value={laundries} onChange={e => setLaundries(e.target.value)} placeholder="Ex: 1" />
               </div>
             </>
           )}
@@ -178,7 +178,7 @@ export function PlumbingCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Perda (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />

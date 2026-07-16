@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Printer, Building2 } from 'lucide-react';
-import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { ImportBudgetModal } from './works/ImportBudgetModal';
 
 interface BudgetCentralProps {
   onBack: () => void;
 }
 
 export function BudgetCentral({ onBack }: BudgetCentralProps) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [works, setWorks] = useState<any[]>([]);
   const [selectedWork, setSelectedWork] = useState<any | null>(null);
   const [calculations, setCalculations] = useState<any[]>([]);
@@ -18,6 +19,8 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
   const [equipmentCost, setEquipmentCost] = useState<string>('');
   const [bdiPercent, setBdiPercent] = useState<string>('0');
   const [discount, setDiscount] = useState<string>('');
+  
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -30,18 +33,48 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
 
   const handleSelectWork = async (work: any) => {
     setSelectedWork(work);
-    // Fetch calculations for this work
     const calcsSnap = await getDocs(collection(db, `works/${work.id}/calculations`));
     setCalculations(calcsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
   };
 
+  const handleImportExcel = async (materials: any[]) => {
+    if (!selectedWork) return;
+    const totalCost = materials.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
+    
+    try {
+      await addDoc(collection(db, 'works', selectedWork.id, 'calculations'), {
+        calcType: 'Planilha Importada',
+        resultData: { materials, mainMetrics: [] },
+        totalCost: totalCost,
+        savedAt: serverTimestamp()
+      });
+      // Refresh calculations
+      const calcsSnap = await getDocs(collection(db, `works/${selectedWork.id}/calculations`));
+      setCalculations(calcsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    } catch (err) {
+      console.error("Error saving imported budget:", err);
+    }
+  };
+
   const materialTotal = calculations.reduce((acc, curr) => acc + (curr.totalCost || 0), 0);
-  const parseAmount = (val: string) => parseFloat(val.replace(',', '.')) || 0;
+  const parseCurrency = (val: string) => {
+    if (!val) return 0;
+    // Removendo R$, pontos e substituindo vírgula por ponto
+    const cleanStr = val.replace(/[^\d,]/g, '').replace(',', '.');
+    return parseFloat(cleanStr) || 0;
+  };
   
-  const vLabor = parseAmount(laborCost);
-  const vEquipment = parseAmount(equipmentCost);
-  const vDiscount = parseAmount(discount);
-  const vBDI = parseAmount(bdiPercent);
+  const vLabor = parseCurrency(laborCost);
+  const vEquipment = parseCurrency(equipmentCost);
+  const vDiscount = parseCurrency(discount);
+  const vBDI = parseFloat(bdiPercent) || 0;
+
+  const formatCurrencyInput = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (!numbers) return '';
+    const amount = parseInt(numbers) / 100;
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
+  };
 
   const subTotal = materialTotal + vLabor + vEquipment;
   const bdiAmount = subTotal * (vBDI / 100);
@@ -49,6 +82,12 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const getClientLabel = () => {
+    if (profile?.role === 'owner') return 'Construtor';
+    if (profile?.role === 'architect') return 'Cliente';
+    return 'Cliente / Proprietário';
   };
 
   return (
@@ -73,7 +112,7 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
                   <Building2 size={24} color="var(--color-primary)" />
                   <div>
                     <h4 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{work.name}</h4>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Cliente: {work.client || 'Não informado'}</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{getClientLabel()}: {work.client || 'Não informado'}</p>
                   </div>
                 </div>
               ))}
@@ -93,7 +132,7 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
                 <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>Orçamento Profissional</h1>
               </div>
               <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Obra: {selectedWork.name}</h2>
-              <p style={{ color: 'var(--text-muted)' }}>Cliente: {selectedWork.client || 'Não informado'} | Data: {new Date().toLocaleDateString('pt-BR')}</p>
+              <p style={{ color: 'var(--text-muted)' }}>{getClientLabel()}: {selectedWork.client || 'Não informado'} | Data: {new Date().toLocaleDateString('pt-BR')}</p>
             </div>
 
             {/* Calculations List */}
@@ -122,13 +161,13 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
               <div style={{ display: 'grid', gap: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>Mão de Obra (R$)</span>
-                  <input type="number" value={laborCost} onChange={e => setLaborCost(e.target.value)} className="input-premium no-print" placeholder="0.00" style={{ width: 120, textAlign: 'right' }} />
+                  <input type="text" value={laborCost} onChange={e => setLaborCost(formatCurrencyInput(e.target.value))} className="input-premium no-print" placeholder="R$ 0,00" style={{ width: 140, textAlign: 'right' }} />
                   <span className="print-only" style={{ display: 'none' }}>R$ {vLabor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>Equipamentos / Frete (R$)</span>
-                  <input type="number" value={equipmentCost} onChange={e => setEquipmentCost(e.target.value)} className="input-premium no-print" placeholder="0.00" style={{ width: 120, textAlign: 'right' }} />
+                  <input type="text" value={equipmentCost} onChange={e => setEquipmentCost(formatCurrencyInput(e.target.value))} className="input-premium no-print" placeholder="R$ 0,00" style={{ width: 140, textAlign: 'right' }} />
                   <span className="print-only" style={{ display: 'none' }}>R$ {vEquipment.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
@@ -147,7 +186,7 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ color: 'var(--color-danger)', fontWeight: 500 }}>Descontos (R$)</span>
-                  <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} className="input-premium no-print" placeholder="0.00" style={{ width: 120, textAlign: 'right', color: 'var(--color-danger)' }} />
+                  <input type="text" value={discount} onChange={e => setDiscount(formatCurrencyInput(e.target.value))} className="input-premium no-print" placeholder="R$ 0,00" style={{ width: 140, textAlign: 'right', color: 'var(--color-danger)' }} />
                   <span className="print-only" style={{ display: 'none', color: 'var(--color-danger)' }}>- R$ {vDiscount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
@@ -188,24 +227,42 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
             `}</style>
 
             {/* Actions (Hide on print) */}
-            <div className="no-print" style={{ display: 'flex', gap: 12, marginTop: 32 }}>
+            <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 32 }}>
               <button 
-                className="btn-primary" 
-                onClick={handlePrint}
-                style={{ flex: 1, padding: 16, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                onClick={() => setIsImportModalOpen(true)}
+                className="btn-secondary" 
+                style={{ padding: 16, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 600, color: 'var(--color-success)', borderColor: 'var(--color-success)' }}
               >
-                <Printer size={20} />
-                Gerar PDF / Imprimir
+                Importar Planilha do Excel
               </button>
               
-              <button 
-                onClick={() => setSelectedWork(null)}
-                style={{ padding: 16, borderRadius: 16, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' }}
-              >
-                Trocar Obra
-              </button>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button 
+                  className="btn-primary" 
+                  onClick={handlePrint}
+                  style={{ flex: 1, padding: 16, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                >
+                  <Printer size={20} />
+                  Gerar PDF / Imprimir
+                </button>
+                
+                <button 
+                  onClick={() => setSelectedWork(null)}
+                  style={{ padding: 16, borderRadius: 16, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Trocar Obra
+                </button>
+              </div>
             </div>
             
+            <ImportBudgetModal 
+              isOpen={isImportModalOpen}
+              onClose={() => setIsImportModalOpen(false)}
+              onImport={(mats) => {
+                setIsImportModalOpen(false);
+                handleImportExcel(mats);
+              }}
+            />
           </div>
         )}
       </div>

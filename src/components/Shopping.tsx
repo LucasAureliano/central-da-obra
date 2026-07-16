@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, updateDoc, getDocs, addDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { useWorks } from '../contexts/WorksContext';
 import { TiltCard } from './TiltCard';
-import { Check, Package, Search } from 'lucide-react';
+import { Check, Package, Search, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ShoppingItem {
@@ -21,128 +22,205 @@ interface ShoppingItem {
 
 export function Shopping() {
   const { user } = useAuth();
-  const [items, setItems] = useState<ShoppingItem[]>([]);
+  const [calcItems, setCalcItems] = useState<ShoppingItem[]>([]);
+  const [manualItems, setManualItems] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'pending' | 'purchased'>('pending');
   const [search, setSearch] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newQty, setNewQty] = useState(0);
+  const [newUnit, setNewUnit] = useState('un');
+  const [newPrice, setNewPrice] = useState(0);
 
+  const { activeWork } = useWorks();
+
+  // Fetch calculation‑derived items
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
+    if (!user || !activeWork) { 
+      setCalcItems([]); 
+      setLoading(false); 
+      return; 
     }
 
-    // 1. Fetch works
-    const qWorks = query(collection(db, 'works'), where('userId', '==', user.uid));
-    const unsubscribeWorks = onSnapshot(qWorks, (worksSnap) => {
-      const worksData = worksSnap.docs.map(d => ({ id: d.id, name: d.data().name }));
-      
-      if (worksData.length === 0) {
-        setItems([]);
-        setLoading(false);
-        return;
-      }
-
-      const unsubscribeCalcs: any[] = [];
-      const allItemsMap: Record<string, ShoppingItem[]> = {};
-
-      let pendingUpdates = worksData.length;
-
-      worksData.forEach(work => {
-        const qCalc = query(collection(db, 'works', work.id, 'calculations'));
-        const unsubCalc = onSnapshot(qCalc, (calcSnap) => {
-          const workItems: ShoppingItem[] = [];
-          
-          calcSnap.forEach(docSnap => {
-            const calcData = docSnap.data();
-            if (calcData.resultData && calcData.resultData.materials) {
-              calcData.resultData.materials.forEach((mat: any, idx: number) => {
-                workItems.push({
-                  workId: work.id,
-                  workName: work.name,
-                  calcId: docSnap.id,
-                  calcName: calcData.name || 'Assistente',
-                  matIndex: idx,
-                  name: mat.name,
-                  quantity: mat.quantity,
-                  unit: mat.unit,
-                  unitPrice: mat.unitPrice,
-                  isPurchased: !!mat.isPurchased
-                });
-              });
-            }
+    const qCalc = query(collection(db, 'works', activeWork.id, 'calculations'));
+    const unsubCalc = onSnapshot(qCalc, (calcSnap) => {
+      const workItems: ShoppingItem[] = [];
+      calcSnap.forEach(docSnap => {
+        const calcData = docSnap.data();
+        if (calcData.resultData && calcData.resultData.materials) {
+          calcData.resultData.materials.forEach((mat: any, idx: number) => {
+            workItems.push({
+              workId: activeWork.id,
+              workName: activeWork.name,
+              calcId: docSnap.id,
+              calcName: calcData.name || 'Assistente',
+              matIndex: idx,
+              name: mat.name,
+              quantity: mat.quantity,
+              unit: mat.unit,
+              unitPrice: mat.unitPrice,
+              isPurchased: !!mat.isPurchased
+            });
           });
-
-          allItemsMap[work.id] = workItems;
-          pendingUpdates--;
-          
-          // Re-flatten
-          const flattened = Object.values(allItemsMap).flat();
-          setItems(flattened);
-          if (pendingUpdates <= 0) {
-            setLoading(false);
-          }
-        });
-        unsubscribeCalcs.push(unsubCalc);
+        }
       });
-
-      return () => {
-        unsubscribeCalcs.forEach(fn => fn());
-      };
+      setCalcItems(workItems);
+      setLoading(false);
     });
 
-    return () => unsubscribeWorks();
-  }, [user]);
+    return () => unsubCalc();
+  }, [user, activeWork]);
+
+  // Fetch manual shopping items for the active work
+  useEffect(() => {
+    if (!user || !activeWork) {
+      setManualItems([]);
+      return;
+    }
+    const qManual = query(collection(db, 'works', activeWork.id, 'shopping'));
+    const unsubManual = onSnapshot(qManual, (snap) => {
+      const items: ShoppingItem[] = [];
+      snap.docs.forEach(docSnap => {
+        const data = docSnap.data();
+        items.push({
+          workId: activeWork.id,
+          workName: activeWork.name,
+          calcId: docSnap.id,
+          matIndex: -1,
+          name: data.name,
+          quantity: data.quantity,
+          unit: data.unit,
+          unitPrice: data.unitPrice,
+          isPurchased: data.isPurchased ?? false,
+          calcName: 'Adicionado Manualmente'
+        });
+      });
+      setManualItems(items);
+    });
+    return () => unsubManual();
+  }, [user, activeWork]);
 
   const handleTogglePurchased = async (item: ShoppingItem) => {
     try {
-      // Optimiztic UI could be implemented here, but we will just wait for the db update
-      // which will trigger the onSnapshot.
+      const isNowPurchased = !item.isPurchased;
       
-      // We need to fetch the specific calculation document to update the array
+      // If marking as purchased, create an expense in Finance
+      if (isNowPurchased) {
+        const expenseWorkId = item.workId || activeWork?.id;
+        if (expenseWorkId) {
+          const amount = Number(item.quantity) * (item.unitPrice || 0);
+          await addDoc(collection(db, 'works', expenseWorkId, 'expenses'), {
+            title: item.name,
+            amount: amount,
+            category: 'Materiais',
+            status: 'Pago',
+            date: serverTimestamp(),
+            workId: expenseWorkId,
+            createdAt: serverTimestamp()
+          });
+          
+          await updateDoc(doc(db, 'works', expenseWorkId), {
+            spent: increment(amount)
+          });
+        }
+      }
+
+      // Manual item update
+      if (item.matIndex === -1 && item.calcId) {
+        const manualRef = doc(db, 'works', item.workId, 'shopping', item.calcId);
+        await updateDoc(manualRef, { isPurchased: isNowPurchased });
+        return;
+      }
+
+      // Calculation item update (existing logic)
       const calcRef = doc(db, 'works', item.workId, 'calculations', item.calcId);
-      
-      // Get the latest data to avoid race conditions
-      // In a real app we'd use a transaction, but this is fine for this scope
       const calcSnap = await getDocs(query(collection(db, 'works', item.workId, 'calculations')));
       const calcDoc = calcSnap.docs.find(d => d.id === item.calcId);
       if (!calcDoc) return;
-      
+
       const calcData = calcDoc.data();
       const updatedMaterials = [...calcData.resultData.materials];
-      
       updatedMaterials[item.matIndex] = {
         ...updatedMaterials[item.matIndex],
-        isPurchased: !item.isPurchased
+        isPurchased: isNowPurchased
       };
 
       const newTotalCost = updatedMaterials.reduce((acc, m) => acc + (Number(m.quantity) * (m.unitPrice || 0)), 0);
-
       await updateDoc(calcRef, {
         'resultData.materials': updatedMaterials,
         totalCost: newTotalCost
       });
-      
     } catch (error) {
-      console.error("Error updating item", error);
+      console.error('Error updating item', error);
     }
   };
 
-  const filteredItems = items.filter(item => {
+  const handleAddManualItem = async () => {
+    if (!newName.trim()) return;
+    if (newQty <= 0) return;
+    if (newPrice < 0) return;
+    try {
+      if (!activeWork) return;
+      await addDoc(collection(db, 'works', activeWork.id, 'shopping'), {
+        name: newName.trim(),
+        quantity: newQty,
+        unit: newUnit,
+        unitPrice: newPrice,
+        isPurchased: false,
+        createdAt: serverTimestamp()
+      });
+      setNewName('');
+      setNewQty(0);
+      setNewUnit('un');
+      setNewPrice(0);
+      setShowAddModal(false);
+    } catch (e) {
+      console.error('Error adding manual item', e);
+    }
+  };
+
+  const mergedItems = [...calcItems, ...manualItems];
+  const filteredItems = mergedItems.filter(item => {
     const matchesFilter = filter === 'pending' ? !item.isPurchased : item.isPurchased;
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || 
-                          item.workName.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.workName?.toLowerCase().includes(search.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
-  const totalPending = items.filter(i => !i.isPurchased).reduce((acc, i) => acc + (Number(i.quantity) * (i.unitPrice || 0)), 0);
+  const totalPending = mergedItems.filter(i => !i.isPurchased)
+    .reduce((acc, i) => acc + (Number(i.quantity) * (i.unitPrice || 0)), 0);
+
+  const unitOptions = ['un', 'm²', 'm³', 'kg', 'saco', 'litro', 'peça', 'metro'];
 
   return (
-    <div className="screen-content" style={{ padding: '24px 20px 100px' }}>
+    <div className="screen-content" style={{ padding: '24px 20px 0 20px' }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Lista de Compras</h1>
         <p style={{ color: 'var(--text-muted)' }}>Gerencie os materiais de todas as suas obras.</p>
       </div>
+      <button
+          onClick={() => setShowAddModal(true)}
+          style={{
+            position: 'fixed',
+            right: 24,
+            bottom: 90,
+            backgroundColor: 'var(--color-primary)',
+            color: '#FFF',
+            border: 'none',
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            cursor: 'pointer',
+            zIndex: 1000
+          }}
+        >
+          <Plus size={24} />
+        </button>
 
       <div className="glass-panel" style={{ padding: 16, borderRadius: 16, marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid var(--color-danger)' }}>
         <div>
@@ -167,7 +245,7 @@ export function Shopping() {
               cursor: 'pointer'
             }}
           >
-            Pendentes ({items.filter(i => !i.isPurchased).length})
+            Pendentes ({mergedItems.filter(i => !i.isPurchased).length})
           </button>
           <button
             onClick={() => setFilter('purchased')}
@@ -179,16 +257,16 @@ export function Shopping() {
               cursor: 'pointer'
             }}
           >
-            Comprados ({items.filter(i => i.isPurchased).length})
+            Comprados ({mergedItems.filter(i => i.isPurchased).length})
           </button>
         </div>
         <div style={{ position: 'relative' }}>
           <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 14 }} />
-          <input 
-            type="text" 
-            placeholder="Buscar material ou obra..." 
+          <input
+            type="text"
+            placeholder="Buscar material ou obra..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             className="input-premium"
             style={{ width: '100%', paddingLeft: 44 }}
           />
@@ -196,7 +274,7 @@ export function Shopping() {
       </div>
 
       {/* List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 100 }}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Carregando materiais...</div>
         ) : filteredItems.length === 0 ? (
@@ -207,7 +285,7 @@ export function Shopping() {
         ) : (
           <AnimatePresence>
             {filteredItems.map(item => (
-              <motion.div 
+              <motion.div
                 key={`${item.calcId}-${item.matIndex}`}
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -215,10 +293,10 @@ export function Shopping() {
                 transition={{ duration: 0.2 }}
               >
                 <TiltCard style={{ padding: 16, borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <button 
+                  <button
                     onClick={() => handleTogglePurchased(item)}
-                    style={{ 
-                      width: 28, height: 28, borderRadius: 14, 
+                    style={{
+                      width: 28, height: 28, borderRadius: 14,
                       backgroundColor: item.isPurchased ? 'var(--color-success)' : 'transparent',
                       border: item.isPurchased ? 'none' : '2px solid var(--border-subtle)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -237,7 +315,7 @@ export function Shopping() {
                       </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.workName} • {item.calcName}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.workName?.length ? `${item.workName} • ${item.calcName}` : ''}</span>
                       {item.unitPrice ? (
                         <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.quantity * item.unitPrice)}
@@ -253,6 +331,88 @@ export function Shopping() {
           </AnimatePresence>
         )}
       </div>
+
+      {/* Add Item Modal */}
+      {showAddModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div className="glass-panel animate-slide-up" style={{ 
+            width: '100%', 
+            maxWidth: 500, 
+            borderTopLeftRadius: 24, 
+            borderTopRightRadius: 24, 
+            padding: '24px 24px calc(24px + env(safe-area-inset-bottom, 0px)) 24px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <h2 style={{ marginTop: 0, marginBottom: 16, fontSize: 20, color: 'var(--text-main)' }}>Adicionar Material</h2>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, color: 'var(--text-muted)' }}>Nome</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                className="input-premium"
+                style={{ width: '100%' }}
+                placeholder="Ex.: Cimento"
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, color: 'var(--text-muted)' }}>Quantidade</label>
+              <input
+                type="number"
+                min="0"
+                value={newQty}
+                onChange={e => setNewQty(parseFloat(e.target.value) || 0)}
+                className="input-premium"
+                style={{ width: '100%' }}
+                placeholder="0"
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, color: 'var(--text-muted)' }}>Unidade</label>
+              <select
+                value={newUnit}
+                onChange={e => setNewUnit(e.target.value)}
+                className="input-premium"
+                style={{ width: '100%' }}
+              >
+                {unitOptions.map(u => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, color: 'var(--text-muted)' }}>Preço Unitário (R$)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={newPrice}
+                onChange={e => setNewPrice(parseFloat(e.target.value) || 0)}
+                className="input-premium"
+                style={{ width: '100%' }}
+                placeholder="0,00"
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+              <button onClick={() => setShowAddModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 14, cursor: 'pointer' }}>
+                <X size={20} /> Cancelar
+              </button>
+              <button onClick={handleAddManualItem} style={{ backgroundColor: 'var(--color-primary)', border: 'none', color: '#FFF', padding: '8px 16px', borderRadius: 8, cursor: 'pointer' }}>
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

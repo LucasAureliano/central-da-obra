@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Search, ChevronRight, Grid, Droplet, Layers, Grid3X3, Paintbrush2, Brush, Home, ShieldCheck, Zap, Droplets, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search, ChevronRight, BrickWall, Droplet, Layers, LayoutGrid, PaintRoller, Brush, Home, Umbrella, Zap, Droplets, Sparkles, Box, X } from 'lucide-react';
 import { MasonryCalc } from './MasonryCalc';
 import { ConcreteMixCalc } from './ConcreteMixCalc';
 import { IsolatedFootingCalc } from './IsolatedFootingCalc';
@@ -20,19 +21,23 @@ import { Lightbulb, Ruler } from 'lucide-react';
 
 type CalcId = 'masonry' | 'concrete-mix' | 'isolated-footing' | 'floor' | 'paint' | 'texture' | 'roofing' | 'waterproofing' | 'electrical' | 'plumbing' | 'drywall' | 'plaster' | 'lighting' | 'blondel' | null;
 
-export function CalculatorLibrary() {
+interface CalculatorLibraryProps {
+  onNavigate: (tab: string, param?: string) => void;
+}
+
+export function CalculatorLibrary({ onNavigate }: CalculatorLibraryProps) {
   const [activeCalc, setActiveCalc] = useState<CalcId>(null);
   const [search, setSearch] = useState('');
 
   const db = [
-    { id: 'masonry', title: 'Alvenaria (Blocos e Tijolos)', desc: 'Cálculo de blocos e argamassa', icon: <Grid size={24} color="#F59E0B" />, cat: 'Alvenaria' },
+    { id: 'masonry', title: 'Alvenaria (Blocos e Tijolos)', desc: 'Cálculo de blocos e argamassa', icon: <BrickWall size={24} color="#F59E0B" />, cat: 'Alvenaria' },
     { id: 'concrete-mix', title: 'Traço de Concreto', desc: 'Cimento, Areia, Brita', icon: <Droplet size={24} color="#3B82F6" />, cat: 'Estrutura' },
-    { id: 'isolated-footing', title: 'Sapata Isolada', desc: 'Fundação direta', icon: <Grid3X3 size={24} color="#8B5CF6" />, cat: 'Estrutura' },
-    { id: 'floor', title: 'Porcelanato e Cerâmica', desc: 'Pisos e Revestimentos', icon: <Grid3X3 size={24} color="#10B981" />, cat: 'Acabamentos' },
-    { id: 'paint', title: 'Pintura de Parede', desc: 'Látex, Epóxi, Esmalte', icon: <Paintbrush2 size={24} color="#EC4899" />, cat: 'Acabamentos' },
+    { id: 'isolated-footing', title: 'Sapata Isolada', desc: 'Fundação direta', icon: <Box size={24} color="#8B5CF6" />, cat: 'Estrutura' },
+    { id: 'floor', title: 'Porcelanato e Cerâmica', desc: 'Pisos e Revestimentos', icon: <LayoutGrid size={24} color="#10B981" />, cat: 'Acabamentos' },
+    { id: 'paint', title: 'Pintura de Parede', desc: 'Látex, Epóxi, Esmalte', icon: <PaintRoller size={24} color="#EC4899" />, cat: 'Acabamentos' },
     { id: 'texture', title: 'Texturas e Grafiato', desc: 'Revestimento texturizado', icon: <Brush size={24} color="#F43F5E" />, cat: 'Acabamentos' },
     { id: 'roofing', title: 'Cobertura Completa', desc: 'Telhas e Estrutura', icon: <Home size={24} color="#EAB308" />, cat: 'Cobertura' },
-    { id: 'waterproofing', title: 'Impermeabilização', desc: 'Lajes e Áreas Molhadas', icon: <ShieldCheck size={24} color="#06B6D4" />, cat: 'Impermeabilização' },
+    { id: 'waterproofing', title: 'Impermeabilização', desc: 'Lajes e Áreas Molhadas', icon: <Umbrella size={24} color="#06B6D4" />, cat: 'Impermeabilização' },
     { id: 'electrical', title: 'Elétrica', desc: 'Pontos, Eletrodutos e Cabos', icon: <Zap size={24} color="#F59E0B" />, cat: 'Instalações' },
     { id: 'plumbing', title: 'Hidrossanitário', desc: 'Água Fria, Quente e Esgoto', icon: <Droplets size={24} color="#0EA5E9" />, cat: 'Instalações' },
     { id: 'drywall', title: 'Drywall', desc: 'Chapas e Perfis', icon: <Layers size={24} color="#64748B" />, cat: 'Gesso' },
@@ -41,13 +46,13 @@ export function CalculatorLibrary() {
     { id: 'blondel', title: 'Fórmula de Blondel', desc: 'Dimensionamento de Escadas', icon: <Ruler size={24} color="#8B5CF6" />, cat: 'Arquitetura & Interiores' }
   ] as const;
 
-  if (activeCalc === 'masonry') return <MasonryCalc onBack={() => setActiveCalc(null)} />;
-  if (activeCalc === 'concrete-mix') return <ConcreteMixCalc onBack={() => setActiveCalc(null)} />;
+  if (activeCalc === 'masonry') return <MasonryCalc onBack={() => setActiveCalc(null)} onNavigate={onNavigate} />;
+  if (activeCalc === 'concrete-mix') return <ConcreteMixCalc onBack={() => setActiveCalc(null)} onNavigate={onNavigate} />;
   if (activeCalc === 'isolated-footing') return <IsolatedFootingCalc onBack={() => setActiveCalc(null)} />;
   if (activeCalc === 'floor') return <FloorTileCalc onBack={() => setActiveCalc(null)} />;
-  if (activeCalc === 'paint') return <WallPaintCalc onBack={() => setActiveCalc(null)} />;
+  if (activeCalc === 'paint') return <WallPaintCalc onBack={() => setActiveCalc(null)} onNavigate={onNavigate} />;
   if (activeCalc === 'texture') return <TextureCalc onBack={() => setActiveCalc(null)} />;
-  if (activeCalc === 'roofing') return <RoofingCalc onBack={() => setActiveCalc(null)} />;
+  if (activeCalc === 'roofing') return <RoofingCalc onBack={() => setActiveCalc(null)} onNavigate={onNavigate} />;
   if (activeCalc === 'waterproofing') return <WaterproofingCalc onBack={() => setActiveCalc(null)} />;
   if (activeCalc === 'electrical') return <ElectricalCalc onBack={() => setActiveCalc(null)} />;
   if (activeCalc === 'plumbing') return <PlumbingCalc onBack={() => setActiveCalc(null)} />;
@@ -81,15 +86,20 @@ export function CalculatorLibrary() {
       <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Assistentes Técnicos</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Escolha um assistente específico.</p>
 
-      <div className="glass-panel" style={{ padding: '12px 16px', borderRadius: 100, display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-        <Search size={20} color="var(--text-muted)" />
+      <div className="glass-panel" style={{ padding: '12px 20px', borderRadius: 100, display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, border: '1px solid var(--border-subtle)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+        <Search size={20} color="var(--color-primary)" />
         <input 
           type="text" 
-          placeholder="Buscar parede, concreto, piso..." 
+          placeholder="Buscar por parede, concreto, piso..." 
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ border: 'none', background: 'transparent', outline: 'none', color: 'var(--text-main)', flex: 1, fontSize: 16 }}
         />
+        {search && (
+          <button onClick={() => setSearch('')} style={{ background: 'var(--bg-elevated)', border: 'none', width: 28, height: 28, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}>
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
@@ -101,25 +111,44 @@ export function CalculatorLibrary() {
             <div key={cat}>
               <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>{cat}</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {items.map(item => (
-                  <div 
-                    key={item.id} 
-                    className="glass-panel card-premium-interactive animate-fade-in" 
-                    onClick={() => setActiveCalc(item.id)}
-                    style={{ padding: 16, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'var(--bg-input-glass)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {item.icon}
+                {items.map(item => {
+                  const inDevelopment = item.id === 'lighting' || item.id === 'blondel';
+                  return (
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      key={item.id} 
+                      className={`glass-panel animate-fade-in ${inDevelopment ? '' : 'card-premium-interactive'}`} 
+                      onClick={() => !inDevelopment && setActiveCalc(item.id)}
+                      whileHover={inDevelopment ? {} : { scale: 1.02 }}
+                      whileTap={inDevelopment ? {} : { scale: 0.98 }}
+                      style={{ 
+                        padding: 16, 
+                        borderRadius: 20, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between',
+                        opacity: inDevelopment ? 0.6 : 1,
+                        cursor: inDevelopment ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'var(--bg-input-glass)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {item.icon}
+                        </div>
+                        <div>
+                          <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)' }}>
+                            {item.title} {inDevelopment && <span style={{ fontSize: 10, padding: '2px 6px', background: 'var(--color-primary-alpha)', color: 'var(--color-primary)', borderRadius: 8, marginLeft: 8, verticalAlign: 'middle' }}>Em Breve</span>}
+                          </h3>
+                          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.desc}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)' }}>{item.title}</h3>
-                        <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.desc}</p>
-                      </div>
-                    </div>
-                    <ChevronRight size={20} color="var(--text-muted)" />
-                  </div>
-                ))}
+                      {!inDevelopment && <ChevronRight size={20} color="var(--text-muted)" />}
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
           );

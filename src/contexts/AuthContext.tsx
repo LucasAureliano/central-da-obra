@@ -1,10 +1,23 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInAnonymously } from 'firebase/auth';
-import type { User } from 'firebase/auth';
-import { auth, db } from '../lib/firebase';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  signInAnonymously,
+} from "firebase/auth";
+import type { User } from "firebase/auth";
+import { auth, db } from "../lib/firebase";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 
-export type UserRole = 'owner' | 'service' | 'architect' | 'builder' | null;
+export type UserRole = "owner" | "service" | "architect" | "builder" | null;
+
+export interface DashboardPrefs {
+  widgets?: string[];
+  order?: string[];
+  hidden?: string[];
+}
 
 export interface UserProfile {
   uid: string;
@@ -16,6 +29,7 @@ export interface UserProfile {
   createdAt: any;
   plan: string;
   hasSeenWelcome?: boolean;
+  dashboardPrefs?: DashboardPrefs;
 }
 
 interface AuthContextType {
@@ -40,26 +54,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let unsubscribeProfile: () => void;
 
+    // Handle Google redirect result
+    getRedirectResult(auth).catch((error) => {
+      console.error("Redirect result error:", error);
+    });
+
     const checkLocalGuest = () => {
-      const localGuestUid = sessionStorage.getItem('localGuestUid');
+      const localGuestUid = sessionStorage.getItem("localGuestUid");
       if (localGuestUid) {
         const fakeUser = {
           uid: localGuestUid,
-          email: 'Visitante',
-          displayName: 'Visitante',
+          email: "Visitante",
+          displayName: "Visitante",
           isAnonymous: true,
         } as unknown as User;
-        
+
         setUser(fakeUser);
         setProfile({
           uid: localGuestUid,
-          email: 'Visitante',
-          name: 'Visitante',
+          email: "Visitante",
+          name: "Visitante",
           photoURL: null,
-          role: (localStorage.getItem('pendingRole') as UserRole) || null,
+          role: (localStorage.getItem("pendingRole") as UserRole) || null,
           createdAt: new Date(),
-          plan: 'free',
-          hasSeenWelcome: sessionStorage.getItem('guestHasSeenWelcome') === 'true'
+          plan: "free",
+          hasSeenWelcome:
+            sessionStorage.getItem("guestHasSeenWelcome") === "true",
         });
         setLocalGuest(true);
         setLoading(false);
@@ -72,15 +92,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         if (firebaseUser) {
           setUser(firebaseUser);
-          
+
           if (!firebaseUser.isAnonymous) {
-            const userRef = doc(db, 'users', firebaseUser.uid);
-            
+            const userRef = doc(db, "users", firebaseUser.uid);
+
             // Listen to profile changes so role updates instantly
             unsubscribeProfile = onSnapshot(userRef, async (userSnap) => {
               if (!userSnap.exists()) {
-                const pendingRole = localStorage.getItem('pendingRole');
-                const pendingSpecialty = localStorage.getItem('pendingSpecialty');
+                const pendingRole = localStorage.getItem("pendingRole");
+                const pendingSpecialty =
+                  localStorage.getItem("pendingSpecialty");
                 const newProfile: any = {
                   uid: firebaseUser.uid,
                   email: firebaseUser.email,
@@ -88,15 +109,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   photoURL: firebaseUser.photoURL,
                   role: pendingRole || null, // Role starts with pending or null
                   createdAt: new Date(),
-                  plan: 'free',
-                  hasSeenWelcome: false
+                  plan: "free",
+                  hasSeenWelcome: false,
+                  dashboardPrefs: {
+                    widgets: [
+                      "resumo",
+                      "calculadoras",
+                      "insights",
+                      "financeiro",
+                    ],
+                    order: ["resumo", "calculadoras", "insights", "financeiro"],
+                  },
                 };
                 if (pendingSpecialty) {
                   newProfile.specialty = pendingSpecialty;
                 }
-                
-                if (pendingRole) localStorage.removeItem('pendingRole');
-                if (pendingSpecialty) localStorage.removeItem('pendingSpecialty');
+
+                if (pendingRole) localStorage.removeItem("pendingRole");
+                if (pendingSpecialty)
+                  localStorage.removeItem("pendingSpecialty");
                 await setDoc(userRef, newProfile);
                 setProfile(newProfile as UserProfile);
               } else {
@@ -109,13 +140,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Guest
             setProfile({
               uid: firebaseUser.uid,
-              email: 'Visitante',
-              name: 'Visitante',
+              email: "Visitante",
+              name: "Visitante",
               photoURL: null,
-              role: (localStorage.getItem('pendingRole') as UserRole) || null,
+              role: (localStorage.getItem("pendingRole") as UserRole) || null,
               createdAt: new Date(),
-              plan: 'free',
-              hasSeenWelcome: sessionStorage.getItem('guestHasSeenWelcome') === 'true'
+              plan: "free",
+              hasSeenWelcome:
+                sessionStorage.getItem("guestHasSeenWelcome") === "true",
+              dashboardPrefs: {
+                widgets: ["resumo", "calculadoras", "insights", "financeiro"],
+                order: ["resumo", "calculadoras", "insights", "financeiro"],
+              },
             });
             setLoading(false);
           }
@@ -141,7 +177,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      provider.setCustomParameters({ prompt: "select_account" });
+      await signInWithRedirect(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google:", error);
       throw error;
@@ -152,32 +189,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       // Clean up previous guest sessions
-      sessionStorage.removeItem('guestHasSeenWelcome');
+      sessionStorage.removeItem("guestHasSeenWelcome");
+      localStorage.removeItem("pendingRole");
       await signInAnonymously(auth);
       setLocalGuest(true);
     } catch (error) {
       console.error("Error signing in anonymously:", error);
       // Fallback for when Firebase Anonymous Auth is not enabled
-      const localGuestUid = 'guest_' + Math.random().toString(36).substr(2, 9);
-      sessionStorage.setItem('localGuestUid', localGuestUid);
-      
+      const localGuestUid = "guest_" + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem("localGuestUid", localGuestUid);
+
       const fakeUser = {
         uid: localGuestUid,
-        email: 'Visitante',
-        displayName: 'Visitante',
+        email: "Visitante",
+        displayName: "Visitante",
         isAnonymous: true,
       } as unknown as User;
-      
+
       setUser(fakeUser);
       setProfile({
         uid: localGuestUid,
-        email: 'Visitante',
-        name: 'Visitante',
+        email: "Visitante",
+        name: "Visitante",
         photoURL: null,
-        role: (localStorage.getItem('pendingRole') as UserRole) || null,
+        role: (localStorage.getItem("pendingRole") as UserRole) || null,
         createdAt: new Date(),
-        plan: 'free',
-        hasSeenWelcome: false
+        plan: "free",
+        hasSeenWelcome: false,
+        dashboardPrefs: {
+          widgets: ["resumo", "calculadoras", "insights", "financeiro"],
+          order: ["resumo", "calculadoras", "insights", "financeiro"],
+        },
       });
       setLocalGuest(true);
     } finally {
@@ -187,8 +229,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      sessionStorage.removeItem('localGuestUid');
-      sessionStorage.removeItem('guestHasSeenWelcome');
+      sessionStorage.removeItem("localGuestUid");
+      sessionStorage.removeItem("guestHasSeenWelcome");
+      localStorage.removeItem("pendingRole");
       setLocalGuest(false);
       setUser(null);
       setProfile(null);
@@ -201,7 +244,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isGuest = (user ? user.isAnonymous : false) || localGuest;
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isGuest, localGuest, signInWithGoogle, loginAsGuest, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        isGuest,
+        localGuest,
+        signInWithGoogle,
+        loginAsGuest,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -210,7 +264,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

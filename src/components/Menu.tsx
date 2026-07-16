@@ -75,8 +75,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
   const getGestaoItems = () => {
     const items = [
       { icon: <Wallet size={20} />, label: 'Financeiro', color: '#10B981', action: () => onMenuSelect('Financeiro') },
-      { icon: <ShoppingCart size={20} />, label: 'Lista de Compras', color: '#8B5CF6', action: () => onMenuSelect('Compras') },
-      { icon: <Users size={20} />, label: 'Contatos', color: '#3B82F6', action: () => onMenuSelect('Contatos') }
+      { icon: <ShoppingCart size={20} />, label: 'Lista de Compras', color: '#8B5CF6', action: () => onMenuSelect('Compras') }
     ];
 
     if (activeRole === 'builder') {
@@ -96,7 +95,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
     {
       title: 'Recursos',
       items: [
-        { icon: <Calculator size={20} />, label: 'Assistentes Técnicos', color: '#10B981', action: () => onMenuSelect('Assistentes') },
+        { icon: <Calculator size={20} />, label: 'Central de Cálculos', color: '#10B981', action: () => onMenuSelect('Cálculos') },
         { icon: <BookOpen size={20} />, label: 'Biblioteca & Normas', color: '#8B5CF6', action: () => onMenuSelect('Biblioteca & Normas') },
       ]
     },
@@ -110,7 +109,6 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
       title: 'Configurações',
       items: [
         { icon: <User size={20} />, label: 'Meu Perfil', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
-        { icon: <Users size={20} />, label: 'Contatos', color: '#6B7280', action: () => onMenuSelect('Contatos') },
         { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
         { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
         { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },

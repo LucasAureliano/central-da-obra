@@ -30,7 +30,7 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
       setNotifications([
         {
           id: 'welcome-guest',
-          title: 'Bem-vindo à Central da Obra!',
+          title: 'Bem-vindo ao CentralObra!',
           message: 'Crie uma conta para aproveitar o assistente com IA, salvar projetos na nuvem e calcular orçamentos precisos.',
           type: 'info',
           read: false,

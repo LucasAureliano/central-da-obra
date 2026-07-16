@@ -1,39 +1,84 @@
 import React, { useState } from 'react';
 import { 
   FileText, Download, Share2, Sparkles, CheckCircle2, 
-  ArrowRight, ClipboardList, TrendingUp, Camera 
+  ArrowRight, ClipboardList, TrendingUp 
 } from 'lucide-react';
 
-interface ReportsProps {
-  activeWorkName: string;
-  shoppingCount: number;
-  financialCount: number;
-  diaryCount: number;
-}
+import { useWorks } from '../contexts/WorksContext';
+import { useAuth } from '../contexts/AuthContext';
+import { collection, query, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { generateGeneralReport, generateFinancialReport, generateShoppingReport } from '../lib/pdfGenerator';
+import { Camera, ClipboardCheck } from 'lucide-react';
 
-export const Reports: React.FC<ReportsProps> = ({ 
-  activeWorkName, 
-  shoppingCount, 
-  financialCount, 
-  diaryCount 
-}) => {
+export const Reports: React.FC = () => {
+  const { activeWork } = useWorks();
+  const { profile } = useAuth();
+  
+  const [shoppingCount, setShoppingCount] = useState(0);
+  const [financialCount, setFinancialCount] = useState(0);
+
+  React.useEffect(() => {
+    if (!activeWork) return;
+
+    // Fetch total expenses count
+    const qExp = query(collection(db, `works/${activeWork.id}/expenses`));
+    getDocs(qExp).then(snap => setFinancialCount(snap.size));
+
+    // Fetch calculations to estimate shopping count
+    const qCalc = query(collection(db, `works/${activeWork.id}/calculations`));
+    getDocs(qCalc).then(snap => {
+      let matCount = 0;
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.resultData && data.resultData.materials) {
+          matCount += data.resultData.materials.length;
+        }
+      });
+      setShoppingCount(matCount);
+    });
+  }, [activeWork]);
+
+  const activeWorkName = activeWork?.name || 'Nenhuma Obra';
+
   const [generatingReport, setGeneratingReport] = useState<string | null>(null);
   const [successReport, setSuccessReport] = useState<string | null>(null);
 
-  const startGeneration = (name: string) => {
+  const startGeneration = async (id: string, name: string) => {
+    if (!activeWork) return;
+    
     setGeneratingReport(name);
-    setTimeout(() => {
+    try {
+      if (id === 'geral') {
+        await generateGeneralReport(activeWork);
+      } else if (id === 'financeiro') {
+        await generateFinancialReport(activeWork);
+      } else if (id === 'compras') {
+        await generateShoppingReport(activeWork);
+      }
       setGeneratingReport(null);
       setSuccessReport(name);
-    }, 2000);
+    } catch (err) {
+      console.error(err);
+      setGeneratingReport(null);
+      alert('Erro ao gerar relatório.');
+    }
   };
 
-  const reportsList = [
+  const baseReportsList = [
     { id: 'geral', title: '📊 Relatório Geral da Obra', desc: 'Resumo executivo da obra, prazos e percentuais concluídos.', icon: <ClipboardList size={22} className="text-primary" /> },
     { id: 'financeiro', title: '💸 Relatório Financeiro', desc: `Extrato completo de receitas, saídas e saldo (${financialCount} registros).`, icon: <TrendingUp size={22} className="text-primary" /> },
     { id: 'compras', title: '🛒 Lista de Compras & Cotações', desc: `Checklist de materiais pendentes e concluídos (${shoppingCount} materiais).`, icon: <FileText size={22} className="text-primary" /> },
-    { id: 'fotografico', title: '📸 Diário Fotográfico de Campo', desc: `Timeline completa com fotos anexadas e observações (${diaryCount} logs).`, icon: <Camera size={22} className="text-primary" /> },
   ];
+
+  if (profile?.role === 'architect' || profile?.role === 'builder') {
+    baseReportsList.push(
+      { id: 'fotografico', title: '📸 Relatório Fotográfico', desc: 'Evolução da obra com registro de imagens datadas.', icon: <Camera size={22} className="text-primary" /> },
+      { id: 'vistoria', title: '✅ Relatório de Vistoria Técnica', desc: 'Conformidades, anomalias e orientações da visita.', icon: <ClipboardCheck size={22} className="text-primary" /> }
+    );
+  }
+
+  const reportsList = baseReportsList;
 
   return (
     <div className="screen-content animate-fade-in" style={{ padding: 16 }}>
@@ -67,7 +112,7 @@ export const Reports: React.FC<ReportsProps> = ({
             </div>
 
             <button 
-              onClick={() => startGeneration(r.title)}
+              onClick={() => startGeneration(r.id, r.title)}
               className="btn-primary" 
               style={{ padding: '8px 12px', fontSize: 12, gap: 6 }}
             >
@@ -159,8 +204,41 @@ export const Reports: React.FC<ReportsProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 8 }}>
               <button 
                 onClick={() => {
-                  alert('Download simulado com sucesso!');
                   setSuccessReport(null);
+                  const printWindow = window.open('', '_blank');
+                  if (printWindow) {
+                    printWindow.document.write(`
+                      <html>
+                        <head>
+                          <title>${successReport}</title>
+                          <style>
+                            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #111; line-height: 1.6; }
+                            h1 { border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 30px; }
+                            .footer { margin-top: 50px; font-size: 12px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 20px; }
+                            .data-box { background: #f4f4f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+                          </style>
+                        </head>
+                        <body>
+                          <h1>${successReport}</h1>
+                          <div class="data-box">
+                            <p><strong>Referência da Obra:</strong> ${activeWorkName}</p>
+                            <p><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+                          </div>
+                          <h3>Resumo Consolidado</h3>
+                          <ul>
+                            <li>Registros Financeiros Processados: ${financialCount}</li>
+                            <li>Materiais na Lista de Compras: ${shoppingCount}</li>
+                          </ul>
+                          <p style="margin-top: 40px;">Este relatório comprova os registros salvos na plataforma até o momento. Os dados financeiros representam as entradas de despesas declaradas pelo gestor da obra.</p>
+                          <div class="footer">Gerado digitalmente via App CentralObra. Obras Inteligentes.</div>
+                          <script>
+                            window.onload = function() { window.print(); }
+                          </script>
+                        </body>
+                      </html>
+                    `);
+                    printWindow.document.close();
+                  }
                 }} 
                 className="btn-primary" 
                 style={{ fontSize: 13, gap: 6 }}
@@ -169,7 +247,8 @@ export const Reports: React.FC<ReportsProps> = ({
               </button>
               <button 
                 onClick={() => {
-                  alert('Compartilhamento simulado com sucesso!');
+                  const text = encodeURIComponent(`Olá! Segue o ${successReport} da obra ${activeWorkName} gerado pelo app CentralObra.`);
+                  window.open(`https://wa.me/?text=${text}`, '_blank');
                   setSuccessReport(null);
                 }} 
                 className="btn-secondary" 

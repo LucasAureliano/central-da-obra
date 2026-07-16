@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { CustomLogo } from './CustomLogo';
+import { Logo } from './ui/Logo';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
@@ -40,7 +40,7 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
       <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '50%', background: 'radial-gradient(ellipse at top, rgba(255,107,0,0.15), transparent 70%)', pointerEvents: 'none' }} />
       
       <div className="animate-stagger-1" style={{ marginBottom: 48, transform: 'scale(1.2)' }}>
-        <CustomLogo theme={theme} />
+        <Logo variant="horizontal" theme={theme} />
       </div>
 
       <div className="glass-panel animate-stagger-2" style={{ width: '100%', maxWidth: 400, padding: 32, borderRadius: 32, border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-elevated)' }}>
@@ -125,15 +125,7 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
             Google
           </button>
 
-          <button 
-            type="button"
-            onClick={() => alert("O Login com Apple requer conta de Desenvolvedor da Apple (Apple Developer) e configuração avançada no Firebase. Função ainda não configurada no servidor.")}
-            className="btn-secondary card-premium-interactive" 
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFF"><path d="M16.365 14.161c0 3.257 2.812 4.331 2.846 4.346-.02.073-.443 1.516-1.458 3.003-.878 1.282-1.789 2.55-3.235 2.576-1.421.026-1.895-.845-3.504-.845-1.61 0-2.128.819-3.483.871-1.447.051-2.495-1.371-3.376-2.646-1.802-2.607-3.179-7.37-1.328-10.584.921-1.597 2.533-2.602 4.316-2.628 1.396-.026 2.685.939 3.528.939.844 0 2.428-1.157 4.103-1.002 1.761.082 3.033.722 3.864 1.936-3.123 1.83-2.656 6.036.327 7.034M15.421 6.551c.783-.949 1.309-2.27 1.164-3.585-1.139.046-2.529.761-3.336 1.737-.723.868-1.348 2.213-1.18 3.511 1.272.098 2.568-.718 3.352-1.663"/></svg>
-            Apple
-          </button>
+
 
           <button 
             type="button"

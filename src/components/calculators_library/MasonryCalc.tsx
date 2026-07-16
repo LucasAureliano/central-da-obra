@@ -3,20 +3,20 @@ import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
-import { Grid, Info, Plus, Trash2 } from 'lucide-react';
+import { Grid, Info, Plus, Trash2, Box, Boxes, Layers } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
 import { Coefficients } from './calcCoefficients';
 
 const blockOptions: SelectOption[] = [
-  { id: 'baiano_9x19x19', title: 'Tijolo Baiano (9x19x19cm)', subtitle: 'Alvenaria de vedação', category: 'Cerâmicos', isFavorite: true },
-  { id: 'ceramico_11.5x14x24', title: 'Bloco Cerâmico (11.5x14x24cm)', subtitle: 'Vedação padrão', category: 'Cerâmicos', isFavorite: true },
-  { id: 'estrutural_14x19x39', title: 'Bloco de Concreto Estrutural (14x19x39cm)', subtitle: 'Função estrutural/Muros', category: 'Concreto' },
-  { id: 'estrutural_19x19x39', title: 'Bloco de Concreto Estrutural (19x19x39cm)', subtitle: 'Maior resistência', category: 'Concreto' },
-  { id: 'macico_5x9x19', title: 'Tijolo Maciço (5x9x19cm)', subtitle: 'Aparente ou estrutural antiga', category: 'Maciços' }
+  { id: 'baiano_9x19x19', title: 'Tijolo Baiano (9x19x19cm)', subtitle: 'Alvenaria de vedação', category: 'Cerâmicos', isFavorite: true, icon: <Grid size={18} color="var(--color-primary)" /> },
+  { id: 'ceramico_11.5x14x24', title: 'Bloco Cerâmico (11.5x14x24cm)', subtitle: 'Vedação padrão', category: 'Cerâmicos', isFavorite: true, icon: <Boxes size={18} color="#F59E0B" /> },
+  { id: 'estrutural_14x19x39', title: 'Bloco de Concreto Estrutural (14x19x39cm)', subtitle: 'Função estrutural/Muros', category: 'Concreto', icon: <Box size={18} color="#64748B" /> },
+  { id: 'estrutural_19x19x39', title: 'Bloco de Concreto Estrutural (19x19x39cm)', subtitle: 'Maior resistência', category: 'Concreto', icon: <Box size={18} color="#475569" /> },
+  { id: 'macico_5x9x19', title: 'Tijolo Maciço (5x9x19cm)', subtitle: 'Aparente ou estrutural antiga', category: 'Maciços', icon: <Layers size={18} color="#EF4444" /> }
 ];
 
-export function MasonryCalc({ onBack }: { onBack: () => void }) {
+export function MasonryCalc({ onBack, onNavigate }: { onBack: () => void, onNavigate?: (tab: string, param?: string) => void }) {
   const [step, setStep] = useState(0);
 
   // States
@@ -85,22 +85,24 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
     const blockName = blockType?.id === 'custom' ? (customBlockName || 'Bloco Personalizado') : blockType?.title;
     materials.push({ name: blockName || 'Blocos', quantity: totalBlocks, unit: 'und' });
 
-    // Mortar calculations (approximate)
-    // Argamassa Convencional: ~15kg a 20kg por m2
-    // Argamassa Pronta: ~15kg a 20kg por m2
-    // Cola estrutural (polimérica): ~1.5kg a 2kg por m2
-    
+    // Constants for Mortar Yields
+    const MORTAR_PRONTA_KG_M2 = 18;
+    const MORTAR_POLIMERICA_KG_M2 = 1.5;
+    const CONVENCIONAL_CIMENTO_KG_M2 = 5;
+    const CONVENCIONAL_CAL_KG_M2 = 5;
+    const CONVENCIONAL_AREIA_M3_M2 = 0.03;
+
     if (mortarType === 'pronta') {
-      const kg = Math.ceil(netArea * 18); // 18kg/m2 avg
+      const kg = Math.ceil(netArea * MORTAR_PRONTA_KG_M2);
       materials.push({ name: 'Argamassa Pronta', quantity: Math.ceil(kg / 20), unit: 'sacos 20kg' });
     } else if (mortarType === 'polimerica') {
-      const kg = Math.ceil(netArea * 1.5); // 1.5kg/m2 avg
+      const kg = Math.ceil(netArea * MORTAR_POLIMERICA_KG_M2);
       materials.push({ name: 'Argamassa Polimérica (Cola)', quantity: kg, unit: 'kg' });
     } else if (mortarType === 'convencional') {
-      // Traço 1:2:8 (cimento, cal, areia) - aprox 5kg cimento, 5kg cal, 0.03m3 areia por m2
-      const cimento = Math.ceil(netArea * 5 / 50); // sacos 50kg
-      const cal = Math.ceil(netArea * 5 / 20); // sacos 20kg
-      const areia = (netArea * 0.03).toFixed(2);
+      // Traço 1:2:8 (cimento, cal, areia)
+      const cimento = Math.ceil((netArea * CONVENCIONAL_CIMENTO_KG_M2) / 50); // sacos 50kg
+      const cal = Math.ceil((netArea * CONVENCIONAL_CAL_KG_M2) / 20); // sacos 20kg
+      const areia = (netArea * CONVENCIONAL_AREIA_M3_M2).toFixed(2);
       
       materials.push({ name: 'Cimento (50kg)', quantity: cimento, unit: 'saco(s)' });
       materials.push({ name: 'Cal / Filito (20kg)', quantity: cal, unit: 'saco(s)' });
@@ -131,7 +133,7 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
               </div>
               <div className="input-group">
                 <label>Rendimento (Blocos por m²)</label>
-                <input type="number" value={customYield} onChange={e => setCustomYield(e.target.value)} placeholder="Ex: 25" />
+                <input type="number" className="input-premium" value={customYield} onChange={e => setCustomYield(e.target.value)} placeholder="Ex: 25" />
               </div>
             </div>
           )}
@@ -166,17 +168,17 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
           {inputMethod === 'area' ? (
             <div className="input-group">
               <label>Área Total (m²)</label>
-              <input type="number" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 14" />
+              <input type="number" className="input-premium" value={area} onChange={e => setArea(e.target.value)} placeholder="Ex: 14" />
             </div>
           ) : (
             <>
               <div className="input-group">
                 <label>Comprimento (m)</label>
-                <input type="number" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 5.0" />
+                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 5.0" />
               </div>
               <div className="input-group">
                 <label>Altura (m)</label>
-                <input type="number" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ex: 2.8" />
+                <input type="number" className="input-premium" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ex: 2.8" />
               </div>
             </>
           )}
@@ -189,10 +191,10 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
       title: 'Existem portas ou janelas?',
       content: (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <button onClick={() => { setHasOpenings(true); handleNext(); }} className={hasOpenings === true ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 20, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === true ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === true ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === true ? 'var(--color-primary)' : 'var(--text-main)' }}>
+          <button onClick={() => { setHasOpenings(true); handleNext(); }} className={hasOpenings === true ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 24, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === true ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === true ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === true ? 'var(--color-primary)' : 'var(--text-main)' }}>
             Sim
           </button>
-          <button onClick={() => { setHasOpenings(false); handleNext(); }} className={hasOpenings === false ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 20, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === false ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === false ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === false ? 'var(--color-primary)' : 'var(--text-main)' }}>
+          <button onClick={() => { setHasOpenings(false); handleNext(); }} className={hasOpenings === false ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'} style={{ padding: 24, borderRadius: 16, textAlign: 'center', fontWeight: 600, fontSize: 16, backgroundColor: hasOpenings === false ? 'var(--color-primary-alpha)' : 'var(--bg-surface)', border: `1px solid ${hasOpenings === false ? 'var(--color-primary)' : 'var(--border-subtle)'}`, color: hasOpenings === false ? 'var(--color-primary)' : 'var(--text-main)' }}>
             Não
           </button>
         </div>
@@ -210,15 +212,15 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Larg. (m)</label>
-                  <input type="number" style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-elevated)', color: 'var(--text-main)' }} value={op.w} onChange={e => updateOpening(op.id, 'w', e.target.value)} placeholder="0.8" />
+                  <input type="number" className="input-premium" value={op.w} onChange={e => updateOpening(op.id, 'w', e.target.value)} placeholder="0.8" />
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Alt. (m)</label>
-                  <input type="number" style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-elevated)', color: 'var(--text-main)' }} value={op.h} onChange={e => updateOpening(op.id, 'h', e.target.value)} placeholder="2.1" />
+                  <input type="number" className="input-premium" value={op.h} onChange={e => updateOpening(op.id, 'h', e.target.value)} placeholder="2.1" />
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Qtd.</label>
-                  <input type="number" style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-elevated)', color: 'var(--text-main)' }} value={op.q} onChange={e => updateOpening(op.id, 'q', e.target.value)} min="1" />
+                  <input type="number" className="input-premium" value={op.q} onChange={e => updateOpening(op.id, 'q', e.target.value)} min="1" />
                 </div>
               </div>
               <button onClick={() => removeOpening(op.id)} style={{ padding: 8, borderRadius: 8, background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', border: 'none', cursor: 'pointer' }}>
@@ -255,7 +257,7 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
               onClick={() => { setMortarType(opt.id); handleNext(); }}
               className={mortarType === opt.id ? 'glass-panel card-premium-interactive' : 'card-premium-interactive'}
               style={{
-                padding: 16, borderRadius: 16, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4,
+                padding: 24, borderRadius: 16, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4,
                 backgroundColor: mortarType === opt.id ? 'var(--color-primary-alpha)' : 'var(--bg-surface)',
                 border: `1px solid ${mortarType === opt.id ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
                 cursor: 'pointer'
@@ -277,7 +279,7 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label>Margem de Perda (%)</label>
-            <input type="number" value={lossRate} onChange={e => setLossRate(e.target.value)} />
+            <input type="number" className="input-premium" value={lossRate} onChange={e => setLossRate(e.target.value)} />
           </div>
           <div style={{ backgroundColor: 'rgba(255,160,87,0.1)', padding: 16, borderRadius: 16, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <Info size={20} color="#FFA057" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -298,6 +300,7 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
         title="Assistente de Alvenaria"
         description="Cálculo detalhado de blocos e argamassa de assentamento."
         icon={<Grid size={24} />}
+        structuralWarning={true}
         onBack={() => setShowResults(false)}
         results={{
           mainMetrics: metrics,
@@ -323,6 +326,8 @@ export function MasonryCalc({ onBack }: { onBack: () => void }) {
       onPrev={handlePrev}
       onCancel={onBack}
       onFinish={() => setShowResults(true)}
+      guideId="alvenaria"
+      onOpenGuide={onNavigate ? (id) => onNavigate('central-tecnica', id) : undefined}
     />
   );
 }

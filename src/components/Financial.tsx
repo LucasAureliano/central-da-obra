@@ -3,7 +3,7 @@ import {
   ArrowLeft, TrendingUp, TrendingDown, DollarSign, 
   Wallet, PieChart, Building2, FileText, ShoppingCart
 } from 'lucide-react';
-import { EmptyState3D } from './EmptyState3D';
+import { EmptyState } from './EmptyState';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
@@ -35,11 +35,14 @@ export function Financial({ onBack }: { onBack: () => void }) {
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data();
         
-        // Parse budget (e.g. "R$ 50.000,00" -> 50000)
         let budgetVal = 0;
-        if (data.budget) {
-          const cleanStr = data.budget.replace(/[^0-9,-]+/g, "").replace(",", ".");
-          budgetVal = parseFloat(cleanStr) || 0;
+        if (data.budget !== undefined) {
+          if (typeof data.budget === 'number') {
+            budgetVal = data.budget;
+          } else if (typeof data.budget === 'string') {
+            const cleanStr = data.budget.replace(/[^0-9,-]+/g, "").replace(",", ".");
+            budgetVal = parseFloat(cleanStr) || 0;
+          }
           budgetSum += budgetVal;
         }
 
@@ -206,7 +209,7 @@ export function Financial({ onBack }: { onBack: () => void }) {
 
             {recentTransactions.length === 0 ? (
               <div style={{ marginTop: 16 }}>
-                <EmptyState3D
+                <EmptyState
                   icon={<FileText size={40} />}
                   title="Nenhum Custo Registrado"
                   description="Você ainda não salvou nenhum cálculo nas suas obras. Adicione cálculos e salve-os para acompanhar as despesas."

@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { ArrowLeft, MapPin, Calendar, DollarSign, Activity } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, DollarSign, Activity, Share2 } from 'lucide-react';
 import { TimelineView } from './works/TimelineView';
 import { DocumentsView } from './works/DocumentsView';
 import { BudgetList } from './works/BudgetList';
-import { WorkDiary } from './works/WorkDiary';
+import { Plus, X, Save } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
+import { addDoc, serverTimestamp } from 'firebase/firestore';
+
 import { useAuth } from '../contexts/AuthContext';
 
 interface WorkDetailsProps {
@@ -14,11 +18,40 @@ interface WorkDetailsProps {
 }
 
 export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [work, setWork] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'orcamento' | 'diario' | 'documentos'>('resumo');
   const [calculations, setCalculations] = useState<any[]>([]);
   const [totalSpent, setTotalSpent] = useState(0);
+  
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [expenseTitle, setExpenseTitle] = useState('');
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!expenseTitle || !expenseAmount) return;
+    
+    setIsSubmitting(true);
+    try {
+      const amount = parseFloat(expenseAmount.replace(/\D/g, '')) / 100;
+      await addDoc(collection(db, `works/${workId}/calculations`), {
+        calcType: expenseTitle,
+        totalCost: amount,
+        savedAt: serverTimestamp(),
+        resultData: { materials: [] }
+      });
+      toast.success('Despesa adicionada com sucesso!');
+      setIsExpenseModalOpen(false);
+      setExpenseTitle('');
+      setExpenseAmount('');
+    } catch (err) {
+      toast.error('Erro ao adicionar despesa');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const docRef = doc(db, 'works', workId);
@@ -81,6 +114,18 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
           <ArrowLeft size={20} />
         </button>
 
+        <button 
+          onClick={() => {
+            const link = `${window.location.origin}/?shared=${workId}`;
+            navigator.clipboard.writeText(link);
+            alert('Link de compartilhamento copiado!');
+          }}
+          style={{ position: 'absolute', top: 24, right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', border: 'none', cursor: 'pointer' }}
+          title="Compartilhar Obra"
+        >
+          <Share2 size={20} />
+        </button>
+
         <div style={{ position: 'absolute', bottom: 16, left: 20, right: 20 }}>
           <span className={`status-chip ${work.progress === 100 ? 'status-active' : work.progress > 50 ? 'status-warning' : 'status-danger'}`} style={{ backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', color: '#FFF', marginBottom: 8, display: 'inline-block' }}>
             {work.status || 'Em Andamento'}
@@ -122,12 +167,6 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
           Orçamento
         </button>
         <button 
-          onClick={() => setActiveTab('diario')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'diario' ? 700 : 600, color: activeTab === 'diario' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'diario' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
-        >
-          Diário
-        </button>
-        <button 
           onClick={() => setActiveTab('documentos')}
           style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'documentos' ? 700 : 600, color: activeTab === 'documentos' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'documentos' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
         >
@@ -144,7 +183,11 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', marginBottom: 8 }}>
                   <DollarSign size={16} /> <span style={{ fontSize: 12, fontWeight: 600 }}>Orçamento</span>
                 </div>
-                <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{work.budget || 'N/A'}</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>
+                  {typeof work.budget === 'number' 
+                    ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(work.budget) 
+                    : (work.budget || 'N/A')}
+                </p>
               </div>
             )}
             <div className="glass-panel" style={{ padding: 16, borderRadius: 16, gridColumn: profile?.role === 'owner' ? 'span 2' : 'auto' }}>
@@ -177,16 +220,12 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         <TimelineView workId={workId} />
       )}
 
-      {activeTab === 'diario' && (
-        <WorkDiary workId={workId} />
-      )}
-
       {activeTab === 'documentos' && (
         <DocumentsView workId={work.id} />
       )}
 
       {activeTab === 'orcamento' && (
-        <BudgetList workId={workId} calculations={calculations} />
+        <BudgetList workId={workId} calculations={calculations} work={work} user={user} profile={profile} />
       )}
 
       {activeTab === 'financas' && (
@@ -196,16 +235,27 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
             <p style={{ fontSize: 32, fontWeight: 800, margin: 0 }}>
               R$ {totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
-            {work.budget && (
+            {work.budget !== undefined && (
               <p style={{ fontSize: 12, opacity: 0.8, marginTop: 8 }}>
-                Orçamento inicial: {work.budget}
+                Orçamento inicial: {typeof work.budget === 'number' ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(work.budget) : work.budget}
               </p>
             )}
           </div>
 
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>
-            Despesas da Obra ({calculations.length})
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>
+              Despesas da Obra ({calculations.length})
+            </h3>
+            {profile?.role !== 'owner' && (
+              <button 
+                onClick={() => setIsExpenseModalOpen(true)}
+                className="btn-primary" 
+                style={{ padding: '8px 16px', borderRadius: 12, display: 'flex', gap: 8, fontSize: 13 }}
+              >
+                <Plus size={16} /> Adicionar
+              </button>
+            )}
+          </div>
           
           <div className="animate-fade-in" style={{ padding: 16 }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Histórico de Despesas</h3>
@@ -233,6 +283,68 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
           <DocumentsView workId={work.id} />
         </div>
       )}
+
+      <AnimatePresence>
+        {isExpenseModalOpen && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} 
+              onClick={() => setIsExpenseModalOpen(false)}
+            />
+            
+            <motion.div 
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="glass-panel" 
+              style={{ width: '100%', maxWidth: 500, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: '32px 24px', position: 'relative', zIndex: 1 }}
+            >
+              <button 
+                onClick={() => setIsExpenseModalOpen(false)}
+                style={{ position: 'absolute', top: 24, right: 24, background: 'var(--bg-elevated)', border: 'none', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Nova Despesa</h2>
+
+              <form onSubmit={handleAddExpense} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Descrição da Despesa *</label>
+                  <input 
+                    required 
+                    value={expenseTitle} 
+                    onChange={e => setExpenseTitle(e.target.value)} 
+                    placeholder="Ex: Compra de cimento" 
+                    className="input-premium"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Valor (R$) *</label>
+                  <input 
+                    required 
+                    value={expenseAmount} 
+                    onChange={e => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      if (!val) setExpenseAmount('');
+                      else setExpenseAmount(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseInt(val) / 100));
+                    }} 
+                    placeholder="R$ 0,00" 
+                    className="input-premium"
+                  />
+                </div>
+                <button type="submit" disabled={isSubmitting} className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, marginTop: 16, display: 'flex', justifyContent: 'center', gap: 8 }}>
+                  {isSubmitting ? (
+                    <div style={{ width: 20, height: 20, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <><Save size={20} /> Salvar Despesa</>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -3,8 +3,9 @@ import { collection, query, onSnapshot, doc, writeBatch, updateDoc, orderBy } fr
 import { db } from '../../lib/firebase';
 import { generateDefaultStages } from '../../lib/ChecklistGenerator';
 import type { Stage } from '../../lib/ChecklistGenerator';
-import { CheckCircle2, Circle, ChevronDown, ChevronRight, Rocket } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronDown, ChevronRight, Rocket, Plus, X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function TimelineView({ workId }: { workId: string }) {
@@ -14,6 +15,9 @@ export function TimelineView({ workId }: { workId: string }) {
   const [loading, setLoading] = useState(true);
   const [expandedStageId, setExpandedStageId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [selectedStageId, setSelectedStageId] = useState<string>('');
 
   useEffect(() => {
     const q = query(collection(db, `works/${workId}/stages`), orderBy('order', 'asc'));
@@ -82,6 +86,28 @@ export function TimelineView({ workId }: { workId: string }) {
     await updateDoc(workRef, { progress });
   };
 
+  const handleAddTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStageId || !newTaskTitle) return;
+    
+    const stage = stages.find(s => s.id === selectedStageId);
+    if (!stage) return;
+
+    const newTask = {
+      id: `task_${Date.now()}`,
+      title: newTaskTitle,
+      isCompleted: false
+    };
+
+    const updatedTasks = [...stage.tasks, newTask];
+    const stageRef = doc(db, `works/${workId}/stages`, stage.id);
+    
+    await updateDoc(stageRef, { tasks: updatedTasks });
+    toast.success('Tarefa adicionada com sucesso!');
+    setIsTaskModalOpen(false);
+    setNewTaskTitle('');
+  };
+
   if (loading) {
     return <div style={{ padding: 20, textAlign: 'center' }}>Carregando cronograma...</div>;
   }
@@ -110,7 +136,21 @@ export function TimelineView({ workId }: { workId: string }) {
 
   return (
     <div style={{ padding: '16px 20px', paddingBottom: 100 }}>
-      <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 20 }}>Linha do Tempo da Obra</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Linha do Tempo</h3>
+        {!isOwner && (
+          <button 
+            onClick={() => {
+              if (stages.length > 0) setSelectedStageId(stages[0].id);
+              setIsTaskModalOpen(true);
+            }} 
+            className="btn-primary" 
+            style={{ padding: '8px 16px', borderRadius: 12, display: 'flex', gap: 8, fontSize: 13 }}
+          >
+            <Plus size={16} /> Nova Tarefa
+          </button>
+        )}
+      </div>
       
       <div style={{ position: 'relative' }}>
         {/* Vertical Line */}
@@ -183,6 +223,61 @@ export function TimelineView({ workId }: { workId: string }) {
           );
         })}
       </div>
+
+      <AnimatePresence>
+        {isTaskModalOpen && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} 
+              onClick={() => setIsTaskModalOpen(false)}
+            />
+            
+            <motion.div 
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="glass-panel" 
+              style={{ width: '100%', maxWidth: 500, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: '32px 24px', position: 'relative', zIndex: 1 }}
+            >
+              <button 
+                onClick={() => setIsTaskModalOpen(false)}
+                style={{ position: 'absolute', top: 24, right: 24, background: 'var(--bg-elevated)', border: 'none', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Nova Tarefa</h2>
+
+              <form onSubmit={handleAddTask} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Etapa *</label>
+                  <select 
+                    required 
+                    value={selectedStageId} 
+                    onChange={e => setSelectedStageId(e.target.value)} 
+                    className="input-premium"
+                  >
+                    {stages.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Título da Tarefa *</label>
+                  <input 
+                    required 
+                    value={newTaskTitle} 
+                    onChange={e => setNewTaskTitle(e.target.value)} 
+                    placeholder="Ex: Instalar tomadas" 
+                    className="input-premium"
+                  />
+                </div>
+                <button type="submit" className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, marginTop: 16, display: 'flex', justifyContent: 'center', gap: 8 }}>
+                  <Save size={20} /> Adicionar
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
