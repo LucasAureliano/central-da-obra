@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ChevronLeft, ChevronRight, CheckCircle, FileText, User, 
-  MapPin, Settings, Package, Users, DollarSign, Tag, Save, 
-  Download, FileCheck, Plus, Trash2
+  ChevronLeft, ChevronRight, CheckCircle, FileText, 
+  Settings, Package, Users, DollarSign, 
+  Download, Plus, Trash2, Search, Zap, 
+  PaintRoller, BrickWall, Droplet, LayoutGrid, AlertCircle
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -11,42 +12,47 @@ import { useAuth } from '../../contexts/AuthContext';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
-const STEPS = [
-  { id: 1, title: 'Cliente', icon: <User size={18} /> },
-  { id: 2, title: 'Obra', icon: <MapPin size={18} /> },
-  { id: 3, title: 'Tipo', icon: <Settings size={18} /> },
-  { id: 4, title: 'Serviços', icon: <FileText size={18} /> },
-  { id: 5, title: 'Materiais', icon: <Package size={18} /> },
-  { id: 6, title: 'Mão de Obra', icon: <Users size={18} /> },
-  { id: 7, title: 'Custos Adic.', icon: <DollarSign size={18} /> },
-  { id: 8, title: 'Desconto', icon: <Tag size={18} /> },
-  { id: 9, title: 'Condições', icon: <FileCheck size={18} /> },
-  { id: 10, title: 'Resumo', icon: <Save size={18} /> }
+const STEPS_DATA = [
+  { id: 0, title: 'Início', msg: 'Vamos criar um orçamento profissional.' },
+  { id: 1, title: 'Cliente', msg: 'Primeiro, para quem é este orçamento?' },
+  { id: 2, title: 'Obra', msg: 'Onde o serviço será realizado?' },
+  { id: 3, title: 'Tipo de Serviço', msg: 'Que tipo de serviço você vai prestar?' },
+  { id: 4, title: 'Serviços', msg: 'Descreva os serviços que serão cobrados.' },
+  { id: 5, title: 'Materiais', msg: 'Haverá fornecimento de materiais?' },
+  { id: 6, title: 'Mão de Obra', msg: 'Como será a alocação da sua equipe?' },
+  { id: 7, title: 'Custos Adic.', msg: 'Existem custos extras de logística?' },
+  { id: 8, title: 'Desconto', msg: 'Deseja aplicar algum desconto?' },
+  { id: 9, title: 'Condições', msg: 'Quais as condições comerciais?' },
+  { id: 10, title: 'Resumo', msg: 'Pronto! Confira o resultado final.' }
 ];
 
 const TEMPLATES: Record<string, any> = {
-  Pedreiro: {
-    services: [{ id: '1', desc: 'Alvenaria de Vedação', qtd: 1, un: 'm²', price: 45, subtotal: 45 }],
-    conditions: { prazo: '15 dias úteis', garantia: '3 meses', pagamento: '50% Entrada, 50% Entrega' }
-  },
-  Pintor: {
-    services: [{ id: '1', desc: 'Pintura Acrílica (2 demãos)', qtd: 1, un: 'm²', price: 25, subtotal: 25 }],
-    conditions: { prazo: '10 dias úteis', garantia: '6 meses', pagamento: '50% Entrada, 50% Entrega' }
-  },
-  Eletricista: {
-    services: [{ id: '1', desc: 'Troca de fiação e disjuntores', qtd: 1, un: 'un', price: 1500, subtotal: 1500 }],
+  'Elétrica': {
+    icon: <Zap size={32} color="#F59E0B" />,
+    services: [{ id: '1', desc: 'Revisão Elétrica e Troca de Disjuntores', qtd: 1, un: 'un', price: 1500 }],
     conditions: { prazo: '3 dias úteis', garantia: '12 meses', pagamento: '30% Entrada, 70% Entrega' }
   },
-  Encanador: {
-    services: [{ id: '1', desc: 'Instalação Hidráulica Ponto de Água', qtd: 1, un: 'pt', price: 200, subtotal: 200 }],
-    conditions: { prazo: '5 dias úteis', garantia: '6 meses', pagamento: 'À vista no término' }
+  'Pintura': {
+    icon: <PaintRoller size={32} color="#EC4899" />,
+    services: [{ id: '1', desc: 'Pintura Acrílica (2 demãos)', qtd: 1, un: 'm²', price: 25 }],
+    conditions: { prazo: '10 dias úteis', garantia: '6 meses', pagamento: '50% Entrada, 50% Entrega' }
+  },
+  'Alvenaria': {
+    icon: <BrickWall size={32} color="#F59E0B" />,
+    services: [{ id: '1', desc: 'Alvenaria de Vedação', qtd: 1, un: 'm²', price: 45 }],
+    conditions: { prazo: '15 dias úteis', garantia: '3 meses', pagamento: '50% Entrada, 50% Entrega' }
+  },
+  'Hidráulica': {
+    icon: <Droplet size={32} color="#0EA5E9" />,
+    services: [{ id: '1', desc: 'Instalação de Ponto de Água/Esgoto', qtd: 1, un: 'pt', price: 250 }],
+    conditions: { prazo: '5 dias úteis', garantia: '6 meses', pagamento: 'À vista' }
   }
 };
 
 export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
   const { user, profile } = useAuth();
   
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // --- STATE DATA ---
@@ -61,14 +67,15 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
   const [discount, setDiscount] = useState({ value: 0, isPercentage: false });
   const [conditions, setConditions] = useState({ prazo: '', garantia: '', pagamento: '', validade: '15 dias', obs: '' });
 
-  // --- AUTOPOPULATE BASED ON PROFILE ---
-  useEffect(() => {
-    if (profile?.specialty && TEMPLATES[profile.specialty]) {
-      setServiceType(profile.specialty);
-      setServices(TEMPLATES[profile.specialty].services);
-      setConditions(TEMPLATES[profile.specialty].conditions);
+  // --- AUTOPOPULATE BASED ON PROFILE (Optional override) ---
+  const applyTemplate = (key: string) => {
+    setServiceType(key);
+    if (TEMPLATES[key]) {
+      setServices(TEMPLATES[key].services.map((s: any) => ({...s, id: Date.now().toString() + Math.random()})));
+      setConditions(TEMPLATES[key].conditions);
     }
-  }, [profile]);
+    setStep(4); // Advance past type
+  };
 
   // --- CALCULATIONS ---
   const totalServices = services.reduce((acc, curr) => acc + (curr.qtd * curr.price), 0);
@@ -86,17 +93,14 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
     setTimeout(() => {
       const doc = new jsPDF();
       
-      // Header
       doc.setFontSize(22);
-      doc.setTextColor(30, 58, 138); // var(--color-primary)
+      doc.setTextColor(30, 58, 138); 
       doc.text('ORÇAMENTO COMERCIAL', 14, 20);
-      
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
       doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 28);
       doc.text(`Validade: ${conditions.validade}`, 14, 33);
       
-      // Provider Info
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
       doc.text('DADOS DO PRESTADOR', 14, 45);
@@ -104,7 +108,6 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
       doc.text(`Nome: ${profile?.name || 'CentralObra Pro'}`, 14, 52);
       if (profile?.specialty) doc.text(`Especialidade: ${profile.specialty}`, 14, 57);
       
-      // Client Info
       doc.setFontSize(12);
       doc.text('DADOS DO CLIENTE', 105, 45);
       doc.setFontSize(10);
@@ -112,7 +115,6 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
       doc.text(`Telefone: ${client.phone || '-'}`, 105, 57);
       doc.text(`Obra: ${workData.name || '-'}`, 105, 62);
       
-      // Services Table
       if (services.length > 0) {
         autoTable(doc, {
           startY: 75,
@@ -123,7 +125,6 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
         });
       }
       
-      // Summary Totals
       const finalY = (doc as any).lastAutoTable?.finalY || 80;
       doc.setFontSize(12);
       doc.text(`Subtotal Serviços: R$ ${totalServices.toFixed(2)}`, 14, finalY + 10);
@@ -133,10 +134,9 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
       doc.text(`Desconto: - R$ ${discountAmount.toFixed(2)}`, 14, finalY + 34);
       
       doc.setFontSize(16);
-      doc.setTextColor(16, 185, 129); // green
+      doc.setTextColor(16, 185, 129);
       doc.text(`TOTAL GERAL: R$ ${grandTotal.toFixed(2)}`, 14, finalY + 45);
       
-      // Conditions
       doc.setFontSize(12);
       doc.setTextColor(0,0,0);
       doc.text('CONDIÇÕES COMERCIAIS', 14, finalY + 60);
@@ -150,9 +150,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
     }, 800);
   };
 
-  // --- ACTIONS ---
   const handleApprove = async () => {
-    // Integração: Criar Obra Automaticamente
     if (workData.name && user) {
       try {
         await addDoc(collection(db, 'works'), {
@@ -173,355 +171,531 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
   };
 
   // --- RENDER HELPERS ---
-  const renderStepHeader = () => (
-    <div style={{ display: 'flex', overflowX: 'auto', gap: 8, paddingBottom: 16, borderBottom: '1px solid var(--border-subtle)', marginBottom: 24, msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
-      {STEPS.map(s => (
-        <div 
-          key={s.id} 
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 20, 
-            backgroundColor: step === s.id ? 'var(--color-primary)' : step > s.id ? 'var(--bg-elevated)' : 'transparent',
-            color: step === s.id ? '#FFF' : step > s.id ? 'var(--text-main)' : 'var(--text-muted)',
-            border: `1px solid ${step === s.id ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
-            whiteSpace: 'nowrap',
-            transition: 'all 0.3s'
-          }}
-        >
-          {step > s.id ? <CheckCircle size={16} color="var(--color-success)" /> : s.icon}
-          <span style={{ fontSize: 13, fontWeight: 600 }}>{s.title}</span>
+  const renderSidebar = () => (
+    <div style={{ 
+      width: 300, backgroundColor: 'var(--bg-elevated)', borderRadius: 24, padding: 24, 
+      display: 'flex', flexDirection: 'column', gap: 24, border: '1px solid var(--border-subtle)',
+      height: 'fit-content', position: 'sticky', top: 24
+    }}>
+      <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Resumo do Orçamento</h3>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Cliente</span>
+          <span style={{ fontWeight: 600, fontSize: 14 }}>{client.name || '---'}</span>
         </div>
-      ))}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Serviços</span>
+          <span style={{ fontWeight: 600, fontSize: 14 }}>{services.length} itens</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Materiais</span>
+          <span style={{ fontWeight: 600, fontSize: 14 }}>{materials.length} itens</span>
+        </div>
+      </div>
+      
+      <div style={{ height: 1, backgroundColor: 'var(--border-subtle)' }} />
+      
+      <div>
+        <span style={{ color: 'var(--text-muted)', fontSize: 13, display: 'block', marginBottom: 4 }}>Total Parcial</span>
+        <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--color-primary)' }}>R$ {grandTotal.toFixed(2)}</span>
+      </div>
     </div>
   );
 
-  return (
-    <div style={{ padding: '20px 16px 100px 16px', minHeight: '100vh' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-        <button className="btn-icon" onClick={onFinish}><ChevronLeft size={24} /></button>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Assistente de Orçamento</h1>
+  const renderHeader = () => {
+    const currentStep = STEPS_DATA.find(s => s.id === step) || STEPS_DATA[0];
+    const progress = Math.max(0, Math.min(100, (step / 10) * 100));
+    
+    return (
+      <div style={{ marginBottom: 32 }}>
+        <button className="btn-icon" onClick={onFinish} style={{ marginBottom: 16 }}><ChevronLeft size={24} /></button>
+        
+        {step > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: 1 }}>Etapa {step} de 10</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>{progress.toFixed(0)}%</span>
+          </div>
+        )}
+        
+        {step > 0 && (
+          <div style={{ height: 6, backgroundColor: 'var(--bg-elevated)', borderRadius: 10, overflow: 'hidden', marginBottom: 24 }}>
+            <motion.div 
+              initial={{ width: 0 }} 
+              animate={{ width: `${progress}%` }} 
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              style={{ height: '100%', backgroundColor: 'var(--color-primary)', borderRadius: 10 }} 
+            />
+          </div>
+        )}
+
+        <motion.div
+          key={currentStep.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h1 style={{ fontSize: step === 0 ? 32 : 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px 0', lineHeight: 1.2 }}>
+            {currentStep.title}
+          </h1>
+          <p style={{ fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>
+            {currentStep.msg}
+          </p>
+        </motion.div>
       </div>
+    );
+  };
 
-      <div className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
-        {renderStepHeader()}
+  const animationProps = {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 },
+    transition: { duration: 0.2 }
+  };
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            {/* STEP 1: CLIENTE */}
-            {step === 1 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Dados do Cliente</h3>
-                <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
-                  <button className={`btn-${client.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 12 }} onClick={() => setClient({ ...client, isNew: true })}>Novo Cliente</button>
-                  <button className={`btn-${!client.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 12 }} onClick={() => setClient({ ...client, isNew: false, name: 'João Silva (Exemplo)', phone: '(11) 99999-9999' })}>Cliente Existente</button>
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-base)', padding: '24px 16px', paddingBottom: 120 }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', gap: 32 }}>
+        
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {renderHeader()}
+
+          <AnimatePresence mode="wait">
+            <motion.div key={step} {...animationProps}>
+              
+              {/* STEP 0: WELCOME */}
+              {step === 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: 'Orçamento em Branco', desc: 'Começar do zero', icon: <FileText size={32} color="var(--color-primary)" />, action: () => setStep(1) },
+                    { title: 'Usar Modelo / Template', desc: 'Preenchimento rápido', icon: <LayoutGrid size={32} color="#10B981" />, action: () => setStep(3) },
+                    { title: 'Duplicar Existente', desc: 'Copiar orçamento anterior', icon: <Settings size={32} color="#8B5CF6" />, action: () => alert('Em breve!') },
+                    { title: 'Da Lista de Compras', desc: 'Converter lista em orçamento', icon: <Package size={32} color="#F59E0B" />, action: () => alert('Em breve!') }
+                  ].map((item, i) => (
+                    <motion.div 
+                      key={i}
+                      whileHover={{ scale: 1.02, y: -4 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={item.action}
+                      className="glass-panel"
+                      style={{ padding: 24, borderRadius: 24, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid var(--border-subtle)' }}
+                    >
+                      <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: 'var(--bg-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {item.icon}
+                      </div>
+                      <div>
+                        <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px 0' }}>{item.title}</h3>
+                        <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <input type="text" className="input-field" placeholder="Nome Completo / Empresa" value={client.name} onChange={e => setClient({...client, name: e.target.value})} />
-                <input type="tel" className="input-field" placeholder="WhatsApp / Telefone" value={client.phone} onChange={e => setClient({...client, phone: e.target.value})} />
-                <input type="email" className="input-field" placeholder="E-mail" value={client.email} onChange={e => setClient({...client, email: e.target.value})} />
-              </div>
-            )}
+              )}
 
-            {/* STEP 2: OBRA */}
-            {step === 2 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Dados da Obra / Local</h3>
-                <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
-                  <button className={`btn-${workData.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 12 }} onClick={() => setWorkData({ ...workData, isNew: true })}>Nova Obra</button>
-                  <button className={`btn-${!workData.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 12 }} onClick={() => setWorkData({ ...workData, isNew: false, name: 'Reforma Apto 402' })}>Vincular a Obra Ativa</button>
+              {/* STEP 1: CLIENT */}
+              {step === 1 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div className="glass-panel" style={{ padding: '12px 20px', borderRadius: 100, display: 'flex', alignItems: 'center', gap: 12, border: '1px solid var(--border-subtle)' }}>
+                    <Search size={20} color="var(--color-primary)" />
+                    <input type="text" placeholder="Pesquisar cliente existente..." style={{ border: 'none', background: 'transparent', outline: 'none', color: 'var(--text-main)', flex: 1, fontSize: 16 }} />
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button className={`btn-${client.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 16, padding: '16px' }} onClick={() => setClient({ ...client, isNew: true })}>Novo Cliente</button>
+                    <button className={`btn-${!client.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 16, padding: '16px' }} onClick={() => setClient({ ...client, isNew: false, name: 'João Silva', phone: '(11) 99999-9999' })}>Selecionar Existente</button>
+                  </div>
+
+                  <div className="glass-panel" style={{ padding: 24, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <input type="text" className="input-field" placeholder="Nome Completo / Empresa" value={client.name} onChange={e => setClient({...client, name: e.target.value})} />
+                    <input type="tel" className="input-field" placeholder="WhatsApp / Telefone" value={client.phone} onChange={e => setClient({...client, phone: e.target.value})} />
+                    <input type="email" className="input-field" placeholder="E-mail (opcional)" value={client.email} onChange={e => setClient({...client, email: e.target.value})} />
+                  </div>
                 </div>
-                <input type="text" className="input-field" placeholder="Nome do Local (Ex: Reforma Apto 402)" value={workData.name} onChange={e => setWorkData({...workData, name: e.target.value})} />
-                <input type="text" className="input-field" placeholder="Endereço Completo" value={workData.address} onChange={e => setWorkData({...workData, address: e.target.value})} />
-              </div>
-            )}
+              )}
 
-            {/* STEP 3: TIPO DE SERVIÇO (TEMPLATES) */}
-            {step === 3 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Tipo de Serviço / Modelo</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Selecione um modelo inteligente para preencher automaticamente os serviços.</p>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {/* STEP 2: WORK */}
+              {step === 2 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button className={`btn-${workData.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 16, padding: '16px' }} onClick={() => setWorkData({ ...workData, isNew: true })}>Nova Obra</button>
+                    <button className={`btn-${!workData.isNew ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 16, padding: '16px' }} onClick={() => setWorkData({ ...workData, isNew: false, name: 'Reforma Apto 402' })}>Obra Existente</button>
+                  </div>
+
+                  <div className="glass-panel" style={{ padding: 24, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <input type="text" className="input-field" placeholder="Nome da Obra (Ex: Reforma Apto 402)" value={workData.name} onChange={e => setWorkData({...workData, name: e.target.value})} />
+                    <input type="text" className="input-field" placeholder="Endereço Completo" value={workData.address} onChange={e => setWorkData({...workData, address: e.target.value})} />
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 3: TYPE */}
+              {step === 3 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                   {Object.keys(TEMPLATES).map(key => (
-                    <div 
+                    <motion.div 
                       key={key} 
-                      onClick={() => {
-                        setServiceType(key);
-                        setServices(TEMPLATES[key].services);
-                        setConditions(TEMPLATES[key].conditions);
-                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => applyTemplate(key)}
                       style={{ 
-                        padding: 16, borderRadius: 16, 
+                        padding: 24, borderRadius: 24, 
                         border: `2px solid ${serviceType === key ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
-                        backgroundColor: serviceType === key ? 'rgba(30, 58, 138, 0.05)' : 'var(--bg-base)',
-                        cursor: 'pointer', textAlign: 'center', fontWeight: 600, color: 'var(--text-main)'
+                        backgroundColor: serviceType === key ? 'rgba(30, 58, 138, 0.05)' : 'var(--bg-elevated)',
+                        cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16
                       }}
                     >
-                      {key}
-                    </div>
+                      <div style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'var(--bg-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {TEMPLATES[key].icon}
+                      </div>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{key}</span>
+                    </motion.div>
                   ))}
-                  <div 
-                    onClick={() => { setServiceType('Outros'); setServices([]); }}
+                  <motion.div 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => { setServiceType('Outros'); setServices([]); setStep(4); }}
                     style={{ 
-                      padding: 16, borderRadius: 16, 
-                      border: `2px solid ${serviceType === 'Outros' ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
-                      backgroundColor: serviceType === 'Outros' ? 'rgba(30, 58, 138, 0.05)' : 'var(--bg-base)',
-                      cursor: 'pointer', textAlign: 'center', fontWeight: 600, color: 'var(--text-main)'
+                      padding: 24, borderRadius: 24, border: '2px dashed var(--border-subtle)',
+                      backgroundColor: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, justifyContent: 'center'
                     }}
                   >
-                    Em Branco
-                  </div>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-muted)' }}>Em Branco (Outro)</span>
+                  </motion.div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* STEP 4: SERVIÇOS */}
-            {step === 4 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Descrição dos Serviços</h3>
-                
-                {services.map((s, index) => (
-                  <div key={s.id} style={{ padding: 16, backgroundColor: 'var(--bg-elevated)', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 600 }}>Item {index + 1}</span>
-                      <button className="btn-icon" onClick={() => setServices(services.filter(x => x.id !== s.id))}><Trash2 size={16} color="var(--color-danger)" /></button>
-                    </div>
-                    <input type="text" className="input-field" placeholder="Descrição (Ex: Instalação de porcelanato)" value={s.desc} onChange={e => { const ns = [...services]; ns[index].desc = e.target.value; setServices(ns); }} />
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <input type="number" className="input-field" style={{ flex: 1 }} placeholder="Qtd" value={s.qtd} onChange={e => { const ns = [...services]; ns[index].qtd = Number(e.target.value); setServices(ns); }} />
-                      <input type="text" className="input-field" style={{ flex: 1 }} placeholder="Un (m², un)" value={s.un} onChange={e => { const ns = [...services]; ns[index].un = e.target.value; setServices(ns); }} />
-                      <input type="number" className="input-field" style={{ flex: 2 }} placeholder="R$ Unit." value={s.price} onChange={e => { const ns = [...services]; ns[index].price = Number(e.target.value); setServices(ns); }} />
-                    </div>
-                  </div>
-                ))}
-                
-                <button 
-                  className="btn-secondary" 
-                  style={{ borderRadius: 12, padding: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                  onClick={() => setServices([...services, { id: Date.now().toString(), desc: '', qtd: 1, un: 'un', price: 0 }])}
-                >
-                  <Plus size={18} /> Adicionar Serviço
-                </button>
-                <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 8 }}>
-                  Subtotal: R$ {totalServices.toFixed(2)}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 5: MATERIAIS */}
-            {step === 5 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Materiais</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Opcional. Adicione se o fornecimento de material estiver incluso no orçamento.</p>
-                
-                {materials.map((m, index) => (
-                  <div key={m.id} style={{ padding: 16, backgroundColor: 'var(--bg-elevated)', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 600 }}>Material {index + 1}</span>
-                      <button className="btn-icon" onClick={() => setMaterials(materials.filter(x => x.id !== m.id))}><Trash2 size={16} color="var(--color-danger)" /></button>
-                    </div>
-                    <input type="text" className="input-field" placeholder="Nome (Ex: Cimento 50kg)" value={m.name} onChange={e => { const nm = [...materials]; nm[index].name = e.target.value; setMaterials(nm); }} />
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <input type="number" className="input-field" style={{ flex: 1 }} placeholder="Qtd" value={m.qtd} onChange={e => { const nm = [...materials]; nm[index].qtd = Number(e.target.value); setMaterials(nm); }} />
-                      <input type="number" className="input-field" style={{ flex: 2 }} placeholder="R$ Unit." value={m.price} onChange={e => { const nm = [...materials]; nm[index].price = Number(e.target.value); setMaterials(nm); }} />
-                    </div>
-                  </div>
-                ))}
-                
-                <button 
-                  className="btn-secondary" 
-                  style={{ borderRadius: 12, padding: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                  onClick={() => setMaterials([...materials, { id: Date.now().toString(), name: '', qtd: 1, un: 'un', price: 0 }])}
-                >
-                  <Plus size={18} /> Adicionar Material
-                </button>
-                <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 8 }}>
-                  Subtotal: R$ {totalMaterials.toFixed(2)}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 6: MÃO DE OBRA */}
-            {step === 6 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Mão de Obra</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Cálculo de alocação de equipe por dias.</p>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Qtd. de Dias</label>
-                    <input type="number" className="input-field" value={labor.days} onChange={e => setLabor({...labor, days: Number(e.target.value)})} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Qtd. Profissionais</label>
-                    <input type="number" className="input-field" value={labor.workers} onChange={e => setLabor({...labor, workers: Number(e.target.value)})} />
-                  </div>
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Valor Diária (R$ / Profissional)</label>
-                  <input type="number" className="input-field" value={labor.dailyRate} onChange={e => setLabor({...labor, dailyRate: Number(e.target.value)})} />
-                </div>
-                
-                <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 8 }}>
-                  Subtotal: R$ {totalLabor.toFixed(2)}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 7: CUSTOS ADICIONAIS */}
-            {step === 7 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Custos Adicionais</h3>
-                
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Frete / Logística (R$)</label>
-                  <input type="number" className="input-field" value={costs.freight} onChange={e => setCosts({...costs, freight: Number(e.target.value)})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Deslocamento (R$)</label>
-                  <input type="number" className="input-field" value={costs.displacement} onChange={e => setCosts({...costs, displacement: Number(e.target.value)})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Locação Equipamentos (R$)</label>
-                  <input type="number" className="input-field" value={costs.rental} onChange={e => setCosts({...costs, rental: Number(e.target.value)})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Outros (R$)</label>
-                  <input type="number" className="input-field" value={costs.others} onChange={e => setCosts({...costs, others: Number(e.target.value)})} />
-                </div>
-                
-                <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 8 }}>
-                  Subtotal: R$ {totalCosts.toFixed(2)}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 8: DESCONTO */}
-            {step === 8 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Descontos</h3>
-                
-                <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
-                  <button className={`btn-${!discount.isPercentage ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 12 }} onClick={() => setDiscount({ ...discount, isPercentage: false })}>Fixo (R$)</button>
-                  <button className={`btn-${discount.isPercentage ? 'primary' : 'secondary'}`} style={{ flex: 1, borderRadius: 12 }} onClick={() => setDiscount({ ...discount, isPercentage: true })}>Percentual (%)</button>
-                </div>
-                
-                <input type="number" className="input-field" placeholder="Valor do Desconto" value={discount.value} onChange={e => setDiscount({...discount, value: Number(e.target.value)})} />
-                
-                <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--color-success)', marginTop: 8 }}>
-                  Desconto Total: - R$ {discountAmount.toFixed(2)}
-                </div>
-              </div>
-            )}
-
-            {/* STEP 9: CONDIÇÕES */}
-            {step === 9 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Condições Comerciais</h3>
-                
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Prazo de Execução</label>
-                  <input type="text" className="input-field" placeholder="Ex: 15 dias úteis" value={conditions.prazo} onChange={e => setConditions({...conditions, prazo: e.target.value})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Garantia</label>
-                  <input type="text" className="input-field" placeholder="Ex: 3 meses contra defeitos" value={conditions.garantia} onChange={e => setConditions({...conditions, garantia: e.target.value})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Forma de Pagamento</label>
-                  <input type="text" className="input-field" placeholder="Ex: 50% Entrada, 50% Término" value={conditions.pagamento} onChange={e => setConditions({...conditions, pagamento: e.target.value})} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Validade da Proposta</label>
-                  <input type="text" className="input-field" placeholder="Ex: 15 dias" value={conditions.validade} onChange={e => setConditions({...conditions, validade: e.target.value})} />
-                </div>
-              </div>
-            )}
-
-            {/* STEP 10: RESUMO */}
-            {step === 10 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                  <CheckCircle size={48} color="var(--color-success)" style={{ margin: '0 auto', marginBottom: 12 }} />
-                  <h3 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Orçamento Finalizado!</h3>
-                  <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Confira os valores antes de gerar o PDF e Aprovar.</p>
-                </div>
-                
-                <div style={{ padding: 16, backgroundColor: 'var(--bg-elevated)', borderRadius: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Serviços:</span>
-                    <span style={{ fontWeight: 600 }}>R$ {totalServices.toFixed(2)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Materiais:</span>
-                    <span style={{ fontWeight: 600 }}>R$ {totalMaterials.toFixed(2)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Mão de Obra:</span>
-                    <span style={{ fontWeight: 600 }}>R$ {totalLabor.toFixed(2)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Custos Adicionais:</span>
-                    <span style={{ fontWeight: 600 }}>R$ {totalCosts.toFixed(2)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: 14, color: 'var(--color-danger)' }}>
-                    <span>Desconto:</span>
-                    <span style={{ fontWeight: 600 }}>- R$ {discountAmount.toFixed(2)}</span>
-                  </div>
-                  <div style={{ height: 1, backgroundColor: 'var(--border-subtle)', margin: '12px 0' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, fontWeight: 800, color: 'var(--color-primary)' }}>
-                    <span>Total:</span>
-                    <span>R$ {grandTotal.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
-                  <button 
-                    className="btn-primary" 
-                    style={{ borderRadius: 12, padding: '16px 0', fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                    onClick={generatePDF}
-                    disabled={isGenerating}
+              {/* STEP 4: SERVICES */}
+              {step === 4 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {services.map((s, index) => (
+                    <motion.div key={s.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-panel" style={{ padding: 20, borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 14, textTransform: 'uppercase' }}>Serviço {index + 1}</span>
+                        <button className="btn-icon" onClick={() => setServices(services.filter(x => x.id !== s.id))}><Trash2 size={18} color="var(--color-danger)" /></button>
+                      </div>
+                      <input type="text" className="input-field" placeholder="Descrição detalhada..." value={s.desc} onChange={e => { const ns = [...services]; ns[index].desc = e.target.value; setServices(ns); }} style={{ fontSize: 16 }} />
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Qtd</label>
+                          <input type="number" className="input-field" value={s.qtd} onChange={e => { const ns = [...services]; ns[index].qtd = Number(e.target.value); setServices(ns); }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Unidade</label>
+                          <input type="text" className="input-field" placeholder="Ex: m², un" value={s.un} onChange={e => { const ns = [...services]; ns[index].un = e.target.value; setServices(ns); }} />
+                        </div>
+                        <div style={{ flex: 2 }}>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Valor Unit. (R$)</label>
+                          <input type="number" className="input-field" value={s.price} onChange={e => { const ns = [...services]; ns[index].price = Number(e.target.value); setServices(ns); }} />
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 4 }}>
+                        Subtotal: R$ {(s.qtd * s.price).toFixed(2)}
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  <motion.button 
+                    whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                    className="btn-secondary" 
+                    style={{ borderRadius: 20, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '2px dashed var(--border-subtle)', background: 'transparent' }}
+                    onClick={() => setServices([...services, { id: Date.now().toString(), desc: '', qtd: 1, un: 'un', price: 0 }])}
                   >
-                    {isGenerating ? 'Gerando...' : <><Download size={18} /> Gerar PDF</>}
-                  </button>
-                  <button 
-                    className="btn-primary" 
-                    style={{ borderRadius: 12, padding: '16px 0', fontSize: 15, fontWeight: 700, backgroundColor: 'var(--color-success)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                    onClick={handleApprove}
-                  >
-                    <CheckCircle size={18} /> Aprovar Obra
-                  </button>
+                    <Plus size={20} /> Adicionar Novo Serviço
+                  </motion.button>
                 </div>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+              )}
 
-        {/* NAVIGATION FOOTER */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
-          <button 
-            className="btn-secondary" 
-            style={{ borderRadius: 12, padding: '12px 24px', visibility: step === 1 ? 'hidden' : 'visible' }}
-            onClick={() => setStep(Math.max(1, step - 1))}
-          >
-            Voltar
-          </button>
-          
-          {step < 10 && (
-            <button 
-              className="btn-primary" 
-              style={{ borderRadius: 12, padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 8 }}
-              onClick={() => setStep(Math.min(10, step + 1))}
-            >
-              Avançar <ChevronRight size={16} />
-            </button>
-          )}
+              {/* STEP 5: MATERIALS */}
+              {step === 5 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
+                    <button className="btn-secondary" style={{ flex: 1, borderRadius: 16, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }} onClick={() => alert('Em breve: Importar das calculadoras de material.')}><LayoutGrid size={16} /> Importar Calculadora</button>
+                    <button className="btn-secondary" style={{ flex: 1, borderRadius: 16, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }} onClick={() => alert('Em breve: Importar da sua lista de compras salva.')}><Package size={16} /> Lista de Compras</button>
+                  </div>
+
+                  {materials.map((m, index) => (
+                    <motion.div key={m.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-panel" style={{ padding: 20, borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700, color: '#10B981', fontSize: 14, textTransform: 'uppercase' }}>Material {index + 1}</span>
+                        <button className="btn-icon" onClick={() => setMaterials(materials.filter(x => x.id !== m.id))}><Trash2 size={18} color="var(--color-danger)" /></button>
+                      </div>
+                      <input type="text" className="input-field" placeholder="Nome do Material..." value={m.name} onChange={e => { const nm = [...materials]; nm[index].name = e.target.value; setMaterials(nm); }} />
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Qtd</label>
+                          <input type="number" className="input-field" value={m.qtd} onChange={e => { const nm = [...materials]; nm[index].qtd = Number(e.target.value); setMaterials(nm); }} />
+                        </div>
+                        <div style={{ flex: 2 }}>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Valor Unit. (R$)</label>
+                          <input type="number" className="input-field" value={m.price} onChange={e => { const nm = [...materials]; nm[index].price = Number(e.target.value); setMaterials(nm); }} />
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 4 }}>
+                        Subtotal: R$ {(m.qtd * m.price).toFixed(2)}
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  <motion.button 
+                    whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                    className="btn-secondary" 
+                    style={{ borderRadius: 20, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '2px dashed var(--border-subtle)', background: 'transparent' }}
+                    onClick={() => setMaterials([...materials, { id: Date.now().toString(), name: '', qtd: 1, price: 0 }])}
+                  >
+                    <Plus size={20} /> Adicionar Material Manualmente
+                  </motion.button>
+                </div>
+              )}
+
+              {/* STEP 6: LABOR */}
+              {step === 6 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div className="glass-panel" style={{ padding: 24, borderRadius: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(30, 58, 138, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                        <Users size={24} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px 0' }}>Profissionais Envolvidos</h4>
+                        <input type="number" className="input-field" value={labor.workers} onChange={e => setLabor({...labor, workers: Number(e.target.value)})} style={{ fontSize: 20, fontWeight: 700, width: '100%', maxWidth: 150 }} />
+                      </div>
+                    </div>
+                    
+                    <div style={{ height: 1, backgroundColor: 'var(--border-subtle)' }} />
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10B981' }}>
+                        <AlertCircle size={24} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px 0' }}>Dias de Trabalho (Estimativa)</h4>
+                        <input type="number" className="input-field" value={labor.days} onChange={e => setLabor({...labor, days: Number(e.target.value)})} style={{ fontSize: 20, fontWeight: 700, width: '100%', maxWidth: 150 }} />
+                      </div>
+                    </div>
+
+                    <div style={{ height: 1, backgroundColor: 'var(--border-subtle)' }} />
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F59E0B' }}>
+                        <DollarSign size={24} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px 0' }}>Valor Médio da Diária (R$)</h4>
+                        <input type="number" className="input-field" value={labor.dailyRate} onChange={e => setLabor({...labor, dailyRate: Number(e.target.value)})} style={{ fontSize: 20, fontWeight: 700, width: '100%', maxWidth: 150 }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="glass-panel" style={{ padding: 24, borderRadius: 24, backgroundColor: 'var(--color-primary)', color: '#FFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: 14, opacity: 0.8, display: 'block', marginBottom: 4 }}>Cálculo Automático de Mão de Obra</span>
+                      <span style={{ fontSize: 13, opacity: 0.6 }}>{labor.workers} pessoas × {labor.days} dias × R$ {labor.dailyRate}</span>
+                    </div>
+                    <span style={{ fontSize: 28, fontWeight: 800 }}>R$ {totalLabor.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 7: ADDITIONAL COSTS */}
+              {step === 7 && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+                  {[
+                    { key: 'freight', title: 'Frete / Logística', desc: 'Transporte de materiais e entulho' },
+                    { key: 'displacement', title: 'Deslocamento', desc: 'Custos de viagem e pedágio' },
+                    { key: 'rental', title: 'Locação', desc: 'Aluguel de andaimes ou máquinas' },
+                    { key: 'others', title: 'Outros Custos', desc: 'Taxas, ART, etc.' }
+                  ].map((item) => (
+                    <div key={item.key} className="glass-panel" style={{ padding: 20, borderRadius: 20, display: 'flex', alignItems: 'center', gap: 16, border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px 0' }}>{item.title}</h4>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{item.desc}</p>
+                      </div>
+                      <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontWeight: 600, color: 'var(--text-muted)' }}>R$</span>
+                        <input 
+                          type="number" 
+                          className="input-field" 
+                          style={{ paddingLeft: 44, width: 140, fontWeight: 700, fontSize: 16 }}
+                          value={(costs as any)[item.key]} 
+                          onChange={e => setCosts({...costs, [item.key]: Number(e.target.value)})} 
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 20, color: 'var(--text-main)', marginTop: 8 }}>
+                    Total Adicional: R$ {totalCosts.toFixed(2)}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 8: DISCOUNT */}
+              {step === 8 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div style={{ display: 'flex', gap: 16 }}>
+                    <motion.div 
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                      onClick={() => setDiscount({ ...discount, isPercentage: false })}
+                      style={{ 
+                        flex: 1, padding: 24, borderRadius: 24, cursor: 'pointer', textAlign: 'center',
+                        border: `2px solid ${!discount.isPercentage ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
+                        backgroundColor: !discount.isPercentage ? 'rgba(30, 58, 138, 0.05)' : 'var(--bg-elevated)'
+                      }}
+                    >
+                      <h4 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 8px 0' }}>Valor Fixo (R$)</h4>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Desconto direto em Reais</p>
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                      onClick={() => setDiscount({ ...discount, isPercentage: true })}
+                      style={{ 
+                        flex: 1, padding: 24, borderRadius: 24, cursor: 'pointer', textAlign: 'center',
+                        border: `2px solid ${discount.isPercentage ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
+                        backgroundColor: discount.isPercentage ? 'rgba(30, 58, 138, 0.05)' : 'var(--bg-elevated)'
+                      }}
+                    >
+                      <h4 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 8px 0' }}>Percentual (%)</h4>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Desconto percentual</p>
+                    </motion.div>
+                  </div>
+
+                  <div className="glass-panel" style={{ padding: 32, borderRadius: 24, textAlign: 'center' }}>
+                    <input 
+                      type="number" 
+                      className="input-field" 
+                      style={{ fontSize: 48, fontWeight: 800, textAlign: 'center', padding: '16px 0', borderBottom: '2px solid var(--color-primary)', borderRadius: 0, backgroundColor: 'transparent' }}
+                      value={discount.value} 
+                      onChange={e => setDiscount({...discount, value: Number(e.target.value)})} 
+                    />
+                    <span style={{ display: 'block', marginTop: 16, fontSize: 16, color: 'var(--text-muted)' }}>
+                      Total de abatimento: <strong style={{ color: 'var(--color-danger)' }}>- R$ {discountAmount.toFixed(2)}</strong>
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 9: CONDITIONS */}
+              {step === 9 && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+                  <div className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Prazo de Execução</label>
+                    <input type="text" className="input-field" placeholder="Ex: 15 dias úteis após início" value={conditions.prazo} onChange={e => setConditions({...conditions, prazo: e.target.value})} style={{ fontSize: 16, fontWeight: 600 }} />
+                  </div>
+                  <div className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Garantia do Serviço</label>
+                    <input type="text" className="input-field" placeholder="Ex: 6 meses contra defeitos" value={conditions.garantia} onChange={e => setConditions({...conditions, garantia: e.target.value})} style={{ fontSize: 16, fontWeight: 600 }} />
+                  </div>
+                  <div className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Forma de Pagamento</label>
+                    <input type="text" className="input-field" placeholder="Ex: 50% Entrada, 50% Término" value={conditions.pagamento} onChange={e => setConditions({...conditions, pagamento: e.target.value})} style={{ fontSize: 16, fontWeight: 600 }} />
+                  </div>
+                  <div className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Validade da Proposta</label>
+                    <input type="text" className="input-field" placeholder="Ex: 15 dias" value={conditions.validade} onChange={e => setConditions({...conditions, validade: e.target.value})} style={{ fontSize: 16, fontWeight: 600 }} />
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 10: SUMMARY */}
+              {step === 10 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div className="glass-panel" style={{ padding: 32, borderRadius: 32, backgroundImage: 'linear-gradient(135deg, var(--bg-elevated) 0%, rgba(30, 58, 138, 0.05) 100%)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Total Geral do Orçamento</span>
+                      <h2 style={{ fontSize: 48, fontWeight: 900, color: 'var(--color-primary)', margin: '8px 0' }}>R$ {grandTotal.toFixed(2)}</h2>
+                      <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Para o cliente: <strong>{client.name || 'Não informado'}</strong></span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px dashed var(--border-subtle)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Serviços ({services.length})</span>
+                        <span style={{ fontWeight: 600 }}>R$ {totalServices.toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px dashed var(--border-subtle)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Materiais ({materials.length})</span>
+                        <span style={{ fontWeight: 600 }}>R$ {totalMaterials.toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px dashed var(--border-subtle)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Mão de Obra</span>
+                        <span style={{ fontWeight: 600 }}>R$ {totalLabor.toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px dashed var(--border-subtle)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Custos Adicionais</span>
+                        <span style={{ fontWeight: 600 }}>R$ {totalCosts.toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12 }}>
+                        <span style={{ color: 'var(--color-danger)' }}>Descontos Aplicados</span>
+                        <span style={{ fontWeight: 600, color: 'var(--color-danger)' }}>- R$ {discountAmount.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                      className="btn-primary" 
+                      style={{ borderRadius: 20, padding: 20, fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
+                      onClick={generatePDF}
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? 'Processando...' : <><Download size={20} /> Gerar PDF Formal</>}
+                    </motion.button>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                      className="btn-primary" 
+                      style={{ borderRadius: 20, padding: 20, fontSize: 16, fontWeight: 700, backgroundColor: '#10B981', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, border: 'none' }}
+                      onClick={handleApprove}
+                    >
+                      <CheckCircle size={20} /> Aprovar e Salvar
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* SIDEBAR FOR DESKTOP */}
+        <div style={{ display: 'none' }} className="desktop-sidebar">
+          {step > 0 && renderSidebar()}
         </div>
       </div>
+
+      {/* FLOATING NAVIGATION FOOTER */}
+      {step > 0 && step < 10 && (
+        <div style={{ 
+          position: 'fixed', bottom: 0, left: 0, right: 0, 
+          padding: '16px 24px', backgroundColor: 'var(--bg-elevated)', 
+          borderTop: '1px solid var(--border-subtle)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.05)', zIndex: 100
+        }}>
+          <button 
+            className="btn-secondary" 
+            style={{ borderRadius: 16, padding: '14px 24px', fontWeight: 600, display: 'flex', gap: 8, alignItems: 'center' }}
+            onClick={() => setStep(step - 1)}
+          >
+            <ChevronLeft size={18} /> Voltar
+          </button>
+          
+          <button 
+            className="btn-primary" 
+            style={{ borderRadius: 16, padding: '14px 32px', fontWeight: 700, display: 'flex', gap: 8, alignItems: 'center' }}
+            onClick={() => setStep(step + 1)}
+          >
+            Avançar <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
+
+      {/* CSS for Desktop Sidebar Visibility */}
+      <style>{`
+        @media (min-width: 1024px) {
+          .desktop-sidebar {
+            display: block !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
