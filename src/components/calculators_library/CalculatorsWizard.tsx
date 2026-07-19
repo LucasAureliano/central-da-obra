@@ -24,7 +24,10 @@ interface CalculatorsWizardProps {
   initialQuery?: string;
 }
 
+import { useAuth } from '../../contexts/AuthContext';
+
 export function CalculatorsWizard({ onNavigate, initialQuery }: CalculatorsWizardProps) {
+  const { profile } = useAuth();
   const [activeCalc, setActiveCalc] = useState<CalcId>(null);
   const [search, setSearch] = useState(initialQuery || '');
 
@@ -45,6 +48,11 @@ export function CalculatorsWizard({ onNavigate, initialQuery }: CalculatorsWizar
     { id: 'blondel', title: 'Escada (Blondel)', desc: 'Degraus e pisada', icon: <Ruler size={24} color="#8B5CF6" />, cat: 'Arquitetura' }
   ] as const;
 
+  const complexIds = ['concrete-mix', 'isolated-footing', 'electrical', 'plumbing', 'blondel'];
+  const allowedDb = profile?.role === 'owner' 
+    ? db.filter(c => !complexIds.includes(c.id))
+    : db;
+
   if (activeCalc === 'masonry') return <MasonryCalc onBack={() => setActiveCalc(null)} onNavigate={onNavigate} />;
   if (activeCalc === 'concrete-mix') return <ConcreteMixCalc onBack={() => setActiveCalc(null)} onNavigate={onNavigate} />;
   if (activeCalc === 'isolated-footing') return <IsolatedFootingCalc onBack={() => setActiveCalc(null)} />;
@@ -60,7 +68,7 @@ export function CalculatorsWizard({ onNavigate, initialQuery }: CalculatorsWizar
   if (activeCalc === 'lighting') return <LightingCalc onBack={() => setActiveCalc(null)} />;
   if (activeCalc === 'blondel') return <BlondelCalc onBack={() => setActiveCalc(null)} />;
 
-  const filtered = db.filter(c => 
+  const filtered = allowedDb.filter(c => 
     c.title.toLowerCase().includes(search.toLowerCase()) || 
     c.cat.toLowerCase().includes(search.toLowerCase()) ||
     c.desc.toLowerCase().includes(search.toLowerCase())

@@ -1,29 +1,42 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Briefcase, MapPin, Calendar, CheckCircle2, Circle } from 'lucide-react';
 import { CustomLogo } from './CustomLogo';
 
-export function SharedWorkView({ workId, theme }: { workId: string; theme: 'light' | 'dark' }) {
+export function SharedWorkView({ token, theme }: { token: string; theme: 'light' | 'dark' }) {
   const [work, setWork] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     async function fetchWork() {
       try {
-        const docRef = doc(db, 'works', workId);
+        const q = query(collection(db, 'shared_links'), where('token', '==', token));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          setErrorMsg('Link de compartilhamento inválido ou expirado.');
+          return;
+        }
+        
+        const linkData = snap.docs[0].data();
+        const docRef = doc(db, 'works', linkData.workId);
         const docSnap = await getDoc(docRef);
+        
         if (docSnap.exists()) {
           setWork({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          setErrorMsg('Obra não encontrada.');
         }
       } catch (err) {
         console.error(err);
+        setErrorMsg('Erro ao carregar os dados.');
       } finally {
         setLoading(false);
       }
     }
     fetchWork();
-  }, [workId]);
+  }, [token]);
 
   if (loading) {
     return (
@@ -33,10 +46,10 @@ export function SharedWorkView({ workId, theme }: { workId: string; theme: 'ligh
     );
   }
 
-  if (!work) {
+  if (errorMsg || !work) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', color: 'var(--text-main)' }}>
-        Obra não encontrada ou link inválido.
+        {errorMsg || 'Obra não encontrada.'}
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Building, ChevronRight, Activity, Users, PenTool } from 'lucide-react';
+import { ChevronRight, Activity, Users, PenTool, Briefcase } from 'lucide-react';
 import { useWorks } from '../../../contexts/WorksContext';
 
 export function WorksManagementWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
@@ -15,8 +15,14 @@ export function WorksManagementWidget({ onNavigate }: { onNavigate: (tab: string
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Building size={24} color="#FFF" />
+          <div style={{ width: 48, height: 48, borderRadius: 16, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {works[0]?.image ? (
+              <img src={works[0].image} alt={works[0].name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '100%', height: '100%', backgroundColor: works[0]?.colorTheme || '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Briefcase size={24} color="rgba(255,255,255,0.8)" />
+              </div>
+            )}
           </div>
           <div>
             <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFF', margin: 0, lineHeight: 1.2 }}>Obras Ativas</h3>
@@ -44,7 +50,7 @@ export function WorksManagementWidget({ onNavigate }: { onNavigate: (tab: string
         </div>
         <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <Users size={18} color="#FFF" />
-          <span style={{ fontSize: 12, fontWeight: 600, color: '#FFF' }}>2</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#FFF' }}>0</span>
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>Equipes Ativas</span>
         </div>
       </div>

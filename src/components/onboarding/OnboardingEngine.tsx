@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { UserRole } from '../../contexts/AuthContext';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { generateDefaultStages } from '../../lib/ChecklistGenerator';
 import { useAuth } from '../../contexts/AuthContext';
 import { OwnerDemo } from './OwnerDemo';
 import { ServiceDemo } from './ServiceDemo';
@@ -81,8 +82,36 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ role, onComp
       try {
         const userRef = doc(db, 'users', user.uid);
         await updateDoc(userRef, { hasSeenWelcome: true });
+
+        // Auto-create initial work based on role to ensure the dashboard isn't empty
+        if (role === 'owner' || role === 'builder') {
+          const defaultWorkName = role === 'owner' ? 'Minha Casa' : 'Residencial Vila Nova';
+          const defaultThemeColors = ['#F97316', '#3B82F6', '#10B981', '#8B5CF6'];
+          
+          const newWorkRef = await addDoc(collection(db, 'works'), {
+            userId: user.uid,
+            name: defaultWorkName,
+            client: 'Próprio',
+            address: 'Não informado',
+            budget: 0,
+            deadline: 'N/A',
+            status: 'Em andamento',
+            progress: 0,
+            image: null,
+            colorTheme: defaultThemeColors[Math.floor(Math.random() * defaultThemeColors.length)],
+            createdAt: serverTimestamp(),
+          });
+
+          const defaultStages = generateDefaultStages();
+          const batch = writeBatch(db);
+          defaultStages.forEach(stage => {
+            const stageRef = doc(collection(db, `works/${newWorkRef.id}/stages`));
+            batch.set(stageRef, stage);
+          });
+          await batch.commit();
+        }
       } catch (err) {
-        console.error('Error marking welcome:', err);
+        console.error('Error marking welcome or creating work:', err);
       }
     }
     onComplete();

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { MapPin, ChevronRight, Calendar as CalendarIcon, Clock, User, Briefcase, AlignLeft, Plus, ChevronLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { db } from '../lib/firebase';
+import { collection, query, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 
 type EventStatus = 'Agendado' | 'Em andamento' | 'Finalizado' | 'Cancelado';
 
@@ -18,17 +20,65 @@ interface AgendaEvent {
   status: EventStatus;
 }
 
-export const Agenda: React.FC = () => {
+export function Agenda() {
+  const { user, isGuest } = useAuth();
   const { profile } = useAuth();
   const isArchitect = profile?.role === 'architect';
   
   const [view, setView] = useState<'Dia' | 'Semana' | 'Mês'>('Dia');
   const [showForm, setShowForm] = useState(false);
+  const [events, setEvents] = useState<AgendaEvent[]>([]);
+  const [formData, setFormData] = useState({ title: '', date: '', time: '', client: '', work: '', location: '', notes: '' });
 
-  const [events] = useState<AgendaEvent[]>([
-    { id: '1', title: isArchitect ? 'Vistoria da Fundação' : 'Pintura Externa', date: '16/07/2026', time: '09:00', duration: '2h', location: 'Edifício Horizon', type: isArchitect ? 'Vistoria' : 'Serviço', client: 'João Silva', work: 'Obra Horizon', notes: 'Verificar alinhamento e documentação', status: 'Agendado' },
-    { id: '2', title: isArchitect ? 'Reunião de Compatibilização' : 'Manutenção Elétrica', date: '16/07/2026', time: '14:30', duration: '1h', location: 'Escritório Central', type: 'Reunião', client: 'Condomínio Alpha', work: 'Reforma', notes: 'Trazer planta revisada', status: 'Agendado' }
-  ]);
+  React.useEffect(() => {
+    if (user && !isGuest) {
+      loadEvents();
+    } else {
+      setEvents([
+        { id: '1', title: isArchitect ? 'Vistoria da Fundação' : 'Pintura Externa', date: '2026-07-16', time: '09:00', duration: '2h', location: 'Edifício Horizon', type: isArchitect ? 'Vistoria' : 'Serviço', client: 'João Silva', work: 'Obra Horizon', notes: 'Verificar alinhamento e documentação', status: 'Agendado' },
+        { id: '2', title: isArchitect ? 'Reunião de Compatibilização' : 'Manutenção Elétrica', date: '2026-07-16', time: '14:30', duration: '1h', location: 'Escritório Central', type: 'Reunião', client: 'Condomínio Alpha', work: 'Reforma', notes: 'Trazer planta revisada', status: 'Agendado' }
+      ]);
+    }
+  }, [user, isGuest]);
+
+  const loadEvents = async () => {
+    if (!user) return;
+    try {
+      const q = query(collection(db, 'users', user.uid, 'calendar'));
+      const snap = await getDocs(q);
+      const evs = snap.docs.map(d => ({ id: d.id, ...d.data() } as AgendaEvent));
+      evs.sort((a, b) => a.time.localeCompare(b.time));
+      setEvents(evs);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSave = async () => {
+    if (isGuest) {
+      alert("Visitantes não podem salvar.");
+      return;
+    }
+    if (!user || !formData.title || !formData.date || !formData.time) {
+      alert("Preencha título, data e hora.");
+      return;
+    }
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'calendar'), {
+        ...formData,
+        duration: '1h',
+        type: 'Geral',
+        status: 'Agendado',
+        createdAt: serverTimestamp()
+      });
+      setShowForm(false);
+      setFormData({ title: '', date: '', time: '', client: '', work: '', location: '', notes: '' });
+      loadEvents();
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao salvar.");
+    }
+  };
 
   if (showForm) {
     return (
@@ -41,21 +91,21 @@ export const Agenda: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="input-group">
             <label className="input-label">Título</label>
-            <input type="text" className="input-field" placeholder="Ex: Vistoria da Obra" />
+            <input type="text" className="input-field" placeholder="Ex: Vistoria da Obra" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div className="input-group">
               <label className="input-label">Data</label>
               <div style={{ position: 'relative' }}>
                 <CalendarIcon size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 16 }} />
-                <input type="date" className="input-field" style={{ paddingLeft: 44 }} />
+                <input type="date" className="input-field" style={{ paddingLeft: 44 }} value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
               </div>
             </div>
             <div className="input-group">
               <label className="input-label">Horário</label>
               <div style={{ position: 'relative' }}>
                 <Clock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 16 }} />
-                <input type="time" className="input-field" style={{ paddingLeft: 44 }} />
+                <input type="time" className="input-field" style={{ paddingLeft: 44 }} value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} />
               </div>
             </div>
           </div>
@@ -63,31 +113,31 @@ export const Agenda: React.FC = () => {
             <label className="input-label">Cliente</label>
             <div style={{ position: 'relative' }}>
               <User size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 16 }} />
-              <input type="text" className="input-field" style={{ paddingLeft: 44 }} placeholder="Nome do cliente" />
+              <input type="text" className="input-field" style={{ paddingLeft: 44 }} placeholder="Nome do cliente" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} />
             </div>
           </div>
           <div className="input-group">
             <label className="input-label">Obra Vinculada</label>
             <div style={{ position: 'relative' }}>
               <Briefcase size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 16 }} />
-              <input type="text" className="input-field" style={{ paddingLeft: 44 }} placeholder="Selecione a obra..." />
+              <input type="text" className="input-field" style={{ paddingLeft: 44 }} placeholder="Selecione a obra..." value={formData.work} onChange={e => setFormData({...formData, work: e.target.value})} />
             </div>
           </div>
           <div className="input-group">
             <label className="input-label">Localização / Endereço</label>
             <div style={{ position: 'relative' }}>
               <MapPin size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 16 }} />
-              <input type="text" className="input-field" style={{ paddingLeft: 44 }} placeholder="Endereço do evento" />
+              <input type="text" className="input-field" style={{ paddingLeft: 44 }} placeholder="Endereço do evento" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
             </div>
           </div>
           <div className="input-group">
             <label className="input-label">Observações</label>
             <div style={{ position: 'relative' }}>
               <AlignLeft size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 16 }} />
-              <textarea className="input-field" style={{ paddingLeft: 44, minHeight: 100 }} placeholder="Notas adicionais..."></textarea>
+              <textarea className="input-field" style={{ paddingLeft: 44, minHeight: 100 }} placeholder="Notas adicionais..." value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})}></textarea>
             </div>
           </div>
-          <button className="btn-primary" style={{ marginTop: 16, width: '100%', padding: '14px 0', borderRadius: 12, fontSize: 16 }}>
+          <button onClick={handleSave} className="btn-primary" style={{ marginTop: 16, width: '100%', padding: '14px 0', borderRadius: 12, fontSize: 16 }}>
             Salvar Agendamento
           </button>
         </div>

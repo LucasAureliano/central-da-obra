@@ -8,6 +8,7 @@ export interface Work {
   name: string;
   budget?: number;
   spent?: number;
+  progress?: number;
   [key: string]: any;
 }
 
@@ -38,22 +39,27 @@ export function WorksProvider({ children }: { children: React.ReactNode }) {
     const qWorks = query(collection(db, 'works'), where('userId', '==', user.uid));
     
     const unsubscribe = onSnapshot(qWorks, (snapshot) => {
+      if (snapshot.empty) {
+        setWorks([]);
+        setActiveWork(null);
+        setIsLoadingWorks(false);
+        return;
+      }
+
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Work));
-      
-      // Sort works by some logic if needed, right now we just use the order from DB
       setWorks(data);
       
-      // Update activeWork if it exists in the new data, else pick the first one
       setActiveWork(currentActive => {
-        if (data.length === 0) return null;
-        if (!currentActive) return data[0];
+        if (!currentActive) return data[0] || null;
         const stillExists = data.find(w => w.id === currentActive.id);
-        return stillExists || data[0];
+        return stillExists || data[0] || null;
       });
 
       setIsLoadingWorks(false);
     }, (error) => {
       console.error("Error fetching works:", error);
+      setWorks([]);
+      setActiveWork(null);
       setIsLoadingWorks(false);
     });
 

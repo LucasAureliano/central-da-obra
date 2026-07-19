@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BaseCalculatorLayout, type CalcResultItem, type CalcMaterial } from './BaseCalculatorLayout';
 import { Lightbulb } from 'lucide-react';
 import { WizardEngine, type WizardStep } from './WizardEngine';
+import { CopilotTip } from '../assistant/CopilotTip';
 
 export function LightingCalc({ onBack }: { onBack: () => void }) {
   const [step, setStep] = useState(0);
@@ -74,6 +75,9 @@ export function LightingCalc({ onBack }: { onBack: () => void }) {
       isValid: parseFloat(w) > 0 && parseFloat(l) > 0,
       content: (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div style={{ gridColumn: 'span 2' }}>
+            <CopilotTip tip={parseFloat(w) * parseFloat(l) > 30 ? 'Ambientes maiores que 30m² podem se beneficiar de circuitos independentes e iluminação setorizada.' : null} />
+          </div>
           <div>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Largura (m)</label>
             <input type="number" className="input-premium" value={w} onChange={e => setW(e.target.value)} placeholder="Ex: 3.0" autoFocus />
@@ -93,6 +97,7 @@ export function LightingCalc({ onBack }: { onBack: () => void }) {
       nextLabel: 'Calcular',
       content: (
         <div style={{ marginBottom: 24 }}>
+          <CopilotTip tip={lux === '500' || lux === '750' || lux === '1000' ? 'Para locais de trabalho (como cozinhas, bancadas ou mesas de escritório), a NBR 8995-1 recomenda a partir de 500 lux para evitar fadiga visual.' : null} />
           <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Nível de Lux (NBR 8995-1)</label>
           <select className="input-premium" value={lux} onChange={e => setLux(e.target.value)} autoFocus>
             <option value="150">150 lux (Quarto - Geral, Circulação)</option>

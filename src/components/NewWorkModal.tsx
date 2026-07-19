@@ -12,10 +12,13 @@ interface NewWorkModalProps {
   onClose: () => void;
 }
 
-const defaultImages = [
-  'https://images.unsplash.com/photo-1541888081622-19e5d424b94a?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop'
+const themeColors = [
+  '#F97316', // Orange
+  '#3B82F6', // Blue
+  '#10B981', // Emerald
+  '#8B5CF6', // Violet
+  '#F43F5E', // Rose
+  '#14B8A6'  // Teal
 ];
 
 export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
@@ -50,7 +53,7 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
 
     setIsSubmitting(true);
     try {
-      const randomImage = defaultImages[Math.floor(Math.random() * defaultImages.length)];
+      const randomColor = themeColors[Math.floor(Math.random() * themeColors.length)];
       
       const numericBudget = budgetInput ? parseInt(budgetInput.replace(/\D/g, '')) / 100 : 0;
 
@@ -63,7 +66,8 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
         deadline: deadline || 'N/A',
         status: 'Em andamento',
         progress: 0,
-        image: randomImage,
+        image: null,
+        colorTheme: randomColor,
         createdAt: serverTimestamp(),
       });
       

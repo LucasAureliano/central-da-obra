@@ -3,15 +3,15 @@ import {
   onAuthStateChanged,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   signInAnonymously,
 } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { browserLocalPersistence, setPersistence } from "firebase/auth";
 
-export type UserRole = "owner" | "service" | "architect" | "builder" | null;
+export type UserRole = "owner" | "service" | "architect" | "engineer" | "builder" | null;
 
 export interface DashboardPrefs {
   widgets?: string[];
@@ -54,10 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let unsubscribeProfile: () => void;
 
-    // Handle Google redirect result
-    getRedirectResult(auth).catch((error) => {
-      console.error("Redirect result error:", error);
-    });
+
 
     const checkLocalGuest = () => {
       const localGuestUid = sessionStorage.getItem("localGuestUid");
@@ -94,6 +91,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(firebaseUser);
 
           if (!firebaseUser.isAnonymous) {
+            sessionStorage.removeItem("localGuestUid");
+            sessionStorage.removeItem("guestHasSeenWelcome");
+            setLocalGuest(false);
+
             const userRef = doc(db, "users", firebaseUser.uid);
 
             // Listen to profile changes so role updates instantly
@@ -131,7 +132,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 await setDoc(userRef, newProfile);
                 setProfile(newProfile as UserProfile);
               } else {
-                setProfile(userSnap.data() as UserProfile);
+                const data = userSnap.data();
+                if (!data) {
+                  setProfile({ uid: firebaseUser.uid, role: null } as UserProfile);
+                } else {
+                  setProfile(data as UserProfile);
+                }
               }
               setLoading(false);
             });
@@ -176,9 +182,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
-      await signInWithRedirect(auth, provider);
+      await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google:", error);
       throw error;

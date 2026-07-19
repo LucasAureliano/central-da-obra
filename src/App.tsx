@@ -22,12 +22,19 @@ import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
+import { WeatherProvider } from './contexts/WeatherContext';
+import { ConstructionIndexesProvider } from './contexts/ConstructionIndexesContext';
+import { MapsProvider } from './contexts/MapsContext';
+import { AssistantProvider } from './contexts/AssistantContext';
+import { PortalProvider } from './contexts/PortalContext';
 import { PlaceholderScreen } from './components/PlaceholderScreen';
 import { SharedWorkView } from './components/SharedWorkView';
 import { CustomToaster } from './components/ui/Toast';
 import { GlobalHeader } from './components/ui/GlobalHeader';
 import { CommercialQuotes } from './components/provider/CommercialQuotes';
 import { ClientsManager } from './components/provider/ClientsManager';
+import { AppSettings } from './components/AppSettings';
+import { TeamManagement } from './components/TeamManagement';
 import { Agenda } from './components/Agenda';
 import { ProjectControl } from './components/architect/ProjectControl';
 import { TechnicalPendings } from './components/architect/TechnicalPendings';
@@ -60,7 +67,7 @@ function App() {
   const isPreview = urlParams.get('preview');
 
   if (sharedWorkId) {
-    return <SharedWorkView workId={sharedWorkId} theme={theme} />;
+    return <SharedWorkView token={sharedWorkId} theme={theme} />;
   }
 
   if (isPreview === 'true') {
@@ -226,6 +233,14 @@ function App() {
       setActiveTab('novo-orcamento');
       return;
     }
+    if (title === 'Equipe') {
+      setActiveTab('equipe');
+      return;
+    }
+    if (title === 'Ajustes do App') {
+      setActiveTab('ajustes');
+      return;
+    }
     setMenuTitle(title);
     setActiveTab('placeholder');
   };
@@ -272,6 +287,8 @@ function App() {
       case 'novo-orcamento': return <QuoteWizard key="novo-orcamento" onFinish={() => setActiveTab('orcamentos')} />;
       case 'financeiro': return <Finance key="financeiro" />;
       case 'perfil': return <Profile key="perfil" />;
+      case 'equipe': return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;
+      case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
       case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => handleNavigate('menu')} />;
       default: return <DashboardRouter key="default" onNavigate={handleNavigate} />;
@@ -279,8 +296,13 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <CustomToaster />
+    <WeatherProvider>
+      <ConstructionIndexesProvider>
+        <MapsProvider>
+          <AssistantProvider>
+            <PortalProvider>
+              <div className="app-container">
+                <CustomToaster />
       
       {/* Desktop Sidebar Navigation */}
       <aside className="sidebar-nav glass-panel">
@@ -419,23 +441,15 @@ function App() {
             backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
             zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              style={{ width: '100%', height: '100%', maxWidth: 500, position: 'relative', overflowY: 'auto' }}
-            >
+            <div className="glass-panel animate-fade-in" style={{ width: '90%', maxWidth: 400, borderRadius: 24, overflow: 'hidden', position: 'relative' }}>
               <button 
                 onClick={closeAuthModal}
-                style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', cursor: 'pointer' }}
+                style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.1)', border: 'none', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', cursor: 'pointer', zIndex: 10 }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
-              
-              {authView === 'login' 
-                ? <Login onGoToRegister={() => setAuthView('register')} theme={theme} /> 
-                : <Register onGoToLogin={() => setAuthView('login')} theme={theme} />}
-            </motion.div>
+              {authView === 'login' ? <Login onGoToRegister={() => setAuthView('register')} theme={theme} /> : <Register onGoToLogin={() => setAuthView('login')} theme={theme} />}
+            </div>
           </div>
         )}
       </AnimatePresence>
@@ -500,6 +514,11 @@ function App() {
         )}
       </AnimatePresence>
     </div>
+            </PortalProvider>
+          </AssistantProvider>
+        </MapsProvider>
+      </ConstructionIndexesProvider>
+    </WeatherProvider>
   );
 }
 

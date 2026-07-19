@@ -20,9 +20,14 @@ import {
   X,
   RefreshCw,
   FileText,
-  Calculator,
   Sparkles,
-  ShoppingCart
+  ShoppingCart,
+  Briefcase,
+  Camera,
+  ClipboardCheck,
+  FileSignature,
+  CalendarDays,
+  Palette
 } from 'lucide-react';
 
 interface MenuProps {
@@ -80,6 +85,16 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
 
     if (activeRole === 'builder') {
       items.push({ icon: <Users size={20} />, label: 'Equipe', color: '#F59E0B', action: () => onMenuSelect('Equipe') });
+      items.push({ icon: <Users size={20} />, label: 'Clientes', color: '#8B5CF6', action: () => onMenuSelect('Clientes') });
+    }
+    
+    if (activeRole === 'service') {
+      items.push({ icon: <Briefcase size={20} />, label: 'Meu Catálogo', color: '#F59E0B', action: () => onMenuSelect('Meu Catálogo') });
+      items.push({ icon: <Users size={20} />, label: 'Clientes', color: '#8B5CF6', action: () => onMenuSelect('Clientes') });
+    }
+
+    if (activeRole === 'architect' || activeRole === 'engineer') {
+      items.push({ icon: <Users size={20} />, label: 'Clientes', color: '#8B5CF6', action: () => onMenuSelect('Clientes') });
     }
 
     items.push({ icon: <FileText size={20} />, label: 'Relatórios', color: '#F43F5E', action: () => onMenuSelect('Relatórios') });
@@ -87,16 +102,28 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
     return items;
   };
 
+  const gestaoTecnicaSection = (activeRole === 'architect' || activeRole === 'engineer') ? [{
+    title: 'Gestão Técnica',
+    items: [
+      { icon: <Camera size={20} />, label: 'Diário Técnico', color: '#3B82F6', action: () => onMenuSelect('Diário Técnico') },
+      { icon: <ClipboardCheck size={20} />, label: 'Vistorias', color: '#F59E0B', action: () => onMenuSelect('Vistorias') },
+      { icon: <FileSignature size={20} />, label: 'Documentos Técnicos', color: '#10B981', action: () => onMenuSelect('Documentos Técnicos') },
+      { icon: <CalendarDays size={20} />, label: 'Cronograma e Medições', color: '#8B5CF6', action: () => onMenuSelect('Cronograma e Medições') },
+    ]
+  }] : [];
+
   const menuSections = [
     {
       title: 'Gestão',
       items: getGestaoItems()
     },
+    ...gestaoTecnicaSection,
     {
       title: 'Recursos',
       items: [
-        { icon: <Calculator size={20} />, label: 'Central de Cálculos', color: '#10B981', action: () => onMenuSelect('Cálculos') },
+        { icon: <Sparkles size={20} />, label: 'Assistente Inteligente', color: '#10B981', action: () => onMenuSelect('Assistente') },
         { icon: <BookOpen size={20} />, label: 'Biblioteca & Normas', color: '#8B5CF6', action: () => onMenuSelect('Biblioteca & Normas') },
+        { icon: <Palette size={20} />, label: 'Studio de Interiores', color: '#D946EF', action: () => onMenuSelect('Studio de Interiores') },
       ]
     },
     {
@@ -173,6 +200,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             <button 
               onClick={async () => {
                 await signOut();
+                window.location.reload();
               }}
               className="card-premium-interactive"
               style={{ width: '100%', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--color-danger)', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--color-danger)', borderRadius: 24, fontSize: 16, fontWeight: 600, cursor: 'pointer' }}

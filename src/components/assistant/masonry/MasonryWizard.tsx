@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, ChevronRight, Check, Sparkles } from 'lucide-react';
 import { MasonryResult } from './MasonryResult';
 import type { AssistantMode } from '../SmartAssistant';
+import { CopilotTip } from '../CopilotTip';
 
 export type MasonryData = {
   material: string;
@@ -35,6 +36,15 @@ export function MasonryWizard({ mode, onBack, onHome }: { mode: AssistantMode, o
     setData(prev => ({ ...prev, ...updates }));
   };
 
+  let currentTip = null;
+  if (step === 2 && data.material.includes('Baiano')) {
+    currentTip = "O Tijolo Baiano (cerâmico) é excelente para vedação térmica e acústica, mas NÃO possui função estrutural. Use-o apenas para fechar vãos.";
+  } else if (step === 3 && data.height > 3) {
+    currentTip = "Paredes com altura superior a 3 metros exigem cinta de amarração intermediária para evitar flambagem e fissuras.";
+  } else if (step === 4 && data.hasOpenings) {
+    currentTip = "Para garantir a integridade da parede, lembre-se de prever vergas (sobre as aberturas) e contravergas (sob as janelas).";
+  }
+
   // Renderiza a etapa atual
   return (
     <div className="screen-content animate-fade-in" style={{ padding: '0 20px', paddingTop: 24, paddingBottom: 100 }}>
@@ -65,6 +75,7 @@ export function MasonryWizard({ mode, onBack, onHome }: { mode: AssistantMode, o
 
       {step === 2 && (
         <div className="animate-fade-in">
+          <CopilotTip tip={currentTip} />
           <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Qual a finalidade?</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {['Parede Interna (Divisória)', 'Parede Externa (Fachada)', 'Muro de Divisa'].map(pur => (
@@ -81,6 +92,7 @@ export function MasonryWizard({ mode, onBack, onHome }: { mode: AssistantMode, o
 
       {step === 3 && (
         <div className="animate-fade-in">
+          <CopilotTip tip={currentTip} />
           <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Medidas principais</h2>
           
           <div className="glass-panel" style={{ padding: 20, borderRadius: 24, marginBottom: 24 }}>
@@ -152,6 +164,7 @@ export function MasonryWizard({ mode, onBack, onHome }: { mode: AssistantMode, o
 
       {step === 4 && (
         <div className="animate-fade-in">
+          <CopilotTip tip={currentTip} />
           <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Acabamentos</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>O que será aplicado sobre a alvenaria?</p>
           

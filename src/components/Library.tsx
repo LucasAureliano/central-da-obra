@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { BookOpen, Search, Download, ExternalLink, ShieldAlert, FileText, Bookmark } from 'lucide-react';
+import { BookOpen, Search, Download, ExternalLink, ShieldAlert, FileText, Bookmark, Calculator, Trash2 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, query, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LibraryItem {
   id: string;
   title: string;
   description: string;
-  category: 'abnt' | 'manuais' | 'seguranca';
+  category: 'abnt' | 'manuais' | 'seguranca' | 'calculos';
   size: string;
   date: string;
   isBookmarked?: boolean;
@@ -21,10 +24,28 @@ const initialLibraryData: LibraryItem[] = [
 ];
 
 export const Library: React.FC = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState<'tudo' | 'abnt' | 'manuais' | 'seguranca'>('tudo');
+  const [activeCategory, setActiveCategory] = useState<'tudo' | 'abnt' | 'manuais' | 'seguranca' | 'calculos'>('tudo');
   const [items, setItems] = useState<LibraryItem[]>(initialLibraryData);
+  const [calculations, setCalculations] = useState<any[]>([]);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (user) {
+      getDocs(query(collection(db, 'users', user.uid, 'calculations'))).then(snap => {
+        setCalculations(snap.docs.map(d => ({id: d.id, ...d.data()})));
+      });
+    }
+  }, [user]);
+
+  const handleDeleteCalculation = async (id: string) => {
+    if (!user) return;
+    if (confirm("Deseja realmente excluir este cálculo?")) {
+      await deleteDoc(doc(db, 'users', user.uid, 'calculations', id));
+      setCalculations(prev => prev.filter(c => c.id !== id));
+    }
+  };
 
   const filteredItems = items.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -130,11 +151,51 @@ export const Library: React.FC = () => {
         >
           <BookOpen size={14} /> Manuais Práticos
         </button>
+        <button 
+          onClick={() => setActiveCategory('calculos')}
+          className={`badge ${activeCategory === 'calculos' ? 'badge-orange' : ''}`}
+          style={{ padding: '8px 16px', fontSize: 13, border: '1px solid', borderColor: activeCategory === 'calculos' ? 'transparent' : 'var(--border-medium)', color: activeCategory === 'calculos' ? '#FFF' : 'var(--text-main)', backgroundColor: activeCategory === 'calculos' ? 'var(--color-primary)' : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+        >
+          <Calculator size={14} /> Meus Cálculos
+        </button>
       </div>
 
       {/* List */}
       <div style={{ padding: '0 16px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {filteredItems.length === 0 ? (
+        {activeCategory === 'calculos' ? (
+          calculations.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-muted)' }}>
+              <Calculator size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
+              <p className="text-sm">Você ainda não salvou nenhum cálculo.</p>
+            </div>
+          ) : (
+            calculations.map(calc => (
+              <div key={calc.id} className="card-premium animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                      <Calculator size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{calc.calcType}</h3>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
+                        {calc.savedAt ? new Date(calc.savedAt.seconds * 1000).toLocaleDateString('pt-BR') : 'Sem data'}
+                      </p>
+                    </div>
+                  </div>
+                  <button onClick={() => handleDeleteCalculation(calc.id)} style={{ background: 'none', border: 'none', color: 'var(--color-danger)', cursor: 'pointer' }}>
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+                {calc.resultData?.materials && (
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', backgroundColor: 'var(--bg-elevated)', padding: 12, borderRadius: 8 }}>
+                    <strong>Materiais Estimados:</strong> {calc.resultData.materials.map((m: any) => `${m.quantity} ${m.unit} de ${m.name}`).join(', ')}
+                  </div>
+                )}
+              </div>
+            ))
+          )
+        ) : filteredItems.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-muted)' }}>
             <Search size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
             <p className="text-sm">Nenhum documento encontrado para "{searchTerm}".</p>

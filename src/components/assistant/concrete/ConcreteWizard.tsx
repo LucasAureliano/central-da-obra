@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Check, Sparkles } from 'lucide-react';
 import { ConcreteResult } from './ConcreteResult';
 import type { AssistantMode } from '../SmartAssistant';
+import { CopilotTip } from '../CopilotTip';
 
 export type ConcreteData = {
   element: string;
@@ -24,6 +25,15 @@ export function ConcreteWizard({ mode, onBack, onHome }: { mode: AssistantMode, 
   };
 
   const updateData = (updates: Partial<ConcreteData>) => setData(prev => ({ ...prev, ...updates }));
+
+  let currentTip = null;
+  if (step === 2 && data.element === 'Fundação (Sapatas)') {
+    currentTip = "Para fundações (sapatas), a NBR 6118 recomenda fck mínimo de 25 MPa para garantir a durabilidade e proteção das armaduras.";
+  } else if (step === 2 && data.element === 'Laje') {
+    currentTip = "Para lajes maciças ou nervuradas, recomenda-se fck de 25 a 30 MPa dependendo do vão e carregamento.";
+  } else if (step === 3 && data.element === 'Fundação (Sapatas)' && (data.fck === '15' || data.fck === '20')) {
+    currentTip = "Atenção: O FCK escolhido é inferior ao recomendado pela NBR (mín 25 MPa). Avalie com seu engenheiro estrutural.";
+  }
 
   return (
     <div className="screen-content animate-fade-in" style={{ padding: '0 20px', paddingTop: 24, paddingBottom: 100 }}>
@@ -49,6 +59,7 @@ export function ConcreteWizard({ mode, onBack, onHome }: { mode: AssistantMode, 
 
       {step === 2 && (
         <div className="animate-fade-in">
+          <CopilotTip tip={currentTip} />
           <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Qual a resistência (FCK)?</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {[
@@ -76,6 +87,7 @@ export function ConcreteWizard({ mode, onBack, onHome }: { mode: AssistantMode, 
 
       {step === 3 && (
         <div className="animate-fade-in">
+          <CopilotTip tip={currentTip} />
           <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Volume de Concreto</h2>
           
           <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>

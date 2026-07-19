@@ -3,25 +3,29 @@ import 'jspdf-autotable';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 import type { Work, Expense } from '../types';
+import { drawHeader, drawFooter } from '../utils/pdfGenerator';
+import { auth } from './firebase';
 
 export const generateGeneralReport = async (activeWork: Work) => {
-  const doc = new jsPDF();
-  const dateStr = new Date().toLocaleDateString('pt-BR');
+  const doc = new jsPDF('p', 'pt', 'a4');
+  const user = auth.currentUser;
+  
+  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork.name);
   
   doc.setFontSize(20);
-  doc.text('Relatório Geral da Obra', 14, 22);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Relatório Geral da Obra', 40, 110);
   
   doc.setFontSize(12);
-  doc.text(`Obra: ${activeWork.name}`, 14, 32);
-  doc.text(`Data: ${dateStr}`, 14, 38);
-  doc.text(`Progresso: ${activeWork.progress || 0}%`, 14, 44);
+  doc.setTextColor(80, 80, 80);
+  doc.text(`Progresso: ${activeWork.progress || 0}%`, 40, 130);
   
   // Orçamento vs Gasto
   const budget = activeWork.budget || 0;
   const spent = activeWork.spent || 0;
   
   (doc as any).autoTable({
-    startY: 55,
+    startY: 150,
     head: [['Indicador', 'Valor']],
     body: [
       ['Orçamento Previsto', `R$ ${budget.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`],
@@ -29,29 +33,32 @@ export const generateGeneralReport = async (activeWork: Work) => {
       ['Saldo Atual', `R$ ${(budget - spent).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`],
     ],
     theme: 'grid',
-    headStyles: { fillColor: [16, 185, 129] }
+    headStyles: { fillColor: [255, 107, 0], textColor: [255, 255, 255] },
+    margin: { top: 40, right: 40, bottom: 60, left: 40 }
   });
 
+  drawFooter(doc);
   doc.save(`relatorio_geral_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
 
 export const generateFinancialReport = async (activeWork: Work) => {
-  const doc = new jsPDF();
-  const dateStr = new Date().toLocaleDateString('pt-BR');
+  const doc = new jsPDF('p', 'pt', 'a4');
+  const user = auth.currentUser;
+  
+  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork.name);
   
   doc.setFontSize(20);
-  doc.text('Relatório Financeiro', 14, 22);
-  
-  doc.setFontSize(12);
-  doc.text(`Obra: ${activeWork.name}`, 14, 32);
-  doc.text(`Data: ${dateStr}`, 14, 38);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Relatório Financeiro', 40, 110);
   
   const qExp = query(collection(db, `works/${activeWork.id}/expenses`), orderBy('date', 'desc'));
   const snap = await getDocs(qExp);
   const expenses = snap.docs.map(d => d.data() as Expense);
 
   if (expenses.length === 0) {
-    doc.text('Nenhuma despesa registrada nesta obra.', 14, 55);
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Nenhuma despesa registrada nesta obra.', 40, 140);
   } else {
     const tableData = expenses.map(e => [
       e.date?.toDate ? e.date.toDate().toLocaleDateString('pt-BR') : new Date(e.date).toLocaleDateString('pt-BR'),
@@ -62,35 +69,38 @@ export const generateFinancialReport = async (activeWork: Work) => {
     ]);
 
     (doc as any).autoTable({
-      startY: 50,
+      startY: 140,
       head: [['Data', 'Descrição', 'Categoria', 'Status', 'Valor']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [59, 130, 246] }
+      headStyles: { fillColor: [255, 107, 0], textColor: [255, 255, 255] },
+      margin: { top: 40, right: 40, bottom: 60, left: 40 }
     });
     
     // Calculate totals
     const totalPago = expenses.filter(e => e.status === 'Pago').reduce((sum, e) => sum + Number(e.amount), 0);
     const totalPendente = expenses.filter(e => e.status === 'Pendente').reduce((sum, e) => sum + Number(e.amount), 0);
     
-    const finalY = (doc as any).lastAutoTable.finalY || 50;
-    doc.text(`Total Pago: R$ ${totalPago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`, 14, finalY + 15);
-    doc.text(`Total Pendente: R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`, 14, finalY + 22);
+    const finalY = (doc as any).lastAutoTable.finalY || 140;
+    doc.setFontSize(12);
+    doc.setTextColor(30, 30, 30);
+    doc.text(`Total Pago: R$ ${totalPago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`, 40, finalY + 30);
+    doc.text(`Total Pendente: R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`, 40, finalY + 50);
   }
 
+  drawFooter(doc);
   doc.save(`financeiro_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
 
 export const generateShoppingReport = async (activeWork: Work) => {
-  const doc = new jsPDF();
-  const dateStr = new Date().toLocaleDateString('pt-BR');
+  const doc = new jsPDF('p', 'pt', 'a4');
+  const user = auth.currentUser;
+  
+  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork.name);
   
   doc.setFontSize(20);
-  doc.text('Lista de Compras & Materiais', 14, 22);
-  
-  doc.setFontSize(12);
-  doc.text(`Obra: ${activeWork.name}`, 14, 32);
-  doc.text(`Data: ${dateStr}`, 14, 38);
+  doc.setTextColor(30, 30, 30);
+  doc.text('Lista de Compras & Materiais', 40, 110);
   
   const qShop = query(collection(db, `works/${activeWork.id}/shopping`));
   const snapShop = await getDocs(qShop);
@@ -127,7 +137,9 @@ export const generateShoppingReport = async (activeWork: Work) => {
   });
 
   if (materials.length === 0) {
-    doc.text('Nenhum material listado.', 14, 55);
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Nenhum material listado.', 40, 140);
   } else {
     const tableData = materials.map(m => [
       m.name,
@@ -137,13 +149,15 @@ export const generateShoppingReport = async (activeWork: Work) => {
     ]);
 
     (doc as any).autoTable({
-      startY: 50,
+      startY: 140,
       head: [['Material', 'Qtd', 'Status', 'Origem']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [139, 92, 246] }
+      headStyles: { fillColor: [255, 107, 0], textColor: [255, 255, 255] },
+      margin: { top: 40, right: 40, bottom: 60, left: 40 }
     });
   }
 
+  drawFooter(doc);
   doc.save(`compras_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
 };

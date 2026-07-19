@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Calendar, DollarSign, Activity, Share2 } from 'lucid
 import { TimelineView } from './works/TimelineView';
 import { DocumentsView } from './works/DocumentsView';
 import { BudgetList } from './works/BudgetList';
+import { ShareWorkView } from './works/ShareWorkView';
 import { Plus, X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -20,7 +21,7 @@ interface WorkDetailsProps {
 export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
   const { profile, user } = useAuth();
   const [work, setWork] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'orcamento' | 'diario' | 'documentos'>('resumo');
+  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'orcamento' | 'diario' | 'documentos' | 'compartilhamento'>('resumo');
   const [calculations, setCalculations] = useState<any[]>([]);
   const [totalSpent, setTotalSpent] = useState(0);
   
@@ -109,18 +110,30 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         
         <button 
           onClick={onBack}
-          style={{ position: 'absolute', top: 24, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', border: 'none', cursor: 'pointer' }}
+          style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', border: 'none', cursor: 'pointer' }}
         >
           <ArrowLeft size={20} />
         </button>
 
         <button 
-          onClick={() => {
-            const link = `${window.location.origin}/?shared=${workId}`;
-            navigator.clipboard.writeText(link);
-            alert('Link de compartilhamento copiado!');
+          onClick={async () => {
+            try {
+              const token = crypto.randomUUID();
+              await addDoc(collection(db, 'shared_links'), {
+                token: token,
+                workId: workId,
+                role: 'viewer',
+                createdAt: new Date().toISOString()
+              });
+              const link = `${window.location.origin}/?shared=${token}`;
+              navigator.clipboard.writeText(link);
+              alert('Link seguro copiado para a área de transferência! Acesso de Apenas Leitura.');
+            } catch(e) {
+              console.error(e);
+              alert('Erro ao gerar link.');
+            }
           }}
-          style={{ position: 'absolute', top: 24, right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', border: 'none', cursor: 'pointer' }}
+          style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', border: 'none', cursor: 'pointer' }}
           title="Compartilhar Obra"
         >
           <Share2 size={20} />
@@ -139,38 +152,38 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 16, padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
+      <div className="hide-scrollbar" style={{ display: 'flex', gap: 16, padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
         <button 
           onClick={() => setActiveTab('resumo')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'resumo' ? 700 : 600, color: activeTab === 'resumo' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'resumo' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
+          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'resumo' ? 700 : 600, color: activeTab === 'resumo' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'resumo' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           Resumo
         </button>
         <button 
           onClick={() => setActiveTab('cronograma')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'cronograma' ? 700 : 600, color: activeTab === 'cronograma' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'cronograma' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
+          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'cronograma' ? 700 : 600, color: activeTab === 'cronograma' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'cronograma' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           Cronograma
         </button>
         {profile?.role !== 'owner' && (
           <button 
             onClick={() => setActiveTab('financas')}
-            style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'financas' ? 700 : 600, color: activeTab === 'financas' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'financas' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'financas' ? 700 : 600, color: activeTab === 'financas' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'financas' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             Finanças
           </button>
         )}
         <button 
           onClick={() => setActiveTab('orcamento')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'orcamento' ? 700 : 600, color: activeTab === 'orcamento' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'orcamento' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
+          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'orcamento' ? 700 : 600, color: activeTab === 'orcamento' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'orcamento' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
-          Orçamento
+          Orçamentos
         </button>
         <button 
-          onClick={() => setActiveTab('documentos')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'documentos' ? 700 : 600, color: activeTab === 'documentos' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'documentos' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer' }}
+          onClick={() => setActiveTab('compartilhamento')}
+          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'compartilhamento' ? 700 : 600, color: activeTab === 'compartilhamento' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'compartilhamento' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
-          Documentos
+          Compartilhamento
         </button>
       </div>
 
@@ -220,9 +233,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         <TimelineView workId={workId} />
       )}
 
-      {activeTab === 'documentos' && (
-        <DocumentsView workId={work.id} />
-      )}
+
 
       {activeTab === 'orcamento' && (
         <BudgetList workId={workId} calculations={calculations} work={work} user={user} profile={profile} />
@@ -281,6 +292,12 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       {activeTab === 'documentos' && (
         <div className="animate-fade-in">
           <DocumentsView workId={work.id} />
+        </div>
+      )}
+
+      {activeTab === 'compartilhamento' && (
+        <div className="animate-fade-in">
+          <ShareWorkView workId={work.id} />
         </div>
       )}
 

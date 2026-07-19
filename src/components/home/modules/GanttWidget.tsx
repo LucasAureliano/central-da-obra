@@ -1,7 +1,12 @@
 import { motion } from 'framer-motion';
 import { Calendar, ChevronRight, CheckCircle, Activity } from 'lucide-react';
+import { useWorks } from '../../../contexts/WorksContext';
 
 export function GanttWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
+  const { works } = useWorks();
+  const onTime = works.filter(w => w.progress === 100 || (w.progress && w.progress > 50)).length;
+  const delayed = works.filter(w => w.progress && w.progress <= 50 && w.progress > 0).length;
+
   return (
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }} 
@@ -29,7 +34,7 @@ export function GanttWidget({ onNavigate }: { onNavigate: (tab: string) => void 
              <CheckCircle size={18} color="#10B981" />
           </div>
           <div>
-            <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-main)', display: 'block' }}>12</span>
+            <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-main)', display: 'block' }}>{onTime}</span>
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Obras no Prazo</span>
           </div>
         </div>
@@ -38,7 +43,7 @@ export function GanttWidget({ onNavigate }: { onNavigate: (tab: string) => void 
              <Activity size={18} color="#EF4444" />
           </div>
           <div>
-            <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-main)', display: 'block' }}>3</span>
+            <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-main)', display: 'block' }}>{delayed}</span>
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Obras Atrasadas</span>
           </div>
         </div>

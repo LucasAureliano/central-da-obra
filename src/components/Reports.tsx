@@ -9,7 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { generateGeneralReport, generateFinancialReport, generateShoppingReport } from '../lib/pdfGenerator';
-import { Camera, ClipboardCheck } from 'lucide-react';
+import { exportShoppingToExcel, exportFinanceToExcel } from '../lib/excelGenerator';
+import { Camera, ClipboardCheck, FileSpreadsheet } from 'lucide-react';
 
 export const Reports: React.FC = () => {
   const { activeWork } = useWorks();
@@ -55,6 +56,10 @@ export const Reports: React.FC = () => {
         await generateFinancialReport(activeWork);
       } else if (id === 'compras') {
         await generateShoppingReport(activeWork);
+      } else if (id === 'fotografico' || id === 'vistoria') {
+        // Not implemented yet
+        await new Promise(r => setTimeout(r, 1000));
+        alert('Este relatório estará disponível na próxima atualização.');
       }
       setGeneratingReport(null);
       setSuccessReport(name);
@@ -62,6 +67,25 @@ export const Reports: React.FC = () => {
       console.error(err);
       setGeneratingReport(null);
       alert('Erro ao gerar relatório.');
+    }
+  };
+
+  const startExcelGeneration = async (id: string, name: string) => {
+    if (!activeWork) return;
+    
+    setGeneratingReport(name + " (Excel)");
+    try {
+      if (id === 'financeiro') {
+        await exportFinanceToExcel(activeWork);
+      } else if (id === 'compras') {
+        await exportShoppingToExcel(activeWork);
+      }
+      setGeneratingReport(null);
+      setSuccessReport(name + " (Excel)");
+    } catch (err) {
+      console.error(err);
+      setGeneratingReport(null);
+      alert('Erro ao exportar planilha.');
     }
   };
 
@@ -111,13 +135,24 @@ export const Reports: React.FC = () => {
               </div>
             </div>
 
-            <button 
-              onClick={() => startGeneration(r.id, r.title)}
-              className="btn-primary" 
-              style={{ padding: '8px 12px', fontSize: 12, gap: 6 }}
-            >
-              <Download size={14} /> Gerar PDF Exportável
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button 
+                onClick={() => startGeneration(r.id, r.title)}
+                className="btn-primary" 
+                style={{ flex: 1, padding: '8px 12px', fontSize: 12, gap: 6 }}
+              >
+                <Download size={14} /> PDF
+              </button>
+              {(r.id === 'financeiro' || r.id === 'compras') && (
+                <button 
+                  onClick={() => startExcelGeneration(r.id, r.title)}
+                  className="btn-secondary" 
+                  style={{ flex: 1, padding: '8px 12px', fontSize: 12, gap: 6, backgroundColor: '#10B981', color: 'white', borderColor: '#10B981' }}
+                >
+                  <FileSpreadsheet size={14} /> Excel
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>

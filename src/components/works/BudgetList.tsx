@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { Check, Circle, DollarSign, Package, Upload, Download } from 'lucide-react';
-import { ImportBudgetModal } from './ImportBudgetModal';
+import { Check, Circle, DollarSign, Package, Download } from 'lucide-react';
 import { generateBudgetPDF } from '../../utils/pdfGenerator';
-import { addDoc, collection } from 'firebase/firestore';
 
 export interface BudgetListProps {
   workId: string;
@@ -16,7 +14,6 @@ export interface BudgetListProps {
 
 export function BudgetList({ workId, work, user, calculations, profile }: BudgetListProps) {
   const [editingPrice, setEditingPrice] = useState<{ calcId: string, matIndex: number } | null>(null);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const handleUpdateMaterial = async (calcId: string, materialIndex: number, field: string, value: any) => {
     const calc = calculations.find(c => c.id === calcId);
@@ -42,20 +39,6 @@ export function BudgetList({ workId, work, user, calculations, profile }: Budget
     }
   };
 
-  const handleImport = async (materials: any[]) => {
-    try {
-      const calcData = {
-        calcType: 'Importação Manual',
-        savedAt: new Date(),
-        resultData: { materials },
-        totalCost: materials.reduce((acc, mat) => acc + (mat.quantity * mat.unitPrice), 0)
-      };
-      await addDoc(collection(db, 'works', workId, 'calculations'), calcData);
-      setIsImportModalOpen(false);
-    } catch (err) {
-      console.error('Failed to import', err);
-    }
-  };
 
   const handleExportPDF = () => {
     generateBudgetPDF({ work, user, calculations, profile });
@@ -69,12 +52,7 @@ export function BudgetList({ workId, work, user, calculations, profile }: Budget
       <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
         <Package size={48} style={{ margin: '0 auto 16px', opacity: 0.2 }} />
         <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Orçamento Vazio</p>
-        <p style={{ fontSize: 14, marginBottom: 24 }}>Os materiais gerados pelos Assistentes Técnicos aparecerão aqui.</p>
-        <button onClick={() => setIsImportModalOpen(true)} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 8, fontWeight: 600 }}>
-          <Upload size={18} />
-          Importar Planilha / PDF
-        </button>
-        <ImportBudgetModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onImport={handleImport} />
+        <p style={{ fontSize: 14, marginBottom: 24 }}>Os materiais gerados pelos Assistentes Técnicos e os Orçamentos criados aparecerão aqui.</p>
       </div>
     );
   }
@@ -103,15 +81,10 @@ export function BudgetList({ workId, work, user, calculations, profile }: Budget
     <div style={{ padding: 20 }}>
       {/* Actions */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginBottom: 24 }}>
-        <button onClick={() => setIsImportModalOpen(true)} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 8, fontWeight: 600 }}>
-          <Upload size={18} /> Importar
-        </button>
         <button onClick={handleExportPDF} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 8, fontWeight: 600 }}>
           <Download size={18} /> Exportar PDF
         </button>
       </div>
-
-      <ImportBudgetModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onImport={handleImport} />
 
       {/* Budget Overview Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>

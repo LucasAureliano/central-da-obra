@@ -1,45 +1,38 @@
-import React, { useState } from 'react';
-import { Filter, ChevronRight, Activity, Building, TrendingUp } from 'lucide-react';
-
-interface TimelinePhase {
-  name: string;
-  start: number; // mock months 1-12
-  duration: number; // mock months
-  progress: number;
-}
-
-interface MasterSchedule {
-  id: string;
-  workName: string;
-  status: 'Em dia' | 'Atrasado' | 'Adiantado';
-  phases: TimelinePhase[];
-}
+﻿import React, { useState, useEffect } from 'react';
+import { ChevronRight, Activity, Building, TrendingUp, Trash2 } from 'lucide-react';
+import { db } from '../../lib/firebase';
+import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { useAuth } from '../../contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 export const ExecutiveTimeline: React.FC = () => {
-  const [schedules] = useState<MasterSchedule[]>([
-    {
-      id: '1',
-      workName: 'Horizonte Residence',
-      status: 'Em dia',
-      phases: [
-        { name: 'Fundação', start: 1, duration: 2, progress: 100 },
-        { name: 'Estrutura', start: 3, duration: 4, progress: 70 },
-        { name: 'Acabamentos', start: 6, duration: 4, progress: 10 },
-      ]
-    },
-    {
-      id: '2',
-      workName: 'Torre Corporate',
-      status: 'Atrasado',
-      phases: [
-        { name: 'Demolição', start: 1, duration: 1, progress: 100 },
-        { name: 'Fundação', start: 2, duration: 3, progress: 40 },
-        { name: 'Estrutura', start: 5, duration: 5, progress: 0 },
-      ]
-    }
-  ]);
+  const { user } = useAuth();
+  const [schedules, setSchedules] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  useEffect(() => {
+    if (user) loadWorks();
+  }, [user]);
+
+  const loadWorks = async () => {
+    try {
+      setLoading(true);
+      const q = query(collection(db, 'works'), where('userId', '==', user?.uid));
+      const snap = await getDocs(q);
+      const worksData = snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+      setSchedules(worksData.map(w => ({
+        id: w.id,
+        workName: w.name,
+        status: w.progress === 100 ? 'Em dia' : (w.progress > 50 ? 'Adiantado' : 'Atrasado'),
+        progress: w.progress || 0,
+        deadline: w.deadline || 'N�o definido'
+      })));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -50,16 +43,24 @@ export const ExecutiveTimeline: React.FC = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir esta obra e todo seu cronograma?')) {
+      try {
+        await deleteDoc(doc(db, 'works', id));
+        loadWorks();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   return (
     <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', marginBottom: 4 }}>Cronograma Geral</h1>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Gantt macro de todas as obras (Visão Executiva)</p>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Vis�o macro de todas as suas obras</p>
         </div>
-        <button className="btn-secondary" style={{ width: 48, height: 48, borderRadius: 24, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Filter size={20} />
-        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
@@ -80,63 +81,41 @@ export const ExecutiveTimeline: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        {schedules.map(schedule => (
-          <div key={schedule.id} className="glass-panel" style={{ padding: 16, borderRadius: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {loading ? (
+           <p style={{textAlign: 'center', color: 'var(--text-muted)'}}>Carregando cronogramas...</p>
+        ) : schedules.length === 0 ? (
+           <p style={{textAlign: 'center', color: 'var(--text-muted)'}}>Nenhuma obra cadastrada.</p>
+        ) : schedules.map(schedule => (
+          <motion.div 
+            key={schedule.id}
+            drag="x"
+            dragConstraints={{ left: -80, right: 0 }}
+            dragElastic={0.1}
+            onDragEnd={(_, { offset }) => {
+              if (offset.x < -50) handleDelete(schedule.id);
+            }}
+            className="glass-panel" 
+            style={{ padding: 16, borderRadius: 16, position: 'relative', overflow: 'hidden' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{schedule.workName}</h3>
                 <span style={{ fontSize: 12, fontWeight: 600, color: getStatusColor(schedule.status), padding: '2px 8px', backgroundColor: `${getStatusColor(schedule.status)}20`, borderRadius: 8, display: 'inline-block', marginTop: 4 }}>
-                  {schedule.status}
+                  Progresso: {schedule.progress}%
                 </span>
               </div>
-              <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)' }}>
-                <ChevronRight size={20} />
-              </button>
-            </div>
-
-            {/* Simulated Gantt Chart */}
-            <div style={{ overflowX: 'auto', paddingBottom: 8 }} className="hide-scrollbar">
-              <div style={{ minWidth: 400 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 2, marginBottom: 8 }}>
-                  {months.map(m => (
-                    <div key={m} style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>{m}</div>
-                  ))}
-                </div>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {schedule.phases.map((phase, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', height: 24, position: 'relative' }}>
-                      {/* Phase Label overlay */}
-                      <span style={{ position: 'absolute', left: 0, top: -14, fontSize: 10, color: 'var(--text-main)', fontWeight: 600 }}>{phase.name}</span>
-                      
-                      {/* Grid background */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 2, width: '100%', position: 'absolute', inset: 0, zIndex: 0 }}>
-                        {months.map(m => (
-                          <div key={m} style={{ backgroundColor: 'var(--bg-elevated)', borderRadius: 2 }} />
-                        ))}
-                      </div>
-
-                      {/* Bar */}
-                      <div style={{ 
-                        position: 'absolute', 
-                        left: `${((phase.start - 1) / 12) * 100}%`, 
-                        width: `${(phase.duration / 12) * 100}%`,
-                        height: '100%',
-                        backgroundColor: 'var(--bg-elevated)',
-                        borderRadius: 4,
-                        zIndex: 1,
-                        border: '1px solid var(--border-subtle)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ width: `${phase.progress}%`, height: '100%', backgroundColor: phase.progress === 100 ? '#10B981' : 'var(--color-primary)' }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                 <ChevronRight size={20} color="var(--text-muted)" />
+                 <span style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>Deslize para excluir</span>
               </div>
             </div>
-          </div>
+            
+            {/* Background Red Indicator for Delete */}
+            <div style={{ position: 'absolute', top: 0, bottom: 0, right: -80, width: 80, backgroundColor: 'var(--color-danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+              <Trash2 size={24} />
+            </div>
+          </motion.div>
         ))}
       </div>
     </div>

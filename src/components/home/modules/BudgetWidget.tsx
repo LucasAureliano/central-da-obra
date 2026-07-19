@@ -47,7 +47,7 @@ export function BudgetWidget({ onNavigate }: { onNavigate: (tab: string) => void
           <UserPlus size={16} /> Meus Clientes
         </button>
         <button 
-          onClick={() => onNavigate('orcamentos')}
+          onClick={() => onNavigate('catalogo-servicos')}
           style={{ padding: '12px 0', borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)', color: '#FFF', fontSize: 13, fontWeight: 600, border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
           <Briefcase size={16} /> Novo Serviço

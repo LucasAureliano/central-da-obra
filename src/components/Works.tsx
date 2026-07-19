@@ -3,9 +3,11 @@ import {
   MapPin, 
   Plus,
   MoreVertical,
-  Briefcase
+  Briefcase,
+  User,
+  HardHat,
+  ArrowRight
 } from 'lucide-react';
-import { EmptyState } from './EmptyState';
 import { NewWorkModal } from './NewWorkModal';
 import { useWorks } from '../contexts/WorksContext';
 
@@ -27,34 +29,42 @@ export function Works({ onWorkSelect }: WorksProps) {
   });
 
   return (
-    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 0 20px' }}>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 0 20px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-main)' }}>Obras</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
+        {works.length > 0 && (
           <button className="btn-primary" style={{ padding: '0 16px', height: 40, borderRadius: 12 }} onClick={() => setIsModalOpen(true)}>
             <Plus size={20} />
             <span>Nova</span>
           </button>
-        </div>
+        )}
       </div>
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
           <div className="skeleton-glass" style={{ height: 180, width: '100%', borderRadius: 24 }} />
           <div className="skeleton-glass" style={{ height: 180, width: '100%', borderRadius: 24 }} />
-          <div className="skeleton-glass" style={{ height: 180, width: '100%', borderRadius: 24 }} />
         </div>
       ) : works.length === 0 ? (
-        <div style={{ marginTop: 32 }}>
-          <EmptyState 
-            icon={<Briefcase size={40} />}
-            title="Nenhuma obra iniciada"
-            description="Você ainda não possui obras cadastradas. Adicione seu primeiro projeto para começar a gerenciar custos e cronograma."
-            actionLabel="Criar Primeira Obra"
-            onAction={() => setIsModalOpen(true)}
-          />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: -60 }}>
+          <div style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, boxShadow: '0 12px 40px rgba(var(--color-primary-rgb), 0.15)' }}>
+            <HardHat size={50} color="var(--color-primary)" />
+          </div>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12, textAlign: 'center' }}>Nenhuma Obra Ativa</h2>
+          <p style={{ fontSize: 16, color: 'var(--text-muted)', textAlign: 'center', maxWidth: 340, lineHeight: 1.5, marginBottom: 32 }}>
+            Centralize a gestão de custos, equipes e cronogramas. Comece agora adicionando seu primeiro projeto.
+          </p>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="btn-primary hover-scale" 
+            style={{ padding: '0 24px', height: 56, borderRadius: 16, fontSize: 16, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 8px 24px rgba(var(--color-primary-rgb), 0.3)' }}
+          >
+            <Plus size={24} />
+            <span>Criar Minha Primeira Obra</span>
+            <ArrowRight size={20} style={{ marginLeft: 8 }} />
+          </button>
         </div>
       ) : (
         <>
@@ -81,13 +91,19 @@ export function Works({ onWorkSelect }: WorksProps) {
           </div>
 
           {/* List of Works */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16, paddingBottom: 40 }}>
             {filteredWorks.map((work, index) => (
               <div key={work.id} className={`card-premium card-premium-interactive animate-stagger-${Math.min((index + 1), 5)}`} style={{ padding: 0, overflow: 'hidden' }} onClick={() => onWorkSelect(work.id)}>
                 
                 {/* Image Thumbnail Header */}
                 <div style={{ height: 120, position: 'relative' }}>
-                  <img src={work.image || 'https://images.unsplash.com/photo-1541888081622-19e5d424b94a?q=80&w=600&auto=format&fit=crop'} alt={work.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {work.image ? (
+                    <img src={work.image} alt={work.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', backgroundColor: work.colorTheme || 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Briefcase size={40} color="rgba(255,255,255,0.8)" />
+                    </div>
+                  )}
                   {/* Dark Gradient Overlay */}
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)' }} />
                   
@@ -100,16 +116,20 @@ export function Works({ onWorkSelect }: WorksProps) {
                   <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFF' }}>{work.name}</h3>
                     <span className={`status-chip ${(work.progress || 0) === 100 ? 'status-active' : (work.progress || 0) > 50 ? 'status-warning' : 'status-danger'}`} style={{ backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', color: '#FFF' }}>
-                      {work.status}
+                      {work.status || 'Ativa'}
                     </span>
                   </div>
                 </div>
 
                 {/* Card Body */}
                 <div style={{ padding: 20 }}>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                     <MapPin size={14} />
                     {work.address || 'Endereço não informado'}
+                  </p>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                    <User size={14} />
+                    {work.client || 'Cliente não informado'}
                   </p>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
