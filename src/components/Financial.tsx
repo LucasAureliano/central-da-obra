@@ -52,14 +52,15 @@ export function Financial({ onBack }: { onBack: () => void }) {
         
         calcSnap.forEach(calcDoc => {
           const calcData = calcDoc.data();
-          if (calcData.totalCost) {
-            spentSum += calcData.totalCost;
+          const cost = Number(calcData.totalCost);
+          if (!isNaN(cost) && cost > 0) {
+            spentSum += cost;
             
             txs.push({
               id: calcDoc.id,
               title: `Material: ${calcData.calcType || 'Cálculo'}`,
               workName: data.name,
-              amount: calcData.totalCost,
+              amount: cost,
               type: 'expense',
               date: calcData.savedAt?.toDate ? calcData.savedAt.toDate() : new Date()
             });

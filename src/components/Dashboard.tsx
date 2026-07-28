@@ -1,8 +1,8 @@
 import { Plus, ArrowRight, Calculator, Briefcase, Activity, Sparkles, CheckSquare, GripVertical, Rocket, Target, Users, Clock, AlertCircle, Calendar, CheckCircle, Clipboard, Camera, FileCheck, AlertTriangle, LayoutDashboard, FileSignature } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { motion, Reorder } from 'framer-motion';
+import { motion, Reorder, useDragControls } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { TiltCard } from './TiltCard';
 import { useWorks } from '../contexts/WorksContext';
@@ -25,71 +25,129 @@ const itemVariants: any = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
+const DraggableWidget = ({ widgetId, renderFn }: { widgetId: string, renderFn: (controls: any) => any }) => {
+  const controls = useDragControls();
+  const content = renderFn(controls);
+  if (!content) return null;
+  return (
+    <Reorder.Item value={widgetId} dragListener={false} dragControls={controls} style={{ marginBottom: 40, touchAction: 'pan-y' }}>
+      <motion.div variants={itemVariants}>
+        {content}
+      </motion.div>
+    </Reorder.Item>
+  );
+};
+
 function TechnicalDashboard({ onNavigate }: DashboardProps) {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { works, isLoadingWorks } = useWorks();
+  const [projects, setProjects] = useState<any[]>([]);
+  
+  const isArchitect = profile?.role === 'architect' || profile?.role === 'engineer';
   const [insights, setInsights] = useState<any[]>([]);
   const [agenda, setAgenda] = useState<any[]>([]);
   const [pendenciesCount, setPendenciesCount] = useState(0);
   const [delayedCount, setDelayedCount] = useState(0);
 
   useEffect(() => {
+    if (isArchitect && user) {
+      const q = query(collection(db, 'projects'), where('userId', '==', user.uid));
+      const unsub = onSnapshot(q, (snap) => {
+        const loaded: any[] = [];
+        snap.forEach(doc => loaded.push({ id: doc.id, ...doc.data() }));
+        setProjects(loaded);
+      });
+      return () => unsub();
+    }
+  }, [isArchitect, user]);
+
+  useEffect(() => {
     if (!works || works.length === 0) return;
     let unsubs: any[] = [];
-    let combinedInsights: any[] = [];
-    let combinedAgenda: any[] = [];
-    let localDelayedCount = 0;
-    let localPendenciesCount = 0;
+    
+    // Use objects to hold data per work to avoid infinite growing arrays
+    const insightsByWork: Record<string, any[]> = {};
+    const agendaByWork: Record<string, any[]> = {};
+    const countsByWork: Record<string, { delayed: number, pendencies: number }> = {};
+
+    const updateAggregates = () => {
+      let totalDelayed = 0;
+      let totalPendencies = 0;
+      let allInsights: any[] = [];
+      let allAgenda: any[] = [];
+      
+      Object.values(countsByWork).forEach(c => {
+        totalDelayed += c.delayed;
+        totalPendencies += c.pendencies;
+      });
+      
+      Object.values(insightsByWork).forEach(arr => {
+        allInsights = [...allInsights, ...arr];
+      });
+      
+      Object.values(agendaByWork).forEach(arr => {
+        allAgenda = [...allAgenda, ...arr];
+      });
+      
+      setDelayedCount(totalDelayed);
+      setPendenciesCount(totalPendencies);
+      setInsights(allInsights.slice(0, 5));
+      setAgenda(allAgenda.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 4));
+    };
 
     works.forEach(work => {
       // 1. Fetch Stages for Pendencies and Delayed Insights
-      const qStages = query(collection(db, 'works', work.id, 'stages'));
+      const qStages = query(collection(db, 'works', work.id, 'schedule_stages'));
       const unsubStages = onSnapshot(qStages, (snap) => {
+        let workInsights: any[] = [];
+        let delayed = 0;
+        let pendencies = 0;
+        
         snap.forEach(doc => {
           const stage = doc.data();
           if (stage.endDate) {
             const end = new Date(stage.endDate);
-            if (end < new Date() && (stage.progress || 0) < 100) {
-              localDelayedCount++;
-              combinedInsights.push({
+            if (end < new Date() && !stage.completed) {
+              delayed++;
+              workInsights.push({
                 id: doc.id,
                 type: 'delayed',
-                title: `Etapa Atrasada: ${stage.name}`,
+                title: `Etapa Atrasada: ${stage.title}`,
                 workName: work.name,
                 workId: work.id,
                 date: stage.endDate
               });
             }
           }
-          if (stage.tasks) {
-            stage.tasks.forEach((t: any) => {
-              if (t.status === 'pending_approval' || (t.isCompleted === false && t.priority === 'high')) {
-                localPendenciesCount++;
-                combinedInsights.push({
-                  id: t.id || Math.random().toString(),
+          if (!stage.completed && stage.startDate) {
+            const start = new Date(stage.startDate);
+            if (start <= new Date()) {
+                pendencies++;
+                workInsights.push({
+                  id: doc.id,
                   type: 'pendency',
-                  title: `Ação Requerida: ${t.title}`,
+                  title: `Etapa Pendente: ${stage.title}`,
                   workName: work.name,
                   workId: work.id
                 });
-              }
-            });
+            }
           }
         });
         
-        setDelayedCount(localDelayedCount);
-        setPendenciesCount(localPendenciesCount);
-        setInsights(combinedInsights.slice(0, 5));
+        insightsByWork[work.id] = workInsights;
+        countsByWork[work.id] = { delayed, pendencies };
+        updateAggregates();
       });
       unsubs.push(unsubStages);
 
       // 2. Fetch Events for Agenda
       const qEvents = query(collection(db, 'works', work.id, 'events'));
       const unsubEvents = onSnapshot(qEvents, (snap) => {
+        let workAgenda: any[] = [];
         snap.forEach(doc => {
           const event = doc.data();
           if (event.date) {
-            combinedAgenda.push({
+            workAgenda.push({
               id: doc.id,
               title: event.title || 'Visita Técnica',
               workName: work.name,
@@ -98,7 +156,8 @@ function TechnicalDashboard({ onNavigate }: DashboardProps) {
             });
           }
         });
-        setAgenda(combinedAgenda.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 4));
+        agendaByWork[work.id] = workAgenda;
+        updateAggregates();
       });
       unsubs.push(unsubEvents);
     });
@@ -155,9 +214,13 @@ function TechnicalDashboard({ onNavigate }: DashboardProps) {
             <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(59, 130, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Briefcase size={20} color="#3B82F6" />
             </div>
-            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Obras Ativas</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>
+              {isArchitect ? 'Projetos Ativos' : 'Obras Ativas'}
+            </span>
           </div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-main)' }}>{works.length}</div>
+          <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-main)' }}>
+            {isArchitect ? projects.length : works.length}
+          </div>
         </TiltCard>
 
         <TiltCard style={{ padding: 20, borderRadius: 24, background: 'linear-gradient(145deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%)', border: '1px solid rgba(245, 158, 11, 0.2)', position: 'relative', overflow: 'hidden' }}>
@@ -196,69 +259,84 @@ function TechnicalDashboard({ onNavigate }: DashboardProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Quick Actions Bar */}
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 20, borderRadius: 24, display: 'flex', gap: 16, overflowX: 'auto', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
-              <Camera size={20} color="#8B5CF6" />
-              <span style={{ fontWeight: 600, color: '#8B5CF6' }}>Nova Vistoria</span>
-            </div>
-            <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
-              <FileCheck size={20} color="#3B82F6" />
-              <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo Diário de Obra</span>
-            </div>
+            {isArchitect ? (
+              <>
+                <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
+                  <Camera size={20} color="#8B5CF6" />
+                  <span style={{ fontWeight: 600, color: '#8B5CF6' }}>Novo Projeto</span>
+                </div>
+                <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('diario-tecnico')}>
+                  <FileCheck size={20} color="#3B82F6" />
+                  <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo Diário Técnico</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
+                  <Camera size={20} color="#8B5CF6" />
+                  <span style={{ fontWeight: 600, color: '#8B5CF6' }}>Nova Vistoria</span>
+                </div>
+                <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
+                  <FileCheck size={20} color="#3B82F6" />
+                  <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo Diário de Obra</span>
+                </div>
+              </>
+            )}
             <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('library')}>
               <Calculator size={20} color="#10B981" />
               <span style={{ fontWeight: 600, color: '#10B981' }}>Memória de Cálculo</span>
             </div>
           </motion.div>
 
-          {/* Minhas Obras */}
+          {/* Minhas Obras / Projetos */}
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <LayoutDashboard size={24} color="var(--color-primary)" />
-                Minhas Obras (Portfólio)
+                {isArchitect ? 'Meus Projetos (Portfólio)' : 'Minhas Obras (Portfólio)'}
               </h2>
               <button onClick={() => onNavigate('obras')} style={{ color: 'var(--color-primary)', background: 'none', border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
-                Ver todas <ArrowRight size={16} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+                Ver {isArchitect ? 'todos' : 'todas'} <ArrowRight size={16} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
               </button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-              {works.map((work) => (
-                <TiltCard key={work.id} style={{ padding: 0, borderRadius: 20, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', overflow: 'hidden', cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
+              {(isArchitect ? projects : works).map((item) => (
+                <TiltCard key={item.id} style={{ padding: 0, borderRadius: 20, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', overflow: 'hidden', cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
                   <div style={{ height: 100, background: 'linear-gradient(135deg, var(--color-primary-alpha) 0%, rgba(139, 92, 246, 0.1) 100%)', display: 'flex', alignItems: 'flex-end', padding: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: (work.progress || 0) >= 100 ? '#10B981' : '#3B82F6', boxShadow: `0 0 10px ${(work.progress || 0) >= 100 ? '#10B981' : '#3B82F6'}` }} />
+                      <div style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: (item.progress || 0) >= 100 ? '#10B981' : '#3B82F6', boxShadow: `0 0 10px ${(item.progress || 0) >= 100 ? '#10B981' : '#3B82F6'}` }} />
                       <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                        {(work.progress || 0) >= 100 ? 'Concluída' : 'Em Execução'}
+                        {(item.progress || 0) >= 100 ? 'Concluído' : 'Em Andamento'}
                       </span>
                     </div>
                   </div>
                   <div style={{ padding: 20 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{work.name}</h3>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</h3>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Progresso Técnico</span>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)' }}>{work.progress || 0}%</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Progresso</span>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)' }}>{item.progress || 0}%</span>
                     </div>
                     <div style={{ width: '100%', height: 6, backgroundColor: 'var(--border-subtle)', borderRadius: 3, overflow: 'hidden' }}>
                       <motion.div 
                         initial={{ width: 0 }}
-                        animate={{ width: `${work.progress || 0}%` }}
+                        animate={{ width: `${item.progress || 0}%` }}
                         transition={{ duration: 1.5, ease: "easeOut" }}
                         style={{ height: '100%', backgroundColor: 'var(--color-primary)', borderRadius: 3 }} 
                       />
                     </div>
                     <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
                       <div style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Users size={12} /> Equipe: {work.teamCount || 0}
+                        <Users size={12} /> Equipe: {item.teamCount || 0}
                       </div>
                       <div style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Clipboard size={12} /> Diários: {work.diariesCount || 0}
+                        <Clipboard size={12} /> Diários: {item.diariesCount || 0}
                       </div>
                     </div>
                   </div>
                 </TiltCard>
               ))}
-              {works.length === 0 && (
+              {(isArchitect ? projects : works).length === 0 && (
                 <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 20, border: '1px dashed var(--border-subtle)' }}>
                   <Briefcase size={48} color="var(--text-muted)" style={{ margin: '0 auto 16px', opacity: 0.5 }} />
                   <h4 style={{ fontSize: 16, color: 'var(--text-main)', fontWeight: 600 }}>Nenhuma obra ativa</h4>
@@ -336,11 +414,17 @@ function TechnicalDashboard({ onNavigate }: DashboardProps) {
 }
 
 
+import { ProviderDashboard } from './provider/ProviderDashboard';
+
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { isGuest, profile } = useAuth();
   
   if (profile?.role === 'architect' || profile?.role === 'engineer') {
     return <TechnicalDashboard onNavigate={onNavigate} />;
+  }
+
+  if (profile?.role === 'service') {
+    return <ProviderDashboard onNavigate={onNavigate} />;
   }
 
   const { works, activeWork, isLoadingWorks } = useWorks();
@@ -369,16 +453,18 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       unsubscribeFns.push(unsubCalc);
 
       // 2. Fetch stages for upcoming tasks
-      const qStages = query(collection(db, 'works', work.id, 'stages'), orderBy('order', 'asc'));
+      const qStages = query(collection(db, 'works', work.id, 'schedule_stages'), orderBy('order', 'asc'));
       const unsubStages = onSnapshot(qStages, (snap) => {
         let pending: any[] = [];
         snap.forEach(doc => {
           const stage = doc.data();
-          if (stage.tasks) {
-            stage.tasks.forEach((t: any) => {
-              if (!t.isCompleted) {
-                pending.push({ ...t, workName: work.name, workId: work.id });
-              }
+          if (!stage.completed) {
+            pending.push({ 
+              title: stage.title, 
+              isCompleted: stage.completed, 
+              workName: work.name, 
+              workId: work.id,
+              date: stage.endDate || stage.startDate 
             });
           }
         });
@@ -817,16 +903,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           {widgetOrder.map((widgetId: string) => {
             const renderFn = widgetMap[widgetId];
             if (!renderFn) return null;
-            const content = renderFn();
-            if (!content) return null;
-
-            return (
-              <Reorder.Item key={widgetId} value={widgetId} style={{ touchAction: 'none', marginBottom: 40 }}>
-                <motion.div variants={itemVariants}>
-                  {content}
-                </motion.div>
-              </Reorder.Item>
-            );
+            return <DraggableWidget key={widgetId} widgetId={widgetId} renderFn={renderFn} />;
           })}
         </Reorder.Group>
         </>

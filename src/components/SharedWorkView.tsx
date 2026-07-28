@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Briefcase, MapPin, Calendar, CheckCircle2, Circle } from 'lucide-react';
+import { Briefcase, MapPin, Calendar, CheckCircle2, Circle, User, Phone, Mail } from 'lucide-react';
 import { CustomLogo } from './CustomLogo';
 
 export function SharedWorkView({ token, theme }: { token: string; theme: 'light' | 'dark' }) {
   const [work, setWork] = useState<any>(null);
+  const [providerProfile, setProviderProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -24,7 +25,19 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          setWork({ id: docSnap.id, ...docSnap.data() });
+          const workData = { id: docSnap.id, ...docSnap.data() } as any;
+          setWork(workData);
+          
+          if (workData.userId) {
+            try {
+              const profileSnap = await getDoc(doc(db, 'users', workData.userId, 'business_profile', 'main'));
+              if (profileSnap.exists()) {
+                setProviderProfile(profileSnap.data());
+              }
+            } catch (e) {
+              console.error('Error fetching provider profile', e);
+            }
+          }
         } else {
           setErrorMsg('Obra não encontrada.');
         }
@@ -157,7 +170,35 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
           </div>
         </div>
 
-      </main>
+          {providerProfile && (
+            <div className="card-premium" style={{ marginTop: 24, padding: 24 }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <User size={24} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                    {providerProfile.companyName || providerProfile.legalName || 'Profissional / Empresa'}
+                  </h2>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Responsável pela execução/serviços</p>
+                </div>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+                {providerProfile.phone && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-main)' }}>
+                    <Phone size={16} color="var(--text-muted)" /> {providerProfile.phone}
+                  </div>
+                )}
+                {providerProfile.email && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-main)' }}>
+                    <Mail size={16} color="var(--text-muted)" /> {providerProfile.email}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </main>
     </div>
   );
 }

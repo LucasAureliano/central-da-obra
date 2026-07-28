@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp, writeBatch, doc } from 'firebase/f
 import { generateDefaultStages } from '../lib/ChecklistGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { useWorks } from '../contexts/WorksContext';
 
 interface NewWorkModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ const themeColors = [
 
 export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
   const { user, profile } = useAuth();
+  const { works, setPrimaryWork } = useWorks();
   
   const [name, setName] = useState('');
   const [client, setClient] = useState('');
@@ -79,6 +81,11 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
         batch.set(stageRef, stage);
       });
       await batch.commit();
+
+      // Auto-set as primary for owners creating their first work
+      if ((profile?.role === 'owner' || !profile?.role) && works.length === 0) {
+        await setPrimaryWork(newWorkRef.id);
+      }
       
       onClose();
       setStep(1);
@@ -100,7 +107,7 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           {/* Backdrop */}
           <motion.div 
             initial={{ opacity: 0 }}
@@ -110,27 +117,24 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
             onClick={onClose}
           />
           
-          {/* Modal / Bottom Sheet */}
+          {/* Modal / Centered Dialog */}
           <motion.div 
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="glass-panel" 
             style={{ 
               position: 'relative', 
               width: '100%', 
               maxWidth: 500, 
-              borderTopLeftRadius: 32, 
-              borderTopRightRadius: 32,
-              borderBottomLeftRadius: 0, 
-              borderBottomRightRadius: 0, 
-              padding: '32px 24px calc(24px + env(safe-area-inset-bottom, 0px)) 24px', 
+              borderRadius: 24,
+              padding: '32px 24px', 
               maxHeight: '90vh', 
               overflowY: 'auto',
-              boxShadow: '0 -10px 40px rgba(0,0,0,0.3)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
               border: '1px solid var(--border-subtle)',
-              borderBottom: 'none'
+              overscrollBehavior: 'contain'
             }}
           >
             <button 
@@ -159,7 +163,7 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
               {step === 1 && (
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Nome da Obra *</label>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>{profile?.role === 'owner' ? 'Nome da minha obra *' : 'Nome da Obra *'}</label>
                     <input 
                       required
                       className="input-premium" 

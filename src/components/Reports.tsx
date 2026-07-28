@@ -92,7 +92,7 @@ export const Reports: React.FC = () => {
   const baseReportsList = [
     { id: 'geral', title: '📊 Relatório Geral da Obra', desc: 'Resumo executivo da obra, prazos e percentuais concluídos.', icon: <ClipboardList size={22} className="text-primary" /> },
     { id: 'financeiro', title: '💸 Relatório Financeiro', desc: `Extrato completo de receitas, saídas e saldo (${financialCount} registros).`, icon: <TrendingUp size={22} className="text-primary" /> },
-    { id: 'compras', title: '🛒 Lista de Compras & Cotações', desc: `Checklist de materiais pendentes e concluídos (${shoppingCount} materiais).`, icon: <FileText size={22} className="text-primary" /> },
+    { id: 'compras', title: '📋 Lista de Materiais', desc: `Checklist de materiais pendentes e concluídos (${shoppingCount} materiais).`, icon: <FileText size={22} className="text-primary" /> },
   ];
 
   if (profile?.role === 'architect' || profile?.role === 'builder') {
@@ -262,7 +262,7 @@ export const Reports: React.FC = () => {
                           <h3>Resumo Consolidado</h3>
                           <ul>
                             <li>Registros Financeiros Processados: ${financialCount}</li>
-                            <li>Materiais na Lista de Compras: ${shoppingCount}</li>
+                            <li>Itens na Lista de Materiais: ${shoppingCount}</li>
                           </ul>
                           <p style="margin-top: 40px;">Este relatório comprova os registros salvos na plataforma até o momento. Os dados financeiros representam as entradas de despesas declaradas pelo gestor da obra.</p>
                           <div class="footer">Gerado digitalmente via App CentralObra. Obras Inteligentes.</div>

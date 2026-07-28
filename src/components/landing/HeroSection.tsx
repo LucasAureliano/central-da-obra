@@ -39,7 +39,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             }}>
               <span className="text-gradient" style={{ fontWeight: 600, fontSize: 13 }}>NOVO</span>
               <span style={{ color: 'var(--text-muted)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
-                Integração completa com normas técnicas <ChevronRight size={14} />
+                Aumente suas vendas com a Central de Marketing <ChevronRight size={14} />
               </span>
             </div>
           </motion.div>
@@ -50,8 +50,8 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            A inteligência por trás de <br className="mobile-hidden" />
-            <span className="text-gradient">obras de sucesso</span>
+            A plataforma completa para <br className="mobile-hidden" />
+            <span className="text-gradient">profissionais da obra</span>
           </motion.h1>
           
           <motion.p 
@@ -60,7 +60,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            Planejamento, gestão financeira, compras, normas e mais de 80 calculadoras de materiais integradas em um único aplicativo. Feito por profissionais, para profissionais.
+            Capte clientes com portfólio e avaliações, crie orçamentos profissionais em PDF e gerencie suas obras e cronogramas de forma inteligente.
           </motion.p>
           
           <motion.div 

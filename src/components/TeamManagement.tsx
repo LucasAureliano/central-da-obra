@@ -191,12 +191,13 @@ export function TeamManagement({ onBack }: { onBack: () => void }) {
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)',
-          zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center'
-        }} className="animate-fade-in">
+          zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
+        }} className="animate-fade-in" onClick={() => setIsModalOpen(false)}>
           <form 
             onSubmit={handleAddContact}
+            onClick={e => e.stopPropagation()}
             className="glass-panel animate-fade-in" 
-            style={{ width: '100%', backgroundColor: 'var(--bg-surface)', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '90vh', overflowY: 'auto' }}
+            style={{ width: '100%', maxWidth: 500, backgroundColor: 'var(--bg-surface)', borderRadius: 24, padding: '32px 24px', maxHeight: '90vh', overflowY: 'auto' }}
           >
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, color: 'var(--text-main)' }}>Novo Contato</h2>
             

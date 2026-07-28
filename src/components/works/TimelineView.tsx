@@ -44,7 +44,6 @@ export function TimelineView({ workId }: { workId: string }) {
   };
 
   const toggleTask = async (stage: Stage, taskId: string, isCompleted: boolean) => {
-    if (isOwner) return;
     
     const updatedTasks = stage.tasks.map(t => 
       t.id === taskId ? { ...t, isCompleted: !isCompleted } : t

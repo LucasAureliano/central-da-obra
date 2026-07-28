@@ -9,10 +9,12 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
   
   const role = profile?.role || 'owner'; // Default to owner if guest or no role
 
-  if (role === 'service') return <ProfessionalDashboard onNavigate={onNavigate} />;
-  if (role === 'architect') return <ArchitectDashboard onNavigate={onNavigate} />;
-  if (role === 'builder') return <BuilderDashboard onNavigate={onNavigate} />;
-  
-  // Default fallback for 'owner' and any unknown role
-  return <OwnerDashboard onNavigate={onNavigate} />;
+  const renderDashboard = () => {
+    if (role === 'service') return <ProfessionalDashboard onNavigate={onNavigate} />;
+    if (role === 'architect') return <ArchitectDashboard onNavigate={onNavigate} />;
+    if (role === 'builder') return <BuilderDashboard onNavigate={onNavigate} />;
+    return <OwnerDashboard onNavigate={onNavigate} />;
+  };
+
+  return renderDashboard();
 }

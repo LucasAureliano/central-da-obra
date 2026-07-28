@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, ArrowRight, MessageSquare, Calculator, BookOpen, ShoppingCart, Lightbulb } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Sparkles, ArrowRight, MessageSquare, Calculator, BookOpen, ShoppingCart, Lightbulb, Calendar, ClipboardList, Palette } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useWorks } from '../../contexts/WorksContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export type AssistantMode = 'fast' | 'pro' | 'tutorial';
 
@@ -10,12 +12,22 @@ interface SmartAssistantProps {
 
 export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<{role: 'assistant'|'user', text: string, suggestions?: any[]}[]>([
-    {
-      role: 'assistant',
-      text: 'Olá! Sou o Assistente Inteligente da CentralObra. O que você deseja fazer hoje?',
+  const [isTyping, setIsTyping] = useState(false);
+  const { primaryWork, activeWork } = useWorks();
+  const { profile } = useAuth();
+  const currentWork = profile?.role === 'owner' ? primaryWork : activeWork;
+  
+  const [messages, setMessages] = useState<{role: 'assistant'|'user', text: string, suggestions?: any[]}[]>([]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{
+        role: 'assistant',
+        text: `Olá! Sou o Assistente Inteligente da CentralObra.${currentWork ? ` Vejo que você está focado na obra "${currentWork.name}".` : ''} Pode me dizer o que precisa em linguagem natural.`,
+      }]);
     }
-  ]);
+  }, [currentWork, messages.length]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,68 +40,120 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
     // Add user message
     setMessages(prev => [...prev, { role: 'user', text }]);
     setQuery('');
+    setIsTyping(true);
 
-    // Process logic (Simulated NLP for now)
     setTimeout(() => {
+      setIsTyping(false);
       const lowerText = text.toLowerCase();
-      let responseText = "Não entendi muito bem. Você pode reformular?";
+      let responseText = "Não entendi muito bem. Pode reformular? Tente usar palavras como 'calcular', 'orçamento', 'compras', 'norma' ou 'obra'.";
       let suggestions: any[] = [];
 
-      if (lowerText.includes('concreto') || lowerText.includes('cimento') || lowerText.includes('traço')) {
-        responseText = "Entendi! Você quer calcular o traço de concreto ou materiais para fundação. O que exatamente precisa?";
+      if (lowerText.includes('concreto') || lowerText.includes('cimento') || lowerText.includes('traço') || lowerText.includes('laje')) {
+        responseText = "Entendi! Vamos trabalhar com concreto. O que exatamente precisa?";
         suggestions = [
           { label: 'Calcular Traço de Concreto', action: () => onNavigate('calculos', 'concrete-mix'), icon: <Calculator size={16} /> },
-          { label: 'Ver Normas sobre Concreto', action: () => onNavigate('biblioteca-normas', 'concreto'), icon: <BookOpen size={16} /> },
-          { label: 'Preços de Cimento', action: () => onNavigate('compras', 'cimento'), icon: <ShoppingCart size={16} /> }
+          { label: 'Ver Normas sobre Concreto', action: () => onNavigate('central-tecnica'), icon: <BookOpen size={16} /> },
+          { label: 'Preços de Cimento', action: () => onNavigate('compras'), icon: <ShoppingCart size={16} /> }
         ];
-      } else if (lowerText.includes('piso') || lowerText.includes('porcelanato') || lowerText.includes('revestimento')) {
-        responseText = "Perfeito, vamos trabalhar com pisos e revestimentos. Posso abrir a calculadora para você ou buscar tendências de interiores.";
+      } else if (lowerText.includes('piso') || lowerText.includes('porcelanato') || lowerText.includes('revestimento') || lowerText.includes('cerâmica')) {
+        responseText = "Vamos trabalhar com pisos e revestimentos. Posso abrir a calculadora ou as Tendências.";
         suggestions = [
           { label: 'Calcular Piso/Porcelanato', action: () => onNavigate('calculos', 'floor'), icon: <Calculator size={16} /> },
-          { label: 'Ver Studio de Interiores', action: () => onNavigate('studio-interiores'), icon: <Lightbulb size={16} /> }
+          { label: 'Ver Tendências', action: () => onNavigate('tendencias'), icon: <Palette size={16} /> }
         ];
       } else if (lowerText.includes('pintura') || lowerText.includes('tinta') || lowerText.includes('parede')) {
-        responseText = "Certo, assunto é pintura. Deseja calcular a quantidade de tinta ou adicionar uma despesa com materiais?";
+        responseText = "Certo, assunto é pintura. Calcular a quantidade de tinta ou registrar a despesa?";
         suggestions = [
           { label: 'Calcular Tinta', action: () => onNavigate('calculos', 'paint'), icon: <Calculator size={16} /> },
           { label: 'Adicionar Despesa', action: () => onNavigate('financeiro'), icon: <ShoppingCart size={16} /> }
         ];
-      } else if (lowerText.includes('elétrica') || lowerText.includes('chuveiro') || lowerText.includes('disjuntor') || lowerText.includes('fio')) {
-        responseText = "Instalações elétricas exigem atenção às normas (NBR 5410). Aqui estão os atalhos mais rápidos:";
+      } else if (lowerText.includes('elétrica') || lowerText.includes('chuveiro') || lowerText.includes('disjuntor') || lowerText.includes('fio') || lowerText.includes('iluminação') || lowerText.includes('dimensionar') || lowerText.includes('spot') || lowerText.includes('luminot')) {
+        responseText = "Entendido. Para iluminação e elétrica, vou abrir as ferramentas certas.";
         suggestions = [
+          { label: 'Projeto Luminotécnico', action: () => onNavigate('calculos', 'lighting'), icon: <Lightbulb size={16} /> },
           { label: 'Calculadora Elétrica', action: () => onNavigate('calculos', 'electrical'), icon: <Calculator size={16} /> },
-          { label: 'Consultar NBR 5410', action: () => onNavigate('biblioteca-normas', 'eletrica'), icon: <BookOpen size={16} /> },
-          { label: 'Projeto Luminotécnico', action: () => onNavigate('calculos', 'lighting'), icon: <Lightbulb size={16} /> }
+          { label: 'Consultar NBR 5410', action: () => onNavigate('central-tecnica'), icon: <BookOpen size={16} /> }
         ];
-      } else if (lowerText.includes('orçamento') || lowerText.includes('orçar') || lowerText.includes('proposta')) {
-        responseText = "Vamos preparar um orçamento. Nosso sistema inteligente irá sugerir materiais baseados no serviço escolhido.";
+      } else if (lowerText.includes('orçamento') || lowerText.includes('orçar') || lowerText.includes('proposta') || lowerText.includes('gastar')) {
+        responseText = "Vamos cuidar dos orçamentos. Criar uma proposta ou registrar uma despesa?";
         suggestions = [
-          { label: 'Criar Novo Orçamento', action: () => onNavigate('novo-orcamento'), icon: <BookOpen size={16} /> }
+          { label: 'Criar Novo Orçamento', action: () => onNavigate('novo-orcamento'), icon: <BookOpen size={16} /> },
+          { label: 'Adicionar Despesa', action: () => onNavigate('financeiro'), icon: <ShoppingCart size={16} /> }
         ];
-      } else if (lowerText.includes('obra') || lowerText.includes('nova obra')) {
-        responseText = "Vamos gerenciar suas obras! Você pode criar uma nova ou gerenciar as existentes.";
+      } else if (lowerText.includes('norma') || lowerText.includes('biblioteca') || lowerText.includes('artigo') || lowerText.includes('nbr') || lowerText.includes('consultar')) {
+        responseText = "Abrindo a Biblioteca Técnica Inteligente. O que quer pesquisar?";
+        suggestions = [
+          { label: 'Acessar Central Técnica', action: () => onNavigate('central-tecnica'), icon: <BookOpen size={16} /> }
+        ];
+      } else if (lowerText.includes('compra') || lowerText.includes('material') || lowerText.includes('lista')) {
+        responseText = "Vou abrir a Lista de Compras para gerenciar os materiais da obra.";
+        suggestions = [
+          { label: 'Lista de Compras', action: () => onNavigate('compras'), icon: <ShoppingCart size={16} /> }
+        ];
+      } else if (lowerText.includes('agenda') || lowerText.includes('compromisso') || lowerText.includes('visita') || lowerText.includes('agendar')) {
+        responseText = "Abrindo sua Agenda Inteligente. Ela já lembra automaticamente de vistorias e vencimentos.";
+        suggestions = [
+          { label: 'Abrir Agenda', action: () => onNavigate('agenda-completa'), icon: <Calendar size={16} /> }
+        ];
+      } else if (lowerText.includes('diário') || lowerText.includes('registro') || lowerText.includes('foto') || lowerText.includes('log')) {
+        responseText = "O Diário Técnico é onde você registra fotos, observações e gera PDF profissional.";
+        suggestions = [
+          { label: 'Abrir Diário de Obra', action: () => onNavigate('diario-tecnico'), icon: <ClipboardList size={16} /> }
+        ];
+      } else if (lowerText.includes('marketing') || lowerText.includes('divulgar') || lowerText.includes('cliente') || lowerText.includes('vender') || lowerText.includes('portfolio') || lowerText.includes('avalia')) {
+        if (profile?.role === 'service' || profile?.role === 'architect') {
+          responseText = "Excelente! Para divulgar seus serviços, use a aba de Marketing para gerar links de avaliação ou posts para redes sociais.";
+          suggestions = [
+            { label: 'Acessar Marketing', action: () => onNavigate('marketing'), icon: <Sparkles size={16} /> },
+            { label: 'Novo Orçamento', action: () => onNavigate('novo-orcamento'), icon: <Calculator size={16} /> }
+          ];
+        } else {
+          responseText = "Você pode compartilhar as obras com seus profissionais, abrindo o painel de obra.";
+          suggestions = [
+            { label: 'Minhas Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
+          ];
+        }
+      } else if (lowerText.includes('interior') || lowerText.includes('decora') || lowerText.includes('moodboard') || lowerText.includes('paleta') || lowerText.includes('tendência')) {
+        responseText = "O Tendências é sua ferramenta de design com inspirações, paletas e moodboards.";
+        suggestions = [
+          { label: 'Abrir Tendências', action: () => onNavigate('tendencias'), icon: <Palette size={16} /> }
+        ];
+      } else if (lowerText.includes('obra') || lowerText.includes('nova obra') || lowerText.includes('projeto')) {
+        responseText = "Vamos gerenciar suas obras! Você pode criar uma nova ou ver as existentes.";
         suggestions = [
           { label: 'Minhas Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
         ];
       } else {
-        responseText = "Desculpe, ainda estou aprendendo. Mas aqui estão alguns atalhos que podem ajudar:";
-        suggestions = [
-          { label: 'Central de Cálculos', action: () => onNavigate('calculos'), icon: <Calculator size={16} /> },
-          { label: 'Biblioteca Técnica', action: () => onNavigate('biblioteca-normas'), icon: <BookOpen size={16} /> },
-          { label: 'Financeiro', action: () => onNavigate('financeiro'), icon: <ShoppingCart size={16} /> }
-        ];
+        if (profile?.role === 'service' || profile?.role === 'architect') {
+          responseText = "Como profissional, estou aqui para te ajudar a orçar mais rápido, fechar mais negócios e gerenciar suas obras. Como posso ajudar?";
+          suggestions = [
+            { label: 'Novo Orçamento', action: () => onNavigate('novo-orcamento'), icon: <Calculator size={16} /> },
+            { label: 'Marketing e Avaliações', action: () => onNavigate('marketing'), icon: <Sparkles size={16} /> },
+            { label: 'Gerenciar Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
+          ];
+        } else {
+          responseText = "Ainda estou aprendendo, mas aqui estão os atalhos mais usados para a sua casa:";
+          suggestions = [
+            { label: 'Central de Cálculos', action: () => onNavigate('calculos'), icon: <Calculator size={16} /> },
+            { label: 'Lista de Compras', action: () => onNavigate('compras'), icon: <ShoppingCart size={16} /> },
+            { label: 'Minhas Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
+          ];
+        }
       }
 
       setMessages(prev => [...prev, { role: 'assistant', text: responseText, suggestions }]);
-    }, 600);
+    }, 800);
   };
 
   const quickChips = [
-    "Calcular concreto",
-    "Criar orçamento",
-    "Instalar chuveiro",
-    "Consultar norma",
-    "Calcular piso"
+    "Quero calcular concreto",
+    "Preciso fazer um orçamento",
+    "Quanto vou gastar para pintar?",
+    "Quero consultar uma norma",
+    "Dimensionar iluminação",
+    "Adicionar uma despesa",
+    "Ver minha agenda",
+    "Registrar no diário"
   ];
 
   return (
@@ -167,6 +231,43 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
             )}
           </motion.div>
         ))}
+        
+        {/* Typing Indicator */}
+        <AnimatePresence>
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              style={{ alignSelf: 'flex-start' }}
+            >
+              <div style={{
+                padding: '14px 18px',
+                borderRadius: 20,
+                borderBottomLeftRadius: 4,
+                backgroundColor: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5
+              }}>
+                {[0, 1, 2].map(i => (
+                  <motion.span
+                    key={i}
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+                    style={{
+                      width: 8, height: 8, borderRadius: 4,
+                      backgroundColor: 'var(--text-muted)',
+                      display: 'inline-block'
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div ref={messagesEndRef} />
       </div>
 

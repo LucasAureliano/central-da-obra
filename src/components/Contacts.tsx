@@ -170,14 +170,24 @@ export function Contacts() {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} onClick={() => setShowAddModal(false)} />
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <motion.div 
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            style={{ width: '100%', maxWidth: 500, backgroundColor: 'var(--bg-main)', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '24px 24px 40px', position: 'relative' }}
-          >
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Novo Contato</h2>
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} 
+            onClick={() => setShowAddModal(false)}
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="glass-panel" 
+            style={{ 
+              position: 'relative', width: '100%', maxWidth: 500, 
+              borderRadius: 24, padding: '32px 24px', 
+              maxHeight: '90vh', overflowY: 'auto',
+              border: '1px solid var(--border-subtle)'
+            }}
+          >  <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Novo Contato</h2>
             <form onSubmit={handleAddContact} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Tipo de Contato</label>

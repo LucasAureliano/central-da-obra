@@ -1,41 +1,44 @@
 import { InsightsWidget } from './InsightsWidget';
-import { BudgetWidget } from './BudgetWidget';
+import { MinhaEmpresaWidget } from './MinhaEmpresaWidget';
 import { AgendaWidget } from './AgendaWidget';
+import { BudgetWidget } from './BudgetWidget';
 import { ServiceFinanceWidget } from './ServiceFinanceWidget';
 import { CalculatorsCentralWidget } from './CalculatorsCentralWidget';
-import { LibraryWidget } from './LibraryWidget';
 import { TipsWidget } from './TipsWidget';
 import { ReorderableDashboardLayout } from './ReorderableDashboardLayout';
 
 export function ProfessionalDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  const DEFAULT_ORDER = ['orcamentos', 'agenda', 'financeiro', 'dicas'];
-  
+  const DEFAULT_ORDER = ['insights', 'minha-empresa', 'agenda', 'orcamentos', 'recebimentos', 'dicas'];
+
   const WIDGET_NAMES = {
-    orcamentos: 'Orçamentos e Serviços',
+    insights: 'Insights da Obra',
+    'minha-empresa': 'Minha Empresa',
     agenda: 'Agenda',
-    financeiro: 'Financeiro',
-    dicas: 'Dicas'
+    orcamentos: 'Orçamentos',
+    recebimentos: 'Recebimentos',
+    dicas: 'Dicas',
   };
 
   const renderWidget = (id: string) => {
     switch (id) {
-      case 'orcamentos': return <BudgetWidget onNavigate={onNavigate} />;
-      case 'agenda': return <AgendaWidget onNavigate={onNavigate} />;
-      case 'financeiro': return <ServiceFinanceWidget onNavigate={onNavigate} />;
-      case 'biblioteca': return <LibraryWidget onNavigate={onNavigate} />;
-      case 'dicas': return <TipsWidget onNavigate={onNavigate} />;
-      default: return null;
+      case 'insights':      return <InsightsWidget onNavigate={onNavigate} />;
+      case 'minha-empresa': return <MinhaEmpresaWidget onNavigate={onNavigate} />;
+      case 'agenda':        return <AgendaWidget onNavigate={onNavigate} />;
+      case 'orcamentos':    return <BudgetWidget onNavigate={onNavigate} />;
+      case 'recebimentos':  return <ServiceFinanceWidget onNavigate={onNavigate} />;
+      case 'dicas':         return <TipsWidget onNavigate={onNavigate} />;
+      default:              return null;
     }
   };
 
   return (
-    <ReorderableDashboardLayout 
-      defaultOrder={DEFAULT_ORDER} 
+    <ReorderableDashboardLayout
+      defaultOrder={DEFAULT_ORDER}
       renderWidget={renderWidget}
       widgetNames={WIDGET_NAMES}
     >
-      <InsightsWidget onNavigate={onNavigate} />
       <CalculatorsCentralWidget onNavigate={onNavigate} />
     </ReorderableDashboardLayout>
   );
 }
+

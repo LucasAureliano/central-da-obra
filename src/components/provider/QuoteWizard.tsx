@@ -13,7 +13,9 @@ import { useAuthModal } from '../../contexts/AuthModalContext';
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { generateCommercialQuotePDF } from '../../utils/pdfGenerator';
+import { materialPriceService } from '../../services/materials/MaterialPriceService';
 import { CopilotTip } from '../assistant/CopilotTip';
+import { PostApprovalModal } from './PostApprovalModal';
 
 const STEPS_DATA = [
   { id: 0, title: 'Início', msg: 'Vamos criar um orçamento profissional.' },
@@ -88,6 +90,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
   const [step, setStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showGuestWarning, setShowGuestWarning] = useState(isGuest);
+  const [showPostApproval, setShowPostApproval] = useState(false);
 
   // --- STATE DATA ---
   const [client, setClient] = useState({ name: '', phone: '', email: '', address: '', city: '', isNew: true });
@@ -105,7 +108,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
       getDocs(query(collection(db, 'users', user.uid, 'clients'))).then(snap => {
         setExistingClients(snap.docs.map(d => ({id: d.id, ...d.data()})));
       });
-      getDocs(query(collection(db, 'users', user.uid, 'services'))).then(snap => {
+      getDocs(query(collection(db, 'users', user.uid, 'services_catalog'))).then(snap => {
         setExistingCatalogServices(snap.docs.map(d => ({id: d.id, ...d.data()})));
       });
     }
@@ -113,10 +116,34 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
   
   const [services, setServices] = useState<any[]>([]);
   const [materials, setMaterials] = useState<any[]>([]);
+  const [isFetchingPrices, setIsFetchingPrices] = useState(false);
   const [labor, setLabor] = useState({ days: 1, workers: 1, dailyRate: 150, obs: '' });
   const [costs, setCosts] = useState({ freight: 0, displacement: 0, rental: 0, others: 0 });
   const [discount, setDiscount] = useState({ value: 0, isPercentage: false });
   const [conditions, setConditions] = useState({ prazo: '', garantia: '', pagamento: '', validade: '15 dias', obs: '' });
+
+  const fetchMarketPrices = async () => {
+    if (materials.length === 0) return;
+    setIsFetchingPrices(true);
+    try {
+      const names = materials.map(m => m.name || m.desc).filter(Boolean);
+      const pricesData = await materialPriceService.searchMultiple(names);
+      
+      const newMaterials = materials.map(m => {
+        const matName = m.name || m.desc;
+        const matches = pricesData[matName] || [];
+        if (matches.length > 0) {
+          return { ...m, price: matches[0].price, supplier: matches[0].supplier, link: matches[0].link };
+        }
+        return m;
+      });
+      setMaterials(newMaterials);
+    } catch (e) {
+      console.error('Error fetching market prices:', e);
+    } finally {
+      setIsFetchingPrices(false);
+    }
+  };
 
   // --- AUTOPOPULATE BASED ON PROFILE (Optional override) ---
   const applyTemplate = (key: string) => {
@@ -203,7 +230,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
             resultData: {
               materials: [
                 ...services.map(s => ({ name: s.desc, quantity: s.qtd, unit: s.un, unitPrice: s.price, isPurchased: false })),
-                ...materials.map(m => ({ name: m.name || m.desc, quantity: m.qtd, unit: m.un || 'un', unitPrice: m.price, isPurchased: false }))
+                ...materials.map(m => ({ name: m.name || m.desc, quantity: m.qtd, unit: m.un || 'un', unitPrice: m.price || 0, supplier: m.supplier || '', link: m.link || '', isPurchased: false }))
               ]
             }
           });
@@ -221,8 +248,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
         console.error('Erro ao criar obra e orçamento', err);
       }
     }
-    alert('Orçamento Aprovado! Obra e Previsão Financeira criadas com sucesso na CentralObra.');
-    onFinish();
+    setShowPostApproval(true);
   };
 
   // --- RENDER HELPERS ---
@@ -600,22 +626,38 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
                             <DollarSign size={20} />
                             <input type="number" className="input-field" value={m.price} onChange={e => { const nm = [...materials]; nm[index].price = Number(e.target.value); setMaterials(nm); }} />
                           </div>
+                          {m.supplier && <span style={{ fontSize: 11, color: 'var(--color-primary)', marginTop: 4, display: 'block' }}>Ref: {m.supplier}</span>}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right', fontWeight: 800, fontSize: 18, color: 'var(--text-main)', marginTop: 4 }}>
-                        Subtotal: R$ {(m.qtd * m.price).toFixed(2)}
+                        Subtotal: R$ {(m.qtd * (m.price || 0)).toFixed(2)}
                       </div>
                     </motion.div>
                   ))}
                   
-                  <motion.button 
-                    whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-                    className="btn-secondary" 
-                    style={{ borderRadius: 20, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '2px dashed var(--border-subtle)', background: 'transparent' }}
-                    onClick={() => setMaterials([...materials, { id: Date.now().toString(), name: '', qtd: 1, price: 0 }])}
-                  >
-                    <Plus size={20} /> Adicionar Material Manualmente
-                  </motion.button>
+                  <div style={{ display: 'grid', gridTemplateColumns: materials.length > 0 ? '1fr 1fr' : '1fr', gap: 12 }}>
+                    <motion.button 
+                      whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                      className="btn-secondary" 
+                      style={{ borderRadius: 20, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '2px dashed var(--border-subtle)', background: 'transparent' }}
+                      onClick={() => setMaterials([...materials, { id: Date.now().toString(), name: '', qtd: 1, price: 0 }])}
+                    >
+                      <Plus size={20} /> Adicionar Material Manualmente
+                    </motion.button>
+
+                    {materials.length > 0 && (
+                      <motion.button 
+                        whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                        className="btn-primary" 
+                        onClick={fetchMarketPrices}
+                        disabled={isFetchingPrices}
+                        style={{ borderRadius: 20, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                      >
+                        {isFetchingPrices ? <div style={{width:20,height:20,border:'2px solid #fff',borderTopColor:'transparent',borderRadius:'50%',animation:'spin 1s linear infinite'}}/> : <Search size={20} />}
+                        {isFetchingPrices ? 'Buscando...' : 'Preencher Preços de Mercado'}
+                      </motion.button>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -937,6 +979,23 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
           }
         }
       `}</style>
+      <PostApprovalModal
+        isOpen={showPostApproval}
+        onClose={() => {
+          setShowPostApproval(false);
+          onFinish();
+        }}
+        quoteData={{
+          clientName: client.name || 'Cliente',
+          clientPhone: client.phone,
+          clientEmail: client.email,
+          workName: workData.name,
+          workAddress: workData.address,
+          grandTotal,
+          serviceType,
+          services
+        }}
+      />
     </div>
   );
 }

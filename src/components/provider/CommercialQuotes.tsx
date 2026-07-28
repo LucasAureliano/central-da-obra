@@ -52,14 +52,43 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
   }, [user]);
 
   const moveQuote = async (id: string, newStatus: QuoteStatus) => {
+    const targetQuote = quotes.find(q => q.id === id);
     const previous = [...quotes];
     setQuotes(quotes.map(q => q.id === id ? { ...q, status: newStatus } : q));
     
-    if (user) {
+    if (user && targetQuote) {
       try {
         await updateDoc(doc(db, 'users', user.uid, 'quotes', id), {
           status: newStatus
         });
+
+        // Sync with Finance & Shopping when Approved
+        if (newStatus === 'Aprovado') {
+          const { addDoc, collection, serverTimestamp } = await import('firebase/firestore');
+          // Add to Shopping
+          await addDoc(collection(db, 'users', user.uid, 'shopping'), {
+            name: `[Cotação] ${targetQuote.service} (${targetQuote.client})`,
+            quantity: 1,
+            unit: 'serviço',
+            unitPrice: targetQuote.value,
+            isPurchased: false,
+            createdAt: serverTimestamp()
+          });
+
+          // Add to Finance (Receita/Contrato ou Despesa de Serviço)
+          await addDoc(collection(db, 'users', user.uid, 'expenses'), {
+            title: `Cotação Aprovada: ${targetQuote.service}`,
+            amount: targetQuote.value,
+            category: 'Mão de obra',
+            status: 'Pendente',
+            date: serverTimestamp(),
+            supplier: targetQuote.client,
+            notes: `Origem: Orçamento comercial ${targetQuote.id}`
+          });
+
+          const { toast } = await import('react-hot-toast');
+          toast.success('Cotação aprovada! Sincronizada com o Financeiro e Lista de Compras.');
+        }
       } catch (err) {
         console.error('Erro ao atualizar status', err);
         setQuotes(previous); // rollback

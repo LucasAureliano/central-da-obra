@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ArrowLeft, MapPin, Calendar, DollarSign, Activity, Share2 } from 'lucide-react';
-import { TimelineView } from './works/TimelineView';
 import { DocumentsView } from './works/DocumentsView';
 import { BudgetList } from './works/BudgetList';
 import { ShareWorkView } from './works/ShareWorkView';
-import { Plus, X, Save } from 'lucide-react';
+import { InteractiveSchedule } from './owner/InteractiveSchedule';
+import { Finance } from './Finance';
+import { Shopping } from './Shopping';
+import { X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { addDoc, serverTimestamp } from 'firebase/firestore';
@@ -21,9 +23,8 @@ interface WorkDetailsProps {
 export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
   const { profile, user } = useAuth();
   const [work, setWork] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'orcamento' | 'diario' | 'documentos' | 'compartilhamento'>('resumo');
+  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'compras' | 'orcamento' | 'diario' | 'documentos' | 'compartilhamento'>('resumo');
   const [calculations, setCalculations] = useState<any[]>([]);
-  const [totalSpent, setTotalSpent] = useState(0);
   
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [expenseTitle, setExpenseTitle] = useState('');
@@ -80,7 +81,6 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         return dateB.getTime() - dateA.getTime();
       });
       setCalculations(calcs);
-      setTotalSpent(spent);
     });
 
     return () => {
@@ -165,14 +165,18 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         >
           Cronograma
         </button>
-        {profile?.role !== 'owner' && (
-          <button 
-            onClick={() => setActiveTab('financas')}
-            style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'financas' ? 700 : 600, color: activeTab === 'financas' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'financas' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-          >
-            Finanças
-          </button>
-        )}
+        <button 
+          onClick={() => setActiveTab('financas')}
+          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'financas' ? 700 : 600, color: activeTab === 'financas' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'financas' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
+        >
+          Finanças
+        </button>
+        <button 
+          onClick={() => setActiveTab('compras')}
+          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'compras' ? 700 : 600, color: activeTab === 'compras' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'compras' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
+        >
+          Materiais
+        </button>
         <button 
           onClick={() => setActiveTab('orcamento')}
           style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'orcamento' ? 700 : 600, color: activeTab === 'orcamento' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'orcamento' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -230,10 +234,10 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       )}
 
       {activeTab === 'cronograma' && (
-        <TimelineView workId={workId} />
+        <div style={{ padding: '20px' }}>
+          <InteractiveSchedule workId={workId} embedded />
+        </div>
       )}
-
-
 
       {activeTab === 'orcamento' && (
         <BudgetList workId={workId} calculations={calculations} work={work} user={user} profile={profile} />
@@ -241,51 +245,13 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
 
       {activeTab === 'financas' && (
         <div style={{ padding: 20 }}>
-          <div className="glass-panel" style={{ padding: 24, borderRadius: 16, marginBottom: 24, background: 'linear-gradient(135deg, var(--color-primary) 0%, #1d4ed8 100%)', color: '#FFF' }}>
-            <h3 style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>Custo Total Registrado</h3>
-            <p style={{ fontSize: 32, fontWeight: 800, margin: 0 }}>
-              R$ {totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-            {work.budget !== undefined && (
-              <p style={{ fontSize: 12, opacity: 0.8, marginTop: 8 }}>
-                Orçamento inicial: {typeof work.budget === 'number' ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(work.budget) : work.budget}
-              </p>
-            )}
-          </div>
+          <Finance workId={workId} embedded />
+        </div>
+      )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>
-              Despesas da Obra ({calculations.length})
-            </h3>
-            {profile?.role !== 'owner' && (
-              <button 
-                onClick={() => setIsExpenseModalOpen(true)}
-                className="btn-primary" 
-                style={{ padding: '8px 16px', borderRadius: 12, display: 'flex', gap: 8, fontSize: 13 }}
-              >
-                <Plus size={16} /> Adicionar
-              </button>
-            )}
-          </div>
-          
-          <div className="animate-fade-in" style={{ padding: 16 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Histórico de Despesas</h3>
-            {calculations.length > 0 ? (
-              calculations.map((calc, idx) => (
-                <div key={calc.id || idx} className="glass-panel" style={{ padding: 16, borderRadius: 16, marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <h4 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)' }}>{calc.calcType || 'Cálculo Genérico'}</h4>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{new Date(calc.savedAt?.toDate?.() || Date.now()).toLocaleDateString('pt-BR')}</p>
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#EF4444' }}>
-                    - R$ {calc.totalCost ? calc.totalCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p style={{ color: 'var(--text-muted)' }}>Nenhum cálculo salvo nesta obra.</p>
-            )}
-          </div>
+      {activeTab === 'compras' && (
+        <div style={{ padding: 20 }}>
+          <Shopping workId={workId} embedded />
         </div>
       )}
 
@@ -303,7 +269,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
 
       <AnimatePresence>
         {isExpenseModalOpen && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} 
@@ -311,10 +277,10 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
             />
             
             <motion.div 
-              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="glass-panel" 
-              style={{ width: '100%', maxWidth: 500, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: '32px 24px', position: 'relative', zIndex: 1 }}
+              style={{ width: '100%', maxWidth: 500, borderRadius: 24, padding: '32px 24px', position: 'relative', zIndex: 1 }}
             >
               <button 
                 onClick={() => setIsExpenseModalOpen(false)}

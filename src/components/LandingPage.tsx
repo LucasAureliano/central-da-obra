@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Logo } from './ui/Logo';
-import { ConstructionShaderBg } from './landing/ConstructionShaderBg';
 import { TestimonialStack } from './landing/TestimonialStack';
 import type { Testimonial } from './landing/TestimonialStack';
 import { Building2, Clock, ThumbsUp, PenTool, ShieldCheck, Zap } from 'lucide-react';
@@ -137,10 +136,10 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
   }
 
   return (
-    <div className="landing-body">
+    <div className="landing-body" style={{ backgroundColor: '#000' }}>
       {/* Background Elements */}
-      <div className="landing-bg">
-        <ConstructionShaderBg theme={theme} />
+      <div className="landing-bg" style={{ backgroundColor: '#000', opacity: 1, zIndex: -1, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+        {/* Solid black background as requested */}
       </div>
 
       {/* Navbar Premium */}

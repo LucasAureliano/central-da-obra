@@ -215,29 +215,38 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
       title: 'Qual a dimensão da peça?',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <SearchableSelect 
-            options={sizeOptions} 
-            selectedId={tileSizeObj?.id} 
-            onSelect={(opt) => { 
-              setTileSizeObj(opt); 
-              handleNext(); 
-            }}
-            onCustomSelect={() => {
-              setTileSizeObj({ id: 'custom', title: 'Outro (Personalizado)' });
-            }}
-            searchPlaceholder="Pesquisar tamanho (ex: 60x60)..."
-          />
-          {tileSizeObj?.id === 'custom' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16, padding: 16, backgroundColor: 'var(--bg-surface)', borderRadius: 16 }}>
-              <div className="input-group">
-                <label>Largura (cm)</label>
-                <input type="number" className="input-premium" value={customTileW} onChange={e => setCustomTileW(e.target.value)} placeholder="Ex: 15" />
+          {tileSizeObj?.id === 'custom' ? (
+            <div className="glass-panel" style={{ padding: 20, borderRadius: 16, backgroundColor: 'var(--color-primary-alpha)', border: '1px solid var(--color-primary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h4 style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-primary)' }}>Medida Personalizada</h4>
+                <button onClick={() => setTileSizeObj(null)} style={{ background: 'var(--bg-elevated)', border: 'none', padding: '6px 12px', borderRadius: 12, fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', cursor: 'pointer' }}>
+                  Alterar
+                </button>
               </div>
-              <div className="input-group">
-                <label>Comprimento (cm)</label>
-                <input type="number" className="input-premium" value={customTileL} onChange={e => setCustomTileL(e.target.value)} placeholder="Ex: 90" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="input-group">
+                  <label>Largura (cm)</label>
+                  <input type="number" className="input-premium" value={customTileW} onChange={e => setCustomTileW(e.target.value)} placeholder="Ex: 15" />
+                </div>
+                <div className="input-group">
+                  <label>Comprimento (cm)</label>
+                  <input type="number" className="input-premium" value={customTileL} onChange={e => setCustomTileL(e.target.value)} placeholder="Ex: 90" />
+                </div>
               </div>
             </div>
+          ) : (
+            <SearchableSelect 
+              options={sizeOptions} 
+              selectedId={tileSizeObj?.id} 
+              onSelect={(opt) => { 
+                setTileSizeObj(opt); 
+                handleNext(); 
+              }}
+              onCustomSelect={() => {
+                setTileSizeObj({ id: 'custom', title: 'Outro (Personalizado)' });
+              }}
+              searchPlaceholder="Pesquisar tamanho (ex: 60x60)..."
+            />
           )}
         </div>
       ),

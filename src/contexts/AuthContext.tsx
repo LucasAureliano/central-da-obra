@@ -30,6 +30,20 @@ export interface UserProfile {
   plan: string;
   hasSeenWelcome?: boolean;
   dashboardPrefs?: DashboardPrefs;
+  
+  // Professional / Commercial fields
+  logotipo?: string;
+  nomeFantasia?: string;
+  razaoSocial?: string;
+  cpfCnpj?: string;
+  creaCau?: string;
+  telefone?: string;
+  whatsapp?: string;
+  emailComercial?: string;
+  redesSociais?: string;
+  pix?: string;
+  endereco?: string;
+  especialidades?: string;
 }
 
 interface AuthContextType {

@@ -273,35 +273,46 @@ export function generateCommercialQuotePDF({
   const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   // 1. Header Profissional (Branco / Minimalista)
+  // Draw CentralObra Logo
+  doc.setFillColor(255, 107, 0); // Orange
+  doc.roundedRect(margin, margin + 4, 24, 24, 4, 4, 'F');
+  doc.setFillColor(255, 255, 255);
+  doc.rect(margin + 5, margin + 17, 14, 2, 'F');
+  doc.roundedRect(margin + 7, margin + 10, 10, 8, 2, 2, 'F');
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(24);
   doc.setTextColor(17, 24, 39); // Gray 900
-  doc.text('PROPOSTA COMERCIAL', margin, margin + 20);
+  doc.text('PROPOSTA COMERCIAL', margin + 34, margin + 24);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(107, 114, 128); // Gray 500
-  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, margin + 35);
-  doc.text(`Validade: ${conditions.validade || '15 dias'}`, margin, margin + 47);
+  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, margin + 45);
+  doc.text(`Validade: ${conditions.validade || '15 dias'}`, margin, margin + 57);
 
   // Logo ou Nome da Empresa a direita
   const rightAlign = pageWidth - margin;
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(17, 24, 39);
-  const prestadorName = profile?.name || 'CentralObra Pro';
+  const prestadorName = profile?.companyName || profile?.name || 'CentralObra Pro';
   doc.text(prestadorName, rightAlign, margin + 20, { align: 'right' });
   
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(107, 114, 128);
-  if (profile?.specialty) doc.text(profile.specialty, rightAlign, margin + 35, { align: 'right' });
-  if (profile?.email) doc.text(profile.email, rightAlign, margin + 47, { align: 'right' });
+  let rightY = margin + 33;
+  if (profile?.documentNumber) { doc.text(`CPF/CNPJ: ${profile.documentNumber}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
+  if (profile?.registry) { doc.text(`Reg: ${profile.registry}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
+  if (profile?.whatsapp || profile?.phone) { doc.text(`Tel/Whats: ${profile.whatsapp || profile.phone}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
+  if (profile?.pixKey) { doc.text(`Chave PIX: ${profile.pixKey}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
+  if (profile?.email) { doc.text(profile.email, rightAlign, rightY, { align: 'right' }); rightY += 12; }
 
   // Divider
   doc.setDrawColor(229, 231, 235); // Gray 200
   doc.setLineWidth(1);
-  doc.line(margin, margin + 65, pageWidth - margin, margin + 65);
+  doc.line(margin, Math.max(margin + 65, rightY + 5), pageWidth - margin, Math.max(margin + 65, rightY + 5));
 
   let currentY = margin + 95;
 

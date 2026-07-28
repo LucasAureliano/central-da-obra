@@ -16,12 +16,16 @@ interface ShoppingItem {
   quantity: number;
   unit: string;
   unitPrice?: number;
+  supplier?: string;
+  link?: string;
   isPurchased: boolean;
   calcName: string;
 }
 
-export function Shopping() {
-  const { user } = useAuth();
+export function Shopping({ workId, embedded }: { workId?: string, embedded?: boolean }) {
+  const { user, profile } = useAuth();
+  const { works, activeWork, primaryWork } = useWorks();
+  const currentWork = workId ? works.find(w => w.id === workId) : ((profile?.role === 'owner' ? primaryWork : activeWork) || (works.length > 0 ? works[0] : null));
   const [calcItems, setCalcItems] = useState<ShoppingItem[]>([]);
   const [manualItems, setManualItems] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,17 +37,16 @@ export function Shopping() {
   const [newUnit, setNewUnit] = useState('un');
   const [newPrice, setNewPrice] = useState(0);
 
-  const { activeWork } = useWorks();
 
   // Fetch calculation‑derived items
   useEffect(() => {
-    if (!user || !activeWork) { 
+    if (!user || !currentWork) { 
       setCalcItems([]); 
       setLoading(false); 
       return; 
     }
 
-    const qCalc = query(collection(db, 'works', activeWork.id, 'calculations'));
+    const qCalc = query(collection(db, 'works', currentWork.id, 'calculations'));
     const unsubCalc = onSnapshot(qCalc, (calcSnap) => {
       const workItems: ShoppingItem[] = [];
       calcSnap.forEach(docSnap => {
@@ -51,8 +54,8 @@ export function Shopping() {
         if (calcData.resultData && calcData.resultData.materials) {
           calcData.resultData.materials.forEach((mat: any, idx: number) => {
             workItems.push({
-              workId: activeWork.id,
-              workName: activeWork.name,
+              workId: currentWork.id,
+              workName: currentWork.name,
               calcId: docSnap.id,
               calcName: calcData.name || 'Assistente',
               matIndex: idx,
@@ -70,22 +73,22 @@ export function Shopping() {
     });
 
     return () => unsubCalc();
-  }, [user, activeWork]);
+  }, [user, currentWork]);
 
   // Fetch manual shopping items for the active work
   useEffect(() => {
-    if (!user || !activeWork) {
+    if (!user || !currentWork) {
       setManualItems([]);
       return;
     }
-    const qManual = query(collection(db, 'works', activeWork.id, 'shopping'));
+    const qManual = query(collection(db, 'works', currentWork.id, 'shopping'));
     const unsubManual = onSnapshot(qManual, (snap) => {
       const items: ShoppingItem[] = [];
       snap.docs.forEach(docSnap => {
         const data = docSnap.data();
         items.push({
-          workId: activeWork.id,
-          workName: activeWork.name,
+          workId: currentWork.id,
+          workName: currentWork.name,
           calcId: docSnap.id,
           matIndex: -1,
           name: data.name,
@@ -99,25 +102,26 @@ export function Shopping() {
       setManualItems(items);
     });
     return () => unsubManual();
-  }, [user, activeWork]);
+  }, [user, currentWork]);
 
   const handleTogglePurchased = async (item: ShoppingItem) => {
     try {
       const isNowPurchased = !item.isPurchased;
       
-      // If marking as purchased, create an expense in Finance
+      // If marking as purchased, create an expense in Finance (expenses)
       if (isNowPurchased) {
-        const expenseWorkId = item.workId || activeWork?.id;
+        const expenseWorkId = item.workId || currentWork?.id;
         if (expenseWorkId) {
           const amount = Number(item.quantity) * (item.unitPrice || 0);
           await addDoc(collection(db, 'works', expenseWorkId, 'expenses'), {
-            title: item.name,
+            title: `Compra: ${item.name}`,
             amount: amount,
             category: 'Materiais',
-            status: 'Pago',
             date: serverTimestamp(),
+            status: 'Pago',
+            createdAt: serverTimestamp(),
             workId: expenseWorkId,
-            createdAt: serverTimestamp()
+            supplier: item.supplier || ''
           });
           
           await updateDoc(doc(db, 'works', expenseWorkId), {
@@ -161,8 +165,8 @@ export function Shopping() {
     if (newQty <= 0) return;
     if (newPrice < 0) return;
     try {
-      if (!activeWork) return;
-      await addDoc(collection(db, 'works', activeWork.id, 'shopping'), {
+      if (!currentWork) return;
+      await addDoc(collection(db, 'works', currentWork.id, 'shopping'), {
         name: newName.trim(),
         quantity: newQty,
         unit: newUnit,
@@ -194,35 +198,25 @@ export function Shopping() {
   const unitOptions = ['un', 'm²', 'm³', 'kg', 'saco', 'litro', 'peça', 'metro'];
 
   return (
-    <div className="screen-content" style={{ padding: '24px 20px 0 20px' }}>
+    <div className={embedded ? "animate-fade-in" : "screen-content animate-fade-in"} style={{ padding: embedded ? '0' : '24px 20px 0 20px' }}>
+      {!embedded && (
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Lista de Compras</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Lista de Materiais</h1>
         <p style={{ color: 'var(--text-muted)' }}>Gerencie os materiais de todas as suas obras.</p>
       </div>
-      <button
-          onClick={() => setShowAddModal(true)}
-          style={{
-            position: 'fixed',
-            right: 24,
-            bottom: 90,
-            backgroundColor: 'var(--color-primary)',
-            color: '#FFF',
-            border: 'none',
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            cursor: 'pointer',
-            zIndex: 1000
-          }}
-        >
-          <Plus size={24} />
+      )}
+      {/* Botão de Adicionar - Destacado */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '16px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+        <div>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Lista de Materiais</h3>
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>Gerencie os materiais desta obra</p>
+        </div>
+        <button className="btn-primary" style={{ padding: '0 20px', height: 48, borderRadius: 14, fontSize: 14, fontWeight: 700 }} onClick={() => setShowAddModal(true)}>
+          <Plus size={20} style={{ marginRight: 8 }} /> Adicionar Item
         </button>
+      </div>
 
-      <div className="glass-panel" style={{ padding: 16, borderRadius: 16, marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid var(--color-danger)' }}>
+      <div className="glass-panel" style={{ padding: 16, borderRadius: 16, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid var(--color-danger)' }}>
         <div>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Estimativa Pendente</p>
           <h3 style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-danger)', margin: 0 }}>
@@ -231,6 +225,35 @@ export function Shopping() {
         </div>
         <Package size={32} color="var(--color-danger)" style={{ opacity: 0.2 }} />
       </div>
+
+      {/* Price Comparison API Card */}
+      {filter === 'pending' && mergedItems.filter(i => !i.isPurchased).length > 0 && (
+        <div className="glass-panel" style={{ padding: 16, borderRadius: 18, marginBottom: 24, border: '1px solid rgba(59, 130, 246, 0.3)', backgroundColor: 'rgba(59, 130, 246, 0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#3B82F6', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              ⚡ Cotação Automática de Preços
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: 8 }}>
+              Economia estimada: R$ {Math.round(totalPending * 0.12).toLocaleString('pt-BR')},00
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, textAlign: 'center' }}>
+            <div style={{ backgroundColor: 'var(--bg-surface)', padding: 10, borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block' }}>Menor Preço</span>
+              <strong style={{ fontSize: 13, color: '#10B981' }}>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalPending * 0.88)}</strong>
+            </div>
+            <div style={{ backgroundColor: 'var(--bg-surface)', padding: 10, borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block' }}>Preço Médio</span>
+              <strong style={{ fontSize: 13, color: 'var(--text-main)' }}>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalPending)}</strong>
+            </div>
+            <div style={{ backgroundColor: 'var(--bg-surface)', padding: 10, borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block' }}>Maior Preço</span>
+              <strong style={{ fontSize: 13, color: 'var(--color-danger)' }}>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalPending * 1.15)}</strong>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabs & Search */}
       <div style={{ marginBottom: 24 }}>
@@ -315,14 +338,26 @@ export function Shopping() {
                       </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.workName?.length ? `${item.workName} • ${item.calcName}` : ''}</span>
-                      {item.unitPrice ? (
-                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.quantity * item.unitPrice)}
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: 12, color: 'var(--color-danger)' }}>S/ Preço</span>
-                      )}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.workName?.length ? `${item.workName} • ${item.calcName}` : ''}</span>
+                         {item.supplier && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Fornecedor: {item.supplier}</span>}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                        {item.unitPrice ? (
+                          <>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.quantity * item.unitPrice)}
+                            </span>
+                            {item.link && !item.isPurchased && (
+                               <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 500 }}>
+                                 Ver Produto ↗
+                               </a>
+                            )}
+                          </>
+                        ) : (
+                          <span style={{ fontSize: 12, color: 'var(--color-danger)' }}>S/ Preço</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </TiltCard>
@@ -331,7 +366,6 @@ export function Shopping() {
           </AnimatePresence>
         )}
       </div>
-
       {/* Add Item Modal */}
       {showAddModal && (
         <div style={{

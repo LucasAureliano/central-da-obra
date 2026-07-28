@@ -34,10 +34,8 @@ export function Agenda() {
     if (user && !isGuest) {
       loadEvents();
     } else {
-      setEvents([
-        { id: '1', title: isArchitect ? 'Vistoria da Fundação' : 'Pintura Externa', date: '2026-07-16', time: '09:00', duration: '2h', location: 'Edifício Horizon', type: isArchitect ? 'Vistoria' : 'Serviço', client: 'João Silva', work: 'Obra Horizon', notes: 'Verificar alinhamento e documentação', status: 'Agendado' },
-        { id: '2', title: isArchitect ? 'Reunião de Compatibilização' : 'Manutenção Elétrica', date: '2026-07-16', time: '14:30', duration: '1h', location: 'Escritório Central', type: 'Reunião', client: 'Condomínio Alpha', work: 'Reforma', notes: 'Trazer planta revisada', status: 'Agendado' }
-      ]);
+      // Zero State: visitantes e usuários sem login não têm eventos
+      setEvents([]);
     }
   }, [user, isGuest]);
 
@@ -199,18 +197,47 @@ export function Agenda() {
             <div style={{ width: 3, height: 48, backgroundColor: 'var(--color-primary)', borderRadius: 2 }}></div>
             
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{event.title}</h4>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
-                  <MapPin size={12} /> {event.location}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
-                  <User size={12} /> {event.client}
-                </div>
+              <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{event.title}</h4>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {event.location && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
+                    <MapPin size={12} color="var(--color-primary)" /> {event.location}
+                  </div>
+                )}
+                {event.client && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
+                    <User size={12} /> {event.client}
+                  </div>
+                )}
               </div>
+              {event.location && (
+                <button
+                  onClick={() => {
+                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(event.location)}`;
+                    window.open(mapsUrl, '_blank');
+                  }}
+                  style={{
+                    alignSelf: 'flex-start',
+                    marginTop: 4,
+                    padding: '4px 10px',
+                    borderRadius: 8,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    backgroundColor: 'var(--color-primary-alpha)',
+                    color: 'var(--color-primary)',
+                    border: '1px solid var(--color-primary-alpha)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <MapPin size={12} /> Abrir Rota no Google Maps
+                </button>
+              )}
             </div>
             
-            <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)' }}>
+            <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
               <ChevronRight size={20} />
             </button>
           </div>

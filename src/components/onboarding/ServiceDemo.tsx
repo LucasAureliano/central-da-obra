@@ -29,9 +29,9 @@ export const ServiceDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
           initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}
         >
-          {step === 0 && 'Gestão de Clientes'}
+          {step === 0 && 'Central de Marketing'}
           {step === 1 && 'Orçamentos Profissionais'}
-          {step === 2 && 'Orçamento Aprovado'}
+          {step === 2 && 'Gestão Centralizada'}
           {step === 3 && 'Controle Financeiro'}
         </motion.h2>
         <motion.p 
@@ -39,9 +39,9 @@ export const ServiceDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
           style={{ fontSize: 16, color: 'var(--text-muted)' }}
         >
-          {step === 0 && 'Cadastre seus clientes e tenha tudo organizado.'}
+          {step === 0 && 'Divulgue seu link e receba avaliações públicas.'}
           {step === 1 && 'Gere PDFs com seu logotipo em poucos cliques.'}
-          {step === 2 && 'Transforme o orçamento em uma obra ativa.'}
+          {step === 2 && 'Controle suas obras e diários num só lugar.'}
           {step === 3 && 'Dê baixa nos recebimentos e veja seu faturamento.'}
         </motion.p>
       </div>
@@ -63,7 +63,7 @@ export const ServiceDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
               className={interacted ? "btn-success" : "btn-primary glow-effect"}
               style={{ width: '100%', height: 48, borderRadius: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
-              {interacted ? <><CheckCircle size={20} /> Cliente Adicionado</> : <><Plus size={20} /> Cadastrar Cliente</>}
+              {interacted ? <><CheckCircle size={20} /> Link Copiado</> : <><Plus size={20} /> Gerar Link de Avaliação</>}
             </button>
 
             <AnimatePresence>
@@ -71,8 +71,8 @@ export const ServiceDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
                 <motion.div layout initial={{ opacity: 0, y: 10, height: 0 }} animate={{ opacity: 1, y: 0, height: 'auto' }} style={{ marginTop: 24, padding: 16, background: 'var(--bg-elevated)', borderRadius: 12, border: '1px dashed var(--border-subtle)', display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
                   <FileText size={24} color="var(--color-primary)" />
                   <div>
-                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>João da Silva</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>(11) 98888-7777</div>
+                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>centralobra.app/#/avaliar/123</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Pronto para compartilhar</div>
                   </div>
                 </motion.div>
               )}
@@ -109,9 +109,9 @@ export const ServiceDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
         {step === 2 && (
           <motion.div layout initial={{ scale: 0.95, y: 10, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="glass-panel" style={{ padding: 24, borderRadius: 24, width: '100%' }}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Status do Orçamento</div>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Controle de Obras</div>
               <div style={{ fontSize: 24, fontWeight: 800, color: interacted ? 'var(--color-success)' : 'var(--text-main)' }}>
-                {interacted ? 'APROVADO' : 'EM ANÁLISE'}
+                {interacted ? 'SINCRONIZADO' : 'AGUARDANDO'}
               </div>
             </div>
             
@@ -120,7 +120,7 @@ export const ServiceDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
               className={interacted ? "btn-secondary" : "btn-success glow-effect"}
               style={{ width: '100%', height: 48, borderRadius: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              {interacted ? 'Obra Criada' : 'Aprovar Orçamento'}
+              {interacted ? 'Diário Criado' : 'Criar Nova Obra'}
             </button>
           </motion.div>
         )}

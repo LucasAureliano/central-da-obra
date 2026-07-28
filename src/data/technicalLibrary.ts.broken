@@ -1,0 +1,2246 @@
+export interface TechnicalArticle {
+  id: string;
+  title: string;
+  category: string;
+  subcategories: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+  summary: string;
+  content: {
+    whatIsIt: string;
+    whereToUse: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    whenToUse?: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    materialsNeeded: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    toolsNeeded: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    stepByStep: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    averageTime?: string;
+    averageConsumption?: string;
+    averageYield?: string;
+    goodPractices: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    commonErrors: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    carePrecautions?: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    safety: {
+      epis: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+      nrs: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+      precautions: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    };
+  };
+  related: {
+    norms: { id: string, name: string, summary: string }[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    calculators: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    materials: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    articles: string[]; 
+    problems?: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+  };
+  metadata: {
+    keywords: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    synonyms: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    recommendedProfile: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    tags: string[  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+    level: 'BÃ¡sico' | 'IntermediÃ¡rio' | 'AvanÃ§ado';
+    lastUpdate: string;
+  };
+}
+
+export const CATEGORIES = [
+  'Todos',
+  'Normas',
+  'Materiais',
+  'ExecuÃ§Ã£o',
+  'Ferramentas',
+  'Problemas',
+  'SeguranÃ§a',
+  'Acabamentos',
+  'Estruturas',
+  'ElÃ©trica',
+  'HidrÃ¡ulica',
+  'Cobertura',
+  'ImpermeabilizaÃ§Ã£o',
+  'Pintura'
+  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+
+export const TECHNICAL_ARTICLES: TechnicalArticle[] = [
+  {
+    id: 'concreto-armado',
+    title: 'Concreto Armado',
+    category: 'Estruturas',
+    subcategories: ['Materiais', 'ExecuÃ§Ã£o'],
+    summary: 'Guia completo sobre concretagem de peÃ§as estruturais como pilares, vigas e lajes.',
+    content: {
+      whatIsIt: 'Ã‰ a uniÃ£o do concreto (cimento, areia, brita e Ã¡gua) com armaduras de aÃ§o, unindo a resistÃªncia Ã  compressÃ£o do concreto com a resistÃªncia Ã  traÃ§Ã£o do aÃ§o.',
+      whereToUse: [
+        'FundaÃ§Ãµes (sapatas, blocos, estacas)',
+        'Vigas e Pilares',
+        'Lajes e Escadas'
+      ],
+      whenToUse: [
+        'Estruturas que exigem alta resistÃªncia e durabilidade',
+        'Obras de pequeno a grande porte',
+        'FundaÃ§Ãµes em solos de diferentes capacidades'
+      ],
+      materialsNeeded: [
+        'Cimento CP II, CP III ou CP IV',
+        'Areia mÃ©dia ou grossa',
+        'Brita 1 ou 2',
+        'Ãgua potÃ¡vel (sem impurezas)',
+        'AÃ§o (CA-50, CA-60)',
+        'Arame recozido',
+        'Madeira para forma (tÃ¡buas, pontaletes)'
+      ],
+      toolsNeeded: [
+        'Betoneira',
+        'Vibrador de concreto',
+        'Carrinho de mÃ£o',
+        'PÃ¡s e enxadas',
+        'Desempenadeira e colher de pedreiro',
+        'Mangueira de nÃ­vel e prumo'
+      ],
+      stepByStep: [
+        '1. Montagem das formas: Garantir que estÃ£o no prumo, no nÃ­vel e travadas.',
+        '2. ColocaÃ§Ã£o das armaduras: Garantir o cobrimento mÃ­nimo exigido por norma usando espaÃ§adores.',
+        '3. Preparo ou Recebimento: Se rodado em obra, seguir o traÃ§o ideal. Se usinado, conferir nota fiscal e abatimento (slump test).',
+        '4. LanÃ§amento: NÃ£o lanÃ§ar de alturas superiores a 2 metros para evitar segregaÃ§Ã£o.',
+        '5. Adensamento: Utilizar vibrador de imersÃ£o de forma vertical sem encostar nas armaduras ou nas formas.',
+        '6. Cura: Manter a superfÃ­cie Ãºmida por no mÃ­nimo 7 dias para evitar fissuras de retraÃ§Ã£o tÃ©rmica.'
+      ],
+      averageTime: 'Varia pelo volume, mas uma laje de 100mÂ² pode ser concretada em cerca de 3 a 5 horas utilizando bomba.',
+      averageConsumption: 'Aproximadamente 350 a 400 kg de cimento por mÂ³ de concreto (dependendo do fck e do traÃ§o).',
+      averageYield: '1 caminhÃ£o betoneira rende cerca de 7 a 8 mÂ³ de concreto usinado.',
+      goodPractices: [
+        'Sempre umedecer as formas de madeira antes da concretagem para nÃ£o roubar Ã¡gua do concreto.',
+        'Limpar o fundo das formas de pilares antes de iniciar o lanÃ§amento (usar janelas de limpeza).',
+        'Programar a concretagem para horÃ¡rios mais frescos do dia.'
+      ],
+      commonErrors: [
+        'Nunca adicionar Ã¡gua no caminhÃ£o betoneira alÃ©m do especificado na nota para "amolecer" o concreto (isso derruba o FCK).',
+        'Nunca concretar sem realizar o processo de cura molhada. O concreto trinca ao perder Ã¡gua muito rÃ¡pido.',
+        'NÃ£o utilizar areia com excesso de argila/barro ou Ã¡gua suja.'
+      ],
+      carePrecautions: [
+        'Manter fÃ´rmas bem escoradas para nÃ£o vazar a nata do cimento',
+        'NÃ£o atrasar o lanÃ§amento do concreto usinado (mÃ¡x 2h30 da saÃ­da da usina)',
+        'Evitar o super adensamento que pode causar segregaÃ§Ã£o'
+      ],
+      safety: {
+        epis: ['Capacete', 'Luvas de raspa', 'Botas de PVC ou seguranÃ§a', 'Ã“culos de proteÃ§Ã£o (durante lanÃ§amento)'],
+        nrs: ['NR-18 (SeguranÃ§a e SaÃºde no Trabalho na IndÃºstria da ConstruÃ§Ã£o)'],
+        precautions: ['AtenÃ§Ã£o Ã  fixaÃ§Ã£o das formas; o estouro de uma forma durante concretagem pode ser fatal.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6118', name: 'NBR 6118', summary: 'Projeto de Estruturas de Concreto' },
+        { id: 'nbr-12655', name: 'NBR 12655', summary: 'Preparo, controle e recebimento de concreto' }
+      ],
+      calculators: ['concreto'],
+      materials: ['Cimento', 'Areia', 'Brita', 'AÃ§o'],
+      articles: ['cura-concreto', 'fissuras-retraÃ§ao'],
+      problems: ['fissuras-retraÃ§ao', 'bicheiras', 'armadura-exposta']
+    },
+    metadata: {
+      keywords: ['fck', 'traÃ§o', 'betoneira', 'slump', 'pilar', 'viga', 'laje'],
+      synonyms: ['Concretagem', 'Massa de concreto', 'Estrutura'],
+      recommendedProfile: ['builder', 'service', 'owner'],
+      tags: ['Estrutura', 'FundaÃ§Ã£o', 'Superestrutura'],
+      level: 'IntermediÃ¡rio',
+      lastUpdate: '2023-10-01'
+    }
+  },
+  {
+    id: 'pintura-parede',
+    title: 'Pintura de Paredes (LÃ¡tex e AcrÃ­lica)',
+    category: 'Acabamentos',
+    subcategories: ['Pintura', 'ExecuÃ§Ã£o'],
+    summary: 'Como preparar e pintar superfÃ­cies internas e externas garantindo durabilidade e bom acabamento.',
+    content: {
+      whatIsIt: 'AplicaÃ§Ã£o de tintas lÃ­quidas para proteger e decorar paredes de alvenaria, gesso ou reboco.',
+      whereToUse: [
+        'Paredes de alvenaria rebocadas',
+        'Paredes de drywall (gesso)',
+        'Tetos e fachadas'
+      ],
+      whenToUse: [
+        'Acabamento final de alvenarias',
+        'RenovaÃ§Ã£o estÃ©tica de ambientes',
+        'ProteÃ§Ã£o contra intempÃ©ries (em Ã¡reas externas)'
+      ],
+      materialsNeeded: [
+        'Lixa para massa/parede (grana 150 a 220)',
+        'Selador acrÃ­lico ou Fundo preparador',
+        'Massa corrida (interior) ou Massa acrÃ­lica (exterior)',
+        'Tinta (AcrÃ­lica, LÃ¡tex PVA ou EpÃ³xi)',
+        'Fita crepe'
+      ],
+      toolsNeeded: [
+        'Rolo de lÃ£ (pelo baixo para massa/pelo alto para superfÃ­cies Ã¡speras)',
+        'Bandeja para pintura',
+        'Trincha (pincel) para recortes',
+        'EspÃ¡tula e Desempenadeira de aÃ§o',
+        'Extensor para rolo'
+      ],
+      stepByStep: [
+        '1. Limpeza: Remover poeira, graxa ou partes soltas da parede.',
+        '2. Lixamento Inicial: Quebrar imperfeiÃ§Ãµes grandes do reboco e limpar o pÃ³.',
+        '3. Fundo: Aplicar 1 demÃ£o de selador acrÃ­lico (parede nova) ou fundo preparador (parede esfarelando/gesso).',
+        '4. Massa: Aplicar 2 ou 3 demÃ£os finas de massa corrida/acrÃ­lica, esperando secar entre elas.',
+        '5. Lixamento Fino: Lixar a massa atÃ© ficar perfeitamente lisa e retirar todo o pÃ³ com pano Ãºmido.',
+        '6. Recorte: Pintar os cantos, rodapÃ©s e teto com a trincha.',
+        '7. Pintura: Aplicar a tinta com rolo de lÃ£ em movimentos de "W", cobrindo a Ã¡rea toda (normalmente 2 a 3 demÃ£os).'
+      ],
+      averageTime: 'Para um cÃ´modo 4x4m, cerca de 1 dia para preparo/emassamento e 1 a 2 dias para pintura completa.',
+      averageConsumption: 'Massa corrida: cerca de 1 a 1,5 kg/mÂ² por demÃ£o. Tinta: 0,15 a 0,25 Litros/mÂ² por demÃ£o.',
+      averageYield: 'Tinta 18L rende 250 a 300 mÂ² por demÃ£o. Massa corrida 25kg rende de 30 a 50 mÂ².',
+      goodPractices: [
+        'Proteger o chÃ£o com lona ou papelÃ£o ondulado, prendendo bem com fita.',
+        'Remover os espelhos de tomadas e maÃ§anetas antes de comeÃ§ar.',
+        'Diluir a tinta exatamente conforme o manual do fabricante.'
+      ],
+      commonErrors: [
+        'NÃ£o esperar o tempo de cura do reboco novo (28 dias). O cimento "queima" a tinta, gerando descascamento e manchas.',
+        'Pintar sobre superfÃ­cies com poeira, fazendo a tinta soltar (famoso "descascamento").',
+        'Usar massa corrida em Ã¡reas externas. Embaixo de umidade, a massa corrida derrete.'
+      ],
+      carePrecautions: [
+        'NÃ£o aplicar em dias muito Ãºmidos (umidade relativa acima de 90%) ou chuvosos',
+        'Proteger mÃ³veis adequadamente para evitar respingos de difÃ­cil remoÃ§Ã£o',
+        'AtenÃ§Ã£o ao lixamento para nÃ£o criar ondulaÃ§Ãµes na parede'
+      ],
+      safety: {
+        epis: ['Ã“culos de proteÃ§Ã£o', 'MÃ¡scara contra poeira (essencial durante o lixamento)'],
+        nrs: ['NR-18', 'NR-35 (Trabalho em altura, caso use andaimes)'],
+        precautions: ['Mantenha o ambiente sempre ventilado para dissipaÃ§Ã£o do odor e aceleraÃ§Ã£o da secagem.']
+      }
+    },
+    related: {
+      norms: [],
+      calculators: ['tinta'],
+      materials: ['Tinta', 'Massa Corrida', 'Rolo de Pintura'],
+      articles: ['descascamento-tinta', 'infiltracao'],
+      problems: ['descascamento', 'manchas-de-umidade', 'mofo']
+    },
+    metadata: {
+      keywords: ['LÃ¡tex', 'AcrÃ­lica', 'Massa corrida', 'Lixamento', 'Rolo', 'DemÃ£o', 'Acabamento'],
+      synonyms: ['Emassar', 'Pintar casa', 'Rolagem'],
+      recommendedProfile: ['owner', 'service'],
+      tags: ['Acabamento', 'DecoraÃ§Ã£o', 'Parede'],
+      level: 'BÃ¡sico',
+      lastUpdate: '2023-11-05'
+    }
+  },
+  {
+    id: 'chuveiro-eletrico',
+    title: 'InstalaÃ§Ã£o de Chuveiro ElÃ©trico',
+    category: 'ElÃ©trica',
+    subcategories: ['HidrÃ¡ulica', 'ExecuÃ§Ã£o'],
+    summary: 'Passo a passo seguro para dimensionar e instalar chuveiros elÃ©tricos.',
+    content: {
+      whatIsIt: 'ConexÃ£o hidrÃ¡ulica e elÃ©trica do equipamento responsÃ¡vel pelo aquecimento de Ã¡gua no banho.',
+      whereToUse: [
+        'Banheiros'
+      ],
+      whenToUse: [
+        'InstalaÃ§Ãµes em residÃªncias sem sistema de aquecimento a gÃ¡s/solar',
+        'SubstituiÃ§Ã£o de chuveiros danificados ou com resistÃªncia queimada'
+      ],
+      materialsNeeded: [
+        'Chuveiro elÃ©trico e cano (se nÃ£o for acoplado)',
+        'Fita Veda-Rosca',
+        'Conectores de porcelana ou bornes de mola (tipo Wago)',
+        'Cabos flexÃ­veis (geralmente 4mmÂ² ou 6mmÂ²)',
+        'Disjuntor termomagnÃ©tico (geralmente 32A, 40A ou 50A)'
+      ],
+      toolsNeeded: [
+        'Chave de fenda e philips',
+        'Alicate decapador e alicate universal',
+        'Chave de teste ou multÃ­metro'
+      ],
+      stepByStep: [
+        '1. Desligue a Energia: Desligue o disjuntor do quadro de forÃ§a.',
+        '2. Preparo HidrÃ¡ulico: Passe fita veda-rosca na conexÃ£o do chuveiro (cerca de 5 a 8 voltas no sentido horÃ¡rio).',
+        '3. Rosqueamento: Rosqueie o chuveiro no ponto de Ã¡gua da parede usando apenas as mÃ£os (nunca use chaves que possam trincar o plÃ¡stico).',
+        '4. Encher de Ãgua (CRÃTICO): Abra o registro e deixe a Ã¡gua fria escorrer pelo chuveiro. ISSO EVITA QUEIMAR A RESISTÃŠNCIA NO PRIMEIRO USO.',
+        '5. ConexÃ£o ElÃ©trica: Use os conectores (cerÃ¢mica ou wago) para ligar os cabos Fase-Fase (220V) ou Fase-Neutro (110V) e o TERRA (cabo verde ou verde/amarelo).',
+        '6. FinalizaÃ§Ã£o: Feche os fios, religue o disjuntor e teste no modo "Inverno".'
+      ],
+      averageTime: 'Cerca de 30 a 60 minutos para uma instalaÃ§Ã£o completa (hidrÃ¡ulica e elÃ©trica).',
+      averageConsumption: 'Varia com a potÃªncia, mas em mÃ©dia 5 a 7 kWh por hora de banho na potÃªncia mÃ¡xima.',
+      averageYield: 'NÃ£o aplicÃ¡vel (equipamento unitÃ¡rio).',
+      goodPractices: [
+        'Utilizar cabos e disjuntores compatÃ­veis com a potÃªncia (Watts) do chuveiro. Chuveiros de 6800W+ exigem cabos de 6mmÂ².',
+        'O circuito do chuveiro deve ser exclusivo, vindo direto do quadro.'
+      ],
+      commonErrors: [
+        'Usar fita isolante para emendar fio de chuveiro. Com o calor e alta corrente, a fita derrete e gera curto-circuito/incÃªndio.',
+        'Ligar o chuveiro seco na eletricidade, queimando a resistÃªncia instantaneamente.',
+        'Instalar sem cabo de aterramento (risco grave de choque fatal no molhado).'
+      ],
+      carePrecautions: [
+        'Sempre garantir que a energia estÃ¡ desligada verificando com chave de teste',
+        'NÃ£o apertar excessivamente a rosca de plÃ¡stico para evitar fissuras na tubulaÃ§Ã£o',
+        'Assegurar-se de que a vedaÃ§Ã£o do acabamento da parede impeÃ§a a entrada de Ã¡gua para o conduite'
+      ],
+      safety: {
+        epis: ['Botas com solado de borracha (isolante)'],
+        nrs: ['NR-10 (SeguranÃ§a em InstalaÃ§Ãµes e ServiÃ§os em Eletricidade)'],
+        precautions: ['Nunca faÃ§a instalaÃ§Ãµes com o chÃ£o do banheiro molhado ou descalÃ§o. Certifique-se com chave de teste que nÃ£o hÃ¡ corrente antes de tocar nos fios.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-5410', name: 'NBR 5410', summary: 'InstalaÃ§Ãµes ElÃ©tricas de Baixa TensÃ£o' }
+      ],
+      calculators: [],
+      materials: ['Chuveiro', 'Cabo ElÃ©trico 6mm', 'Disjuntor', 'Fita Veda-rosca', 'Conector de Porcelana'],
+      articles: ['quadro-distribuicao', 'aterramento'],
+      problems: ['resistencia-queimada', 'disjuntor-desarmando', 'choque-no-registro']
+    },
+    metadata: {
+      keywords: ['Disjuntor', 'Cabo', 'Fio', 'Aterramento', 'ResistÃªncia', 'Queimou', 'Banho'],
+      synonyms: ['Ducha', 'Aquecedor', 'InstalaÃ§Ã£o elÃ©trica'],
+      recommendedProfile: ['owner', 'service'],
+      tags: ['ElÃ©trica', 'InstalaÃ§Ã£o', 'Banheiro'],
+      level: 'BÃ¡sico',
+      lastUpdate: '2023-09-12'
+    }
+  },
+  {
+    id: 'infiltracao-parede',
+    title: 'InfiltraÃ§Ã£o de Parede (Umidade Ascendente)',
+    category: 'Problemas',
+    subcategories: ['ImpermeabilizaÃ§Ã£o'],
+    summary: 'Como identificar e resolver problemas de umidade subindo pelo rodapÃ© das paredes (ascendente).',
+    content: {
+      whatIsIt: 'Ã‰ a Ã¡gua presente no solo que sobe atravÃ©s dos poros da fundaÃ§Ã£o e da alvenaria (capilaridade), descascando a tinta e gerando mofo atÃ© cerca de 1 metro de altura.',
+      whereToUse: [],
+      whenToUse: [
+        'Manchas Ãºmidas aparecem prÃ³ximas ao rodapÃ©',
+        'A tinta comeÃ§a a formar bolhas e descascar',
+        'PresenÃ§a de eflorescÃªncia (pÃ³ branco) ou mofo'
+      ],
+      materialsNeeded: [
+        'Argamassa polimÃ©rica (ex: Viaplus 1000, Sikatop 100)',
+        'Cristalizante para concreto (opcional)',
+        'Areia, Cimento, Aditivo impermeabilizante para reboco (ex: Vedacit)',
+        'Massa acrÃ­lica e Tinta'
+      ],
+      toolsNeeded: [
+        'Marreta e Talhadeira (para descascar o reboco)',
+        'Trincha (para aplicar a argamassa polimÃ©rica)',
+        'Desempenadeira e colher',
+        'Escova de aÃ§o'
+      ],
+      stepByStep: [
+        '1. RemoÃ§Ã£o: Descasque o reboco podre/Ãºmido atÃ© o bloco/tijolo, ultrapassando a mancha de umidade em pelo menos 50 cm para cima.',
+        '2. Limpeza: Escove bem os blocos para retirar pÃ³ e partes soltas. Molhe levemente a superfÃ­cie.',
+        '3. Bloqueio: Aplique de 3 a 4 demÃ£os cruzadas de argamassa polimÃ©rica com trincha, estendendo atÃ© o contrapiso.',
+        '4. Chapisco: FaÃ§a um chapisco forte com adesivo (ex: Bianco).',
+        '5. Novo Reboco: RefaÃ§a o reboco usando aditivo impermeabilizante (hidrÃ³fugo) na massa.',
+        '6. Acabamento: Use massa acrÃ­lica (resistente Ã  Ã¡gua) e tinta acrÃ­lica premium.'
+      ],
+      averageTime: 'De 2 a 4 dias dependendo da Ã¡rea, devido ao tempo necessÃ¡rio para secagem da argamassa polimÃ©rica e novo reboco.',
+      averageConsumption: 'Argamassa polimÃ©rica: cerca de 3 a 4 kg/mÂ² considerando 3 a 4 demÃ£os.',
+      averageYield: 'Uma caixa de 18kg de argamassa polimÃ©rica faz aproximadamente 4,5 a 6 mÂ².',
+      goodPractices: [
+        'A melhor forma de evitar esse problema Ã© tratar a fundaÃ§Ã£o (baldrame) DURANTE a construÃ§Ã£o, cobrindo o topo do baldrame e descendo 10cm nas laterais com tinta asfÃ¡ltica.',
+        'Sempre limpar bem a junta entre a parede e o chÃ£o antes da impermeabilizaÃ§Ã£o.'
+      ],
+      commonErrors: [
+        'Passar massa corrida e repintar a parede Ãºmida achando que vai resolver. O problema voltarÃ¡ em poucas semanas.',
+        'Aplicar revestimento cerÃ¢mico para esconder a umidade. A Ã¡gua vai continuar subindo pelo tijolo por trÃ¡s da cerÃ¢mica e estourarÃ¡ a parede mais acima.'
+      ],
+      carePrecautions: [
+        'Umedecer levemente a base de alvenaria antes de aplicar a argamassa polimÃ©rica (nÃ£o encharcar)',
+        'Respeitar fielmente o tempo de cura das camadas',
+        'NÃ£o utilizar gesso como reboco em Ã¡reas com histÃ³rico de umidade'
+      ],
+      safety: {
+        epis: ['Ã“culos de proteÃ§Ã£o (ao quebrar parede)', 'Luvas de proteÃ§Ã£o', 'MÃ¡scara'],
+        nrs: [],
+        precautions: ['A quebra do reboco gera muita poeira respirÃ¡vel e estilhaÃ§os pontiagudos.']
+      }
+    },
+    related: {
+      norms: [],
+      calculators: [],
+      materials: ['Argamassa PolimÃ©rica', 'Vedacit', 'Bianco', 'Massa AcrÃ­lica'],
+      articles: ['impermeabilizacao-laje'],
+      problems: ['descascamento-tinta', 'mofo', 'degradacao-alvenaria']
+    },
+    metadata: {
+      keywords: ['Mofo', 'Bolor', 'Descascando', 'Ãgua', 'RodapÃ©', 'Bolha', 'Capilaridade', 'Baldrame'],
+      synonyms: ['Parede molhada', 'Umidade rodapÃ©', 'Parede estourando', 'Vazamento'],
+      recommendedProfile: ['owner', 'service', 'architect'],
+      tags: ['Patologia', 'Reforma', 'Umidade'],
+      level: 'IntermediÃ¡rio',
+      lastUpdate: '2023-08-20'
+    }
+  },
+  {
+    id: 'nbr-6118',
+    title: 'NBR 6118 - Projeto de Estruturas de Concreto',
+    category: 'Normas',
+    subcategories: ['Estruturas'],
+    summary: 'A bÃ­blia do concreto armado no Brasil. Define critÃ©rios de projeto, seguranÃ§a e durabilidade das estruturas.',
+    content: {
+      whatIsIt: 'Norma tÃ©cnica brasileira que estabelece os requisitos fundamentais para o projeto de estruturas de concreto (simples, armado e protendido).',
+      whereToUse: [
+        'Projetos estruturais de edifÃ­cios residenciais e comerciais.',
+        'Dimensionamento de vigas, lajes, pilares e fundaÃ§Ãµes.'
+      ],
+      whenToUse: [
+        'Dimensionamento de estruturas de concreto',
+        'InspeÃ§Ãµes e anÃ¡lises patolÃ³gicas de viabilidade estrutural',
+        'ElaboraÃ§Ã£o de projetos executivos'
+      ],
+      materialsNeeded: [],
+      toolsNeeded: [],
+      stepByStep: [],
+      averageTime: 'NÃ£o aplicÃ¡vel.',
+      averageConsumption: 'NÃ£o aplicÃ¡vel.',
+      averageYield: 'NÃ£o aplicÃ¡vel.',
+      goodPractices: [
+        'Classe de Agressividade Ambiental (CAA): A norma define 4 classes (de rural a marinha/industrial). Cada classe exige um cobrimento de armadura diferente e um FCK mÃ­nimo diferente. Em Ã¡rea litorÃ¢nea, o mÃ­nimo para concreto armado geralmente Ã© Fck = 30MPa e cobrimentos generosos.',
+        'A espessura mÃ­nima para lajes maciÃ§as varia de acordo com o uso (ex: 7 cm em coberturas, 9 cm em pisos residenciais, 12 cm para passagem de veÃ­culos).'
+      ],
+      commonErrors: [
+        'Ignorar a dimensÃ£o mÃ¡xima do agregado (brita) na hora de definir o espaÃ§amento entre as armaduras, causando "bicheiras" onde o concreto nÃ£o penetra.',
+        'Deixar as armaduras encostadas na forma. A norma exige o uso de espaÃ§adores para garantir o cobrimento nominal mÃ­nimo de concreto, que Ã© o que protege o aÃ§o da ferrugem.'
+      ],
+      carePrecautions: [
+        'AtenÃ§Ã£o estrita aos recobrimentos nominais',
+        'Validar resistÃªncia exigida x resistÃªncia entregue (corpos de prova)'
+      ],
+      safety: {
+        epis: [],
+        nrs: [],
+        precautions: ['Qualquer alteraÃ§Ã£o na obra (ex: quebrar vigas, furos em lajes) deve ser validada por um engenheiro calculista em conformidade com esta norma.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-12655', name: 'NBR 12655', summary: 'Preparo, controle e recebimento do concreto' },
+        { id: 'nbr-14931', name: 'NBR 14931', summary: 'ExecuÃ§Ã£o de estruturas de concreto' }
+      ],
+      calculators: ['concreto'],
+      materials: ['AÃ§o', 'Concreto'],
+      articles: ['concreto-armado'],
+      problems: ['fissuras-excessivas', 'flechas-altas', 'corrosao-armaduras']
+    },
+    metadata: {
+      keywords: ['Engenharia', 'CÃ¡lculo Estrutural', 'FCK', 'Cobrimento', 'Agressividade'],
+      synonyms: ['Norma de estrutura', 'Norma de concreto'],
+      recommendedProfile: ['architect', 'builder'],
+      tags: ['TÃ©cnico', 'Engenharia', 'Projeto'],
+      level: 'AvanÃ§ado',
+      lastUpdate: '2023-12-01'
+    }
+  },
+  {
+    id: 'nbr-5410',
+    title: 'NBR 5410 - InstalaÃ§Ãµes ElÃ©tricas de Baixa TensÃ£o',
+    category: 'Normas',
+    subcategories: ['ElÃ©trica'],
+    summary: 'Diretrizes para garantir a seguranÃ§a de pessoas e bens contra os perigos da energia elÃ©trica e o funcionamento adequado da instalaÃ§Ã£o.',
+    content: {
+      whatIsIt: 'Norma que rege todas as instalaÃ§Ãµes elÃ©tricas de baixa tensÃ£o (atÃ© 1000V em corrente alternada). Ã‰ essencial para engenheiros e eletricistas.',
+      whereToUse: [
+        'InstalaÃ§Ãµes prediais, comerciais e residenciais.'
+      ],
+      whenToUse: [
+        'Projetos de novas instalaÃ§Ãµes elÃ©tricas',
+        'EmissÃ£o de Laudo de InstalaÃ§Ã£o ElÃ©trica',
+        'Reformas que exijam novos quadros ou readequaÃ§Ã£o de carga'
+      ],
+      materialsNeeded: [],
+      toolsNeeded: [],
+      stepByStep: [],
+      averageTime: 'NÃ£o aplicÃ¡vel.',
+      averageConsumption: 'NÃ£o aplicÃ¡vel.',
+      averageYield: 'NÃ£o aplicÃ¡vel.',
+      goodPractices: [
+        'Obrigatoriedade do Dispositivo DR (Diferencial Residual): Deve proteger circuitos de Ã¡reas molhadas (banheiros, cozinhas, lavanderias e Ã¡reas externas). Ele salva vidas contra choques elÃ©tricos.',
+        'Aterramento: Toda tomada e todo equipamento deve possuir o condutor de proteÃ§Ã£o (fio terra - cor verde ou verde/amarelo).',
+        'DivisÃ£o de Circuitos: Circuitos de iluminaÃ§Ã£o devem ser separados dos de tomadas. Equipamentos de alta potÃªncia (ar-condicionado, chuveiro, microondas) exigem circuitos independentes.'
+      ],
+      commonErrors: [
+        'Usar fio neutro de um circuito diferente. Cada circuito deve ter seu prÃ³prio fio fase e seu fio neutro correspondente.',
+        'Dimensionar disjuntor para proteger o equipamento. O disjuntor deve ser calculado e instalado para **proteger o cabo** (condutor) contra superaquecimento.',
+        'Emendas mal feitas. As conexÃµes e emendas devem garantir a mesma condutividade e isolaÃ§Ã£o do cabo original (recomendado uso de conectores ao invÃ©s de fita isolante).'
+      ],
+      carePrecautions: [
+        'Exigir produtos (cabos, disjuntores) certificados pelo INMETRO',
+        'Sempre dimensionar cabos considerando queda de tensÃ£o',
+        'Garantir separaÃ§Ã£o fÃ­sica adequada entre elÃ©trica e hidrÃ¡ulica'
+      ],
+      safety: {
+        epis: [],
+        nrs: ['NR-10'],
+        precautions: ['Choques elÃ©tricos sÃ£o fatais. As diretrizes da 5410 sÃ£o obrigatÃ³rias por lei em projetos elÃ©tricos no Brasil.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-5444', name: 'NBR 5444', summary: 'SÃ­mbolos grÃ¡ficos para instalaÃ§Ãµes elÃ©tricas' }
+      ],
+      calculators: [],
+      materials: ['Disjuntor DR', 'DPS', 'Cabos ElÃ©tricos', 'Aterramento'],
+      articles: ['chuveiro-eletrico'],
+      problems: ['curto-circuito', 'choque-eletrico', 'sobrecarga']
+    },
+    metadata: {
+      keywords: ['DR', 'DPS', 'Disjuntor', 'Curto-circuito', 'Aterramento', 'Tomada', 'Projeto elÃ©trico'],
+      synonyms: ['Norma elÃ©trica', 'InstalaÃ§Ã£o elÃ©trica residencial'],
+      recommendedProfile: ['architect', 'builder', 'service'],
+      tags: ['ElÃ©trica', 'SeguranÃ§a', 'Projeto'],
+      level: 'AvanÃ§ado',
+      lastUpdate: '2024-01-15'
+    }
+  },
+  {
+    id: 'telhado-ceramico',
+    title: 'ExecuÃ§Ã£o de Telhado CerÃ¢mico',
+    category: 'Cobertura',
+    subcategories: ['ExecuÃ§Ã£o', 'Materiais'],
+    summary: 'Guia de montagem de estrutura de madeira e instalaÃ§Ã£o de telhas cerÃ¢micas para coberturas residenciais.',
+    content: {
+      whatIsIt: 'Sistema de cobertura tradicional formado por uma trama estrutural de madeira (tesouras, terÃ§as, caibros e ripas) sobre a qual se apoiam as telhas cerÃ¢micas de barro.',
+      whereToUse: [
+        'ResidÃªncias',
+        'Ãreas de lazer',
+        'EdificaÃ§Ãµes comerciais com estilo rÃºstico/tradicional'
+      ],
+      whenToUse: [
+        'Em projetos que exigem conforto tÃ©rmico superior (o barro Ã© um Ã³timo isolante tÃ©rmico)',
+        'Para agregar valor estÃ©tico tradicional Ã  fachada'
+      ],
+      materialsNeeded: [
+        'Telhas cerÃ¢micas (Romana, Portuguesa, Francesa, etc.)',
+        'Madeira para estrutura (Tesouras, TerÃ§as, Caibros e Ripas - ex: MaÃ§aranduba, Garapeira, Pinus Autoclavado)',
+        'Pregos galvanizados (diversos tamanhos)',
+        'Manta tÃ©rmica subcobertura (opcional, mas recomendado)',
+        'Argamassa para emboÃ§amento da cumeeira ou passarinheira'
+      ],
+      toolsNeeded: [
+        'Serra circular ou Serrote',
+        'Martelo',
+        'Esquadro, trena e nÃ­vel',
+        'Linha de pedreiro',
+        'Furadeira/Parafusadeira'
+      ],
+      stepByStep: [
+        '1. InstalaÃ§Ã£o das Tesouras e TerÃ§as: FixaÃ§Ã£o dos componentes estruturais principais sobre as lajes ou oitÃµes, garantindo a inclinaÃ§Ã£o definida em projeto.',
+        '2. InstalaÃ§Ã£o dos Caibros: Pregados sobre as terÃ§as, seguindo a direÃ§Ã£o do caimento d\'Ã¡gua.',
+        '3. FixaÃ§Ã£o das Ripas (Galga): As ripas sÃ£o pregadas horizontalmente sobre os caibros. A distÃ¢ncia entre elas (galga) depende do modelo exato da telha (consultar fabricante).',
+        '4. Telhamento: Inicia-se sempre de baixo (beiral) para cima (cumeeira).',
+        '5. Cumeeira: InstalaÃ§Ã£o das peÃ§as de cumeeira no topo do telhado, unindo as duas Ã¡guas, fixadas com argamassa ou sistemas a seco.',
+        '6. Acabamentos: ColocaÃ§Ã£o de passarinheiras e rufo lateral (se houver encosto em parede).'
+      ],
+      averageTime: 'Um telhado de 100mÂ² leva de 4 a 7 dias para uma equipe experiente (carpinteiro e ajudantes).',
+      averageConsumption: 'Depende da telha (ex: Romana leva em mÃ©dia 16 unidades/mÂ²; Portuguesa 17/mÂ²).',
+      averageYield: 'O consumo de madeira varia muito conforme a estrutura, mas pode-se prever cerca de 0,02 a 0,03 mÂ³ de madeira por metro quadrado de cobertura.',
+      goodPractices: [
+        'Respeitar rigorosamente a inclinaÃ§Ã£o mÃ­nima especificada pelo fabricante (geralmente entre 30% e 35% para telhas cerÃ¢micas).',
+        'Aplicar tratamento preservativo contra cupins e brocas na madeira antes da instalaÃ§Ã£o.'
+      ],
+      commonErrors: [
+        'Fazer a galga (distÃ¢ncia das ripas) incorreta, fazendo com que as telhas nÃ£o encaixem direito e fiquem frouxas.',
+        'Falta de amarraÃ§Ã£o da estrutura na laje, permitindo que ventos fortes desloquem a cobertura.',
+        'Deixar inclinaÃ§Ã£o inferior ao recomendado, o que provoca retorno de Ã¡gua com ventos (goteiras e vazamentos).'
+      ],
+      carePrecautions: [
+        'Nunca pisar diretamente no meio da telha; pisar sempre sobre a regiÃ£o apoiada na ripa ou usar tÃ¡buas para distribuir o peso',
+        'AtenÃ§Ã£o ao sentido predominante dos ventos para sobreposiÃ§Ã£o das telhas nas bordas'
+      ],
+      safety: {
+        epis: ['Cinto de seguranÃ§a tipo paraquedista com talabarte duplo', 'Capacete com jugular', 'Botas de seguranÃ§a', 'Luvas'],
+        nrs: ['NR-35 (Trabalho em Altura)', 'NR-18'],
+        precautions: ['Trabalho em telhados possui risco crÃ­tico de queda, agravado em dias de vento forte ou chuva. Uso de linha de vida Ã© obrigatÃ³rio.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-15310', name: 'NBR 15310', summary: 'Componentes cerÃ¢micos - Telhas - Terminologia, requisitos e mÃ©todos de ensaio' }
+      ],
+      calculators: ['telhado'],
+      materials: ['Telha CerÃ¢mica', 'Madeira para Telhado', 'Manta TÃ©rmica'],
+      articles: ['manta-termica-telhado'],
+      problems: ['goteiras', 'cupim-na-madeira', 'telhas-quebradas']
+    },
+    metadata: {
+      keywords: ['Telha', 'Romana', 'Portuguesa', 'Madeiramento', 'Tesoura', 'Caibro', 'Ripa', 'Cumeeira', 'Galga'],
+      synonyms: ['Fazer telhado', 'Cobrir casa', 'Estrutura de madeira'],
+      recommendedProfile: ['builder', 'owner'],
+      tags: ['Cobertura', 'Telhado', 'Estrutura'],
+      level: 'IntermediÃ¡rio',
+      lastUpdate: '2024-03-21'
+    }
+  },
+  {
+    id: 'nbr-15575',
+    title: 'NBR 15575 â€” Norma de Desempenho de EdificaÃ§Ãµes',
+    category: 'Normas',
+    subcategories: ['Normas', 'ExecuÃ§Ã£o'],
+    summary: 'Diretrizes essenciais de desempenho acÃºstico, tÃ©rmico, lumÃ­nico e estrutural para habitaÃ§Ãµes.',
+    content: {
+      whatIsIt: 'Estabelece os requisitos mÃ­nimos de qualidade, durabilidade, conforto acÃºstico, tÃ©rmico e seguranÃ§a estrutural em edificaÃ§Ãµes habitacionais no Brasil.',
+      whereToUse: ['Projetos residenciais', 'EdifÃ­cios de apartamentos', 'Casas tÃ©rreas e sobrados'],
+      materialsNeeded: ['Isolantes acÃºsticos (lÃ£ de rocha/vidro)', 'Esquadrias com vedaÃ§Ã£o acÃºstica', 'Argamassas e blocos termoacÃºsticos'],
+      toolsNeeded: ['DecibelÃ­metro', 'TermÃ´metro infravermelho', 'Software de simulaÃ§Ã£o lumÃ­nica'],
+      stepByStep: [
+        'AnÃ¡lise de ruÃ­do aÃ©reo e impacto entre pisos',
+        'Dimensionamento de vedaÃ§Ãµes tÃ©rmicas',
+        'AvaliaÃ§Ã£o da vida Ãºtil do projeto (VUP min. 50 anos para estrutura)'
+      ],
+      goodPractices: ['Especificar portas com vedaÃ§Ã£o nas frestas', 'Usar lajes com espessura mÃ­nima de 12cm'],
+      commonErrors: ['NÃ£o considerar o nÃ­vel de ruÃ­do externo no projeto de fachada'],
+      safety: { epis: ['Protetor auricular'], nrs: ['NR-15'], precautions: ['MediÃ§Ã£o em horÃ¡rios padrÃ£o'] }
+    },
+    related: {
+      norms: [{ id: 'nbr-15575', name: 'ABNT NBR 15575', summary: 'EdificaÃ§Ãµes habitacionais â€” Desempenho' }],
+      calculators: ['isolamento-acustico'],
+      materials: ['LÃ£ de Rocha', 'Bloco Celular'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['nbr 15575', 'desempenho', 'acÃºstico', 'tÃ©rmico', 'vup', 'habitaÃ§Ã£o'],
+      synonyms: ['norma de desempenho', 'conforto acÃºstico'],
+      recommendedProfile: ['Arquiteto', 'Engenheiro', 'ProprietÃ¡rio'],
+      tags: ['#NBR15575', '#Desempenho', '#AcÃºstica'],
+      level: 'AvanÃ§ado',
+      lastUpdate: '2026-07-20'
+    }
+  },
+  {
+    id: 'nbr-9575-impermeabilizacao',
+    title: 'NBR 9575 & NBR 9574 â€” ImpermeabilizaÃ§Ã£o',
+    category: 'ImpermeabilizaÃ§Ã£o',
+    subcategories: ['ImpermeabilizaÃ§Ã£o', 'Normas'],
+    summary: 'SeleÃ§Ã£o, projeto e execuÃ§Ã£o correta de sistemas impermeabilizantes flexÃ­veis e rÃ­gidos.',
+    content: {
+      whatIsIt: 'Define os critÃ©rios de projeto e execuÃ§Ã£o para evitar infiltraÃ§Ãµes de Ã¡gua e umidade em Ã¡reas molhadas, lajes e fundaÃ§Ãµes.',
+      whereToUse: ['Lajes expostas', 'Banheiros e varandas', 'ReservatÃ³rios de Ã¡gua', 'Baldrames e viga calha'],
+      materialsNeeded: ['Manta asfÃ¡ltica 4mm', 'Prime asfÃ¡ltico', 'Argamassa polimÃ©rica', 'Tela de poliÃ©ster'],
+      toolsNeeded: ['MaÃ§arico a gÃ¡s', 'Trincha e rolo', 'Colher de pedreiro'],
+      stepByStep: [
+        'RegularizaÃ§Ã£o do caimento (mÃ­nimo 1% para ralos)',
+        'Arredondamento de cantos (meia-cana)',
+        'AplicaÃ§Ã£o de primer e manta asfÃ¡ltica vulcanizada',
+        'Teste de estanqueidade de 72 horas com lÃ¢mina d Ã¡gua'
+      ],
+      goodPractices: ['Nunca pular o teste de estanqueidade de 72h', 'Proteger com camada separadora e proteÃ§Ã£o mecÃ¢nica'],
+      commonErrors: ['NÃ£o fazer a meia-cana nos cantos de encontro parede/piso'],
+      safety: { epis: ['Luva de raspa', 'Ã“culos de proteÃ§Ã£o', 'Bota de couro'], nrs: ['NR-18', 'NR-35'], precautions: ['Cuidado ao manusear maÃ§arico'] }
+    },
+    related: {
+      norms: [{ id: 'nbr-9575', name: 'ABNT NBR 9575', summary: 'ImpermeabilizaÃ§Ã£o â€” SeleÃ§Ã£o e projeto' }],
+      calculators: ['impermeabilizacao-laje'],
+      materials: ['Manta AsfÃ¡ltica', 'Primer'],
+      articles: ['infiltracao-parede']
+    },
+    metadata: {
+      keywords: ['nbr 9575', 'impermeabilizaÃ§Ã£o', 'manta asfÃ¡ltica', 'vazamento'],
+      synonyms: ['manta asfÃ¡ltica', 'vedaÃ§Ã£o de laje'],
+      recommendedProfile: ['Engenheiro', 'Prestador', 'ProprietÃ¡rio'],
+      tags: ['#ImpermeabilizaÃ§Ã£o', '#NBR9575', '#SemVazamentos'],
+      level: 'IntermediÃ¡rio',
+      lastUpdate: '2026-07-20'
+    }
+  },
+  {
+    id: 'alvenaria-estrutural',
+    title: 'Alvenaria Estrutural',
+    category: 'Estruturas',
+    subcategories: ['Materiais', 'ExecuÃ§Ã£o', 'Normas'],
+    summary: 'Guia bÃ¡sico de execuÃ§Ã£o de alvenaria estrutural, sem necessidade de vigas e pilares.',
+    content: {
+      whatIsIt: 'Sistema construtivo onde as prÃ³prias paredes suportam o peso da edificaÃ§Ã£o, substituindo vigas e pilares.',
+      whereToUse: ['EdificaÃ§Ãµes de atÃ© 4 pavimentos', 'Muros de arrimo', 'HabitaÃ§Ã£o popular'],
+      materialsNeeded: ['Bloco estrutural de concreto ou cerÃ¢mico', 'Argamassa estrutural', 'AÃ§o', 'Graute'],
+      toolsNeeded: ['Colher de pedreiro', 'Prumo', 'NÃ­vel', 'RÃ©gua de alumÃ­nio', 'Linha de pedreiro'],
+      stepByStep: [
+        '1. MarcaÃ§Ã£o da primeira fiada com rigoroso controle de esquadro e prumo.',
+        '2. Assentamento dos blocos garantindo o nÃ­vel e alinhamento.',
+        '3. Grauteamento dos pontos previstos em projeto.',
+        '4. Passagem de instalaÃ§Ãµes elÃ©tricas e hidrÃ¡ulicas junto com a elevaÃ§Ã£o, sem rasgar os blocos.'
+      ],
+      goodPractices: ['Nunca rasgue blocos estruturais para passar canos', 'Respeitar a cura da argamassa e graute'],
+      commonErrors: ['Rasgar a parede para instalar tubulaÃ§Ãµes apÃ³s finalizada', 'Uso de bloco de vedaÃ§Ã£o no lugar de estrutural'],
+      safety: { epis: ['Capacete', 'Luva', 'Bota', 'Ã“culos'], nrs: ['NR-18', 'NR-35'], precautions: ['Cuidados com poeira no corte'] }
+    },
+    related: {
+      norms: [{ id: 'nbr-15961', name: 'ABNT NBR 15961', summary: 'Alvenaria Estrutural' }],
+      calculators: [],
+      materials: ['Bloco Estrutural', 'Argamassa'],
+      articles: []
+    },
+    metadata: {
+      keywords: ['alvenaria estrutural', 'bloco estrutural', 'graute'],
+      synonyms: ['bloco de concreto', 'parede estrutural'],
+      recommendedProfile: ['Arquiteto', 'Engenheiro', 'Prestador'],
+      tags: ['#AlvenariaEstrutural', '#Engenharia'],
+      level: 'IntermediÃ¡rio',
+      lastUpdate: '2026-07-23'
+    }
+  }
+  ,
+  {
+    id: 'fundacoes-rasas',
+    title: 'Fundações Rasas (Sapatas e Radiers)',
+    category: 'Estruturas',
+    subcategories: ['Fundações', 'Concreto Armado', 'Solos'],
+    summary: 'Guia completo sobre a execução de fundações superficiais, como sapatas isoladas, sapatas corridas e radiers.',
+    content: {
+      whatIsIt: 'Fundações rasas (ou diretas) são elementos estruturais que transmitem as cargas da edificação para as camadas superficiais do solo (até 3 metros de profundidade). Exemplos comuns são as sapatas isoladas, sapatas corridas e o radier.',
+      whereToUse: [
+        'Terrenos com boa capacidade de suporte nas camadas superficiais.',
+        'Obras de pequeno e médio porte, como residências e galpões.',
+        'Sapatas isoladas: embaixo de pilares isolados.',
+        'Radier: laje inteiriça de fundação, ideal para solos mais fracos ou obras em light steel frame/wood frame.'
+      ],
+      materialsNeeded: [
+        'Concreto Usinado (fck adequado)',
+        'Armadura de Aço (Vergalhões)',
+        'Formas de madeira',
+        'Lona plástica (para radiers)',
+        'Brita (para lastro)'
+      ],
+      toolsNeeded: [
+        'Retroescavadeira ou Pás e Picaretas',
+        'Compactador de solo (sapo)',
+        'Vibrador de concreto',
+        'Nível a laser e trena',
+        'Prumos e linhas'
+      ],
+      stepByStep: [
+        '1. Locação da obra: marcar os eixos das sapatas com gabarito de madeira.',
+        '2. Escavação: abrir as cavas das sapatas até a profundidade especificada no projeto estrutural/sondagem.',
+        '3. Lastro de brita/concreto magro: aplicar 5cm no fundo da cava para nivelamento e proteção da armadura.',
+        '4. Montagem e posicionamento da armadura: respeitar o cobrimento mínimo usando espaçadores (cocadas).',
+        '5. Forma: colocar as caixarias laterais da sapata.',
+        '6. Concretagem e vibração: lançar o concreto e vibrar corretamente para evitar bicheiras.',
+        '7. Cura e reaterro: manter o concreto úmido por 7 dias e reaterrar a cava com solo compactado.'
+      ],
+      goodPractices: [
+        'Sempre realize sondagem SPT antes de definir o tipo de fundação.',
+        'Utilize espaçadores plásticos para garantir o cobrimento correto da armadura (fuga da umidade do solo).',
+        'Compacte muito bem o solo de apoio antes do lastro.'
+      ],
+      commonErrors: [
+        'Concretar direto no solo de terra, sem lastro, fazendo o aço enferrujar rápido.',
+        'Escavar a cava menor que o especificado, reduzindo a base da sapata.',
+        'Errar o prumo da espera do pilar.'
+      ],
+      safety: {
+        epis: ['Bota de PVC', 'Luvas', 'Capacete', 'Óculos de proteção'],
+        nrs: ['NR-18 (Segurança e Saúde no Trabalho na Indústria da Construção)'],
+        precautions: ['Atenção a desmoronamentos durante escavações manuais. Escoramento pode ser necessário em valas profundas.']
+      }
+    },
+    related: {
+      norms: [
+        { id: 'nbr-6122', name: 'NBR 6122', summary: 'Projeto e Execução de Fundações.' }
+      ],
+      calculators: ['concrete-mix'],
+      materials: ['cimento', 'aco-ca50', 'brita'],
+      articles: ['concreto-armado']
+    },
+    metadata: {
+      keywords: ['sapata', 'radier', 'fundação', 'baldrame', 'broca'],
+      synonyms: ['Alicerce', 'Base', 'Fundação Direta'],
+      recommendedProfile: ['builder', 'architect'],
+      tags: ['Fundação', 'Estrutura', 'Solo'],
+      level: 'Intermediário',
+      lastUpdate: '2023-11-15'
+    }
+  }
+];
+

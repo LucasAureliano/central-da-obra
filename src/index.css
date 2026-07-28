@@ -425,7 +425,7 @@ h1, h2, h3, h4, h5, h6 {
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(80px + env(safe-area-inset-bottom, 0px));
+  height: calc(80px + env(safe-area-inset-bottom, 16px));
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -433,7 +433,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 16px);
   z-index: 100;
 }
 
@@ -442,23 +442,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .wizard-footer {
-  position: fixed;
-  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-  left: 0;
-  right: 0;
   padding: 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   background-color: var(--bg-base);
   border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
   gap: 16px;
   z-index: 40;
-}
-
-@media (min-width: 769px) {
-  .wizard-footer {
-    bottom: 0;
-  }
 }
 
 .nav-item {
@@ -485,6 +476,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   font-family: 'Roboto', sans-serif;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .nav-item.active {
@@ -504,7 +498,43 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease, color 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Prominent / Highlighted Bottom Nav Button */
+.nav-item.highlight-nav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+.nav-item.highlight-nav .nav-icon-container {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  box-shadow: 0 8px 16px var(--color-primary-alpha);
+  border: 4px solid var(--bg-surface);
+  margin: 0;
+}
+.nav-item.highlight-nav.active .nav-icon-container {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 12px 20px var(--color-primary-alpha);
+  margin: 0;
+}
+.nav-item.highlight-nav span {
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: auto;
+  margin-bottom: 12px;
 }
 
 /* Inputs */

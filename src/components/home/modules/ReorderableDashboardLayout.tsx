@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Reorder, motion, AnimatePresence } from 'framer-motion';
+import { Reorder, motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -79,40 +79,15 @@ export function ReorderableDashboardLayout({ defaultOrder, renderWidget, widgetN
 
       <Reorder.Group axis="y" values={localOrder} onReorder={handleReorder} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         <AnimatePresence>
-          {localOrder.map((id: string) => {
-            const widgetNode = renderWidget(id);
-            if (!widgetNode) return null;
-            return (
-              <Reorder.Item 
-                key={id} 
-                value={id}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-                style={{ cursor: isEditing ? 'grab' : 'default', position: 'relative', marginBottom: isEditing ? 8 : 0 }} 
-                whileDrag={{ scale: 1.02, cursor: 'grabbing', zIndex: 50 }}
-                dragListener={isEditing}
-              >
-                {isEditing && (
-                  <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 8 }}>
-                    <button 
-                      onClick={() => hideWidget(id)}
-                      style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: '#FFF', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >
-                      <EyeOff size={16} />
-                    </button>
-                    <div style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <GripVertical size={16} />
-                    </div>
-                  </div>
-                )}
-                <div style={{ opacity: isEditing ? 0.8 : 1, transition: 'opacity 0.2s', pointerEvents: isEditing ? 'none' : 'auto' }}>
-                  {widgetNode}
-                </div>
-              </Reorder.Item>
-            );
-          })}
+          {localOrder.map((id: string) => (
+            <DraggableDashboardItem
+              key={id}
+              id={id}
+              widgetNode={renderWidget(id)}
+              isEditing={isEditing}
+              onHide={() => hideWidget(id)}
+            />
+          ))}
         </AnimatePresence>
       </Reorder.Group>
 
@@ -155,5 +130,45 @@ export function ReorderableDashboardLayout({ defaultOrder, renderWidget, widgetN
         </button>
       </div>
     </div>
+  );
+}
+
+function DraggableDashboardItem({ id, widgetNode, isEditing, onHide }: any) {
+  const controls = useDragControls();
+
+  if (!widgetNode) return null;
+
+  return (
+    <Reorder.Item 
+      value={id}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0, scale: 0.9 }}
+      transition={{ duration: 0.2 }}
+      style={{ position: 'relative', marginBottom: isEditing ? 8 : 0 }} 
+      whileDrag={{ scale: 1.02, cursor: 'grabbing', zIndex: 50 }}
+      dragListener={false}
+      dragControls={controls}
+    >
+      {isEditing && (
+        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 8 }}>
+          <button 
+            onClick={onHide}
+            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: '#FFF', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          >
+            <EyeOff size={16} />
+          </button>
+          <div 
+            onPointerDown={(e) => controls.start(e)}
+            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', touchAction: 'none' }}
+          >
+            <GripVertical size={16} />
+          </div>
+        </div>
+      )}
+      <div style={{ opacity: isEditing ? 0.8 : 1, transition: 'opacity 0.2s', pointerEvents: isEditing ? 'none' : 'auto' }}>
+        {widgetNode}
+      </div>
+    </Reorder.Item>
   );
 }

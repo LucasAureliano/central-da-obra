@@ -44,7 +44,7 @@ export function WizardEngine({
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '100vh', backgroundColor: 'var(--bg-base)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', backgroundColor: 'var(--bg-base)' }}>
       {/* Header */}
       <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--border-subtle)', position: 'sticky', top: 0, backgroundColor: 'var(--bg-base)', zIndex: 10 }}>
         <button onClick={onCancel} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -85,7 +85,7 @@ export function WizardEngine({
       </div>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, position: 'relative', overflowX: 'hidden' }}>
+      <div style={{ flex: 1, position: 'relative', overflowX: 'hidden', overflowY: 'auto' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={step.id}
@@ -93,7 +93,7 @@ export function WizardEngine({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            style={{ padding: 24, paddingBottom: 100 }}
+            style={{ padding: 24, paddingBottom: 40 }}
           >
             <div style={{ marginBottom: 24 }}>
               <h3 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>{step.title}</h3>

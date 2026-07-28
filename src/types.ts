@@ -71,3 +71,81 @@ export interface Expense {
   status: ExpenseStatus;
   createdAt: any; // firebase.firestore.Timestamp
 }
+
+// ------------------------------------------------------------------
+// Service Provider Role specific types
+
+export interface Client {
+  id?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  address?: string;
+  notes?: string;
+  photoUrl?: string;
+  servicesCount: number;
+  totalContracted: number;
+  totalServices?: number;
+  totalValue?: number;
+  lastVisit?: any;
+  nextVisit?: any;
+  createdAt: any;
+  userId: string;
+}
+
+export interface ServiceCatalogItem {
+  id?: string;
+  title: string;
+  description?: string;
+  unit: Unit | string;
+  suggestedPrice: number;
+  averageTimeDays: number;
+  notes?: string;
+  materialsUsed?: string[];
+  userId: string;
+  createdAt: any;
+}
+
+export interface ProviderService {
+  id?: string;
+  title: string;
+  clientId?: string;
+  clientName?: string;
+  address?: string;
+  value: number;
+  progress: number;
+  status: 'Agendado' | 'Em Execução' | 'Pausado' | 'Concluído' | 'Cancelado';
+  deadline?: any;
+  photos?: string[];
+  userId: string;
+  createdAt: any;
+}
+
+export interface Receipt {
+  id?: string;
+  title: string;
+  amount: number;
+  status: 'Recebido' | 'Pendente' | 'Vencido';
+  date: any; // Timestamp
+  paymentMethod?: 'PIX' | 'Dinheiro' | 'Cartão' | 'Transferência' | 'Cheque' | 'Boleto';
+  clientId?: string;
+  serviceId?: string;
+  notes?: string;
+  userId: string;
+  createdAt: any;
+}
+
+export interface AgendaEvent {
+  id?: string;
+  title: string;
+  date: any; // Timestamp
+  durationHours: number;
+  clientId?: string;
+  clientName?: string;
+  address?: string;
+  serviceId?: string;
+  notes?: string;
+  userId: string;
+  createdAt: any;
+}

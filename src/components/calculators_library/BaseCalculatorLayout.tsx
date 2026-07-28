@@ -11,7 +11,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { SelectWorkModal } from './SelectWorkModal';
 import { useWorks } from '../../contexts/WorksContext';
 import { drawHeader, drawFooter } from '../../utils/pdfGenerator';
-
+import { materialPriceService } from '../../services/materials/MaterialPriceService';
 export type CalcResultItem = {
   label: string;
   value: string | number;
@@ -74,9 +74,37 @@ export function BaseCalculatorLayout({
   const { triggerGuestAlert } = useAuthModal();
   const { activeWork } = useWorks();
   
-  const [prices, setPrices] = useState<Record<string, number>>({});
+  const [prices, setPrices] = useState<Record<string, { price: number, supplier: string, link?: string }>>({});
+  const [isFetchingPrices, setIsFetchingPrices] = useState(false);
 
-  
+  // Auto-fetch real prices when results change
+  React.useEffect(() => {
+    if (results?.materials && results.materials.length > 0) {
+      setIsFetchingPrices(true);
+      const materialNames = results.materials.map(m => m.name);
+      
+      materialPriceService.searchMultiple(materialNames).then(pricesData => {
+        const newPrices: Record<string, { price: number, supplier: string, link?: string }> = {};
+        
+        results.materials.forEach(mat => {
+           // We use the first (lowest) valid price
+           const matches = pricesData[mat.name] || [];
+           if (matches.length > 0) {
+             const bestPrice = matches[0];
+             newPrices[mat.name] = {
+               price: bestPrice.price,
+               supplier: bestPrice.supplier,
+               link: bestPrice.link
+             };
+           }
+        });
+        
+        setPrices(newPrices);
+      }).finally(() => {
+        setIsFetchingPrices(false);
+      });
+    }
+  }, [results]);
   // Generic Save
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -119,7 +147,7 @@ export function BaseCalculatorLayout({
     try {
       // Calculate total cost at the moment of saving
       const totalCost = results.materials.reduce((acc, mat) => {
-        const price = prices[mat.name] || 0;
+        const price = prices[mat.name]?.price || 0;
         return acc + (Number(mat.quantity) * price);
       }, 0);
 
@@ -128,7 +156,9 @@ export function BaseCalculatorLayout({
         ...results,
         materials: results.materials.map(mat => ({
           ...mat,
-          unitPrice: prices[mat.name] || 0,
+          unitPrice: prices[mat.name]?.price || 0,
+          supplier: prices[mat.name]?.supplier || '',
+          link: prices[mat.name]?.link || '',
           isPurchased: false
         }))
       };
@@ -171,12 +201,14 @@ export function BaseCalculatorLayout({
     setIsAddingShopping(true);
     try {
       const promises = results.materials.map(mat => {
-        const price = prices[mat.name] || 0;
+        const priceInfo = prices[mat.name];
         return addDoc(collection(db, 'works', activeWork.id, 'shopping'), {
           name: mat.name,
           quantity: mat.quantity,
           unit: mat.unit,
-          unitPrice: price,
+          unitPrice: priceInfo?.price || 0,
+          supplier: priceInfo?.supplier || '',
+          link: priceInfo?.link || '',
           isPurchased: false,
           addedAt: serverTimestamp()
         });
@@ -238,7 +270,7 @@ export function BaseCalculatorLayout({
           const materialsData = results.materials.map(m => [
             m.name,
             `${m.quantity} ${m.unit}`,
-            prices[m.name] ? `R$ ${Number(prices[m.name]).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '-'
+            prices[m.name]?.price ? `R$ ${Number(prices[m.name].price).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '-'
           ]);
 
           autoTable(doc, {
@@ -383,7 +415,7 @@ export function BaseCalculatorLayout({
               {/* ESTIMATED TOTAL COST */}
               {(() => {
                 const totalCost = results.materials.reduce((acc, mat) => {
-                  const price = prices[mat.name] || 0;
+                  const price = prices[mat.name]?.price || 0;
                   return acc + (Number(mat.quantity) * price);
                 }, 0);
                 if (totalCost > 0) {
@@ -400,28 +432,49 @@ export function BaseCalculatorLayout({
               })()}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottom: '1px solid var(--border-subtle)', paddingBottom: 8 }}>
-                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Lista de Materiais</h3>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Preço Unit. (R$)</span>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                  Lista de Materiais
+                  {isFetchingPrices && <span style={{ fontSize: 11, color: 'var(--color-primary)', marginLeft: 8, fontWeight: 500 }}>(Buscando preços de mercado...)</span>}
+                </h3>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-                {results.materials.map((mat, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                    <div style={{ flex: 1 }}>
-                      <span style={{ fontSize: 14, color: 'var(--text-muted)', display: 'block' }}>{mat.name}</span>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{mat.quantity} {mat.unit}</span>
+                {results.materials.map((mat, i) => {
+                  const priceInfo = prices[mat.name];
+                  
+                  return (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, backgroundColor: 'var(--bg-surface)', padding: 12, borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: 4 }}>{mat.name}</span>
+                        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Quantidade: {mat.quantity} {mat.unit}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        {priceInfo ? (
+                           <>
+                             <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-primary)' }}>R$ {priceInfo.price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                             <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>em {priceInfo.supplier}</span>
+                             {priceInfo.link && (
+                               <a href={priceInfo.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', fontWeight: 600, marginTop: 4 }}>
+                                 Abrir Produto ↗
+                               </a>
+                             )}
+                           </>
+                        ) : (
+                           <input 
+                             type="number" 
+                             placeholder="Preço Manual R$"
+                             className="input-premium"
+                             disabled={isFetchingPrices}
+                             style={{ width: 120, padding: '8px 12px', fontSize: 13, textAlign: 'right', marginBottom: 0 }}
+                             onChange={(e) => {
+                               const val = parseFloat(e.target.value) || 0;
+                               setPrices(prev => ({ ...prev, [mat.name]: { price: val, supplier: 'Manual' } }));
+                             }}
+                           />
+                        )}
+                      </div>
                     </div>
-                    <input 
-                      type="number" 
-                      placeholder="0,00"
-                      className="input-premium"
-                      style={{ width: 80, padding: '8px 12px', fontSize: 14, textAlign: 'right', marginBottom: 0 }}
-                      onChange={(e) => {
-                        const val = parseFloat(e.target.value) || 0;
-                        setPrices(prev => ({ ...prev, [mat.name]: val }));
-                      }}
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {results.observations && results.observations.length > 0 && (
                 <div style={{ backgroundColor: 'rgba(255,165,0,0.05)', padding: 16, borderRadius: 12, border: '1px solid rgba(255,165,0,0.2)' }}>

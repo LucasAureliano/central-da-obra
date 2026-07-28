@@ -1,291 +1,444 @@
-import React, { useState, useEffect } from 'react';
-import { Briefcase, Search, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
-import { useAuthModal } from '../../contexts/AuthModalContext';
+import { Plus, Briefcase, Clock, Package, Edit3, Trash2, X, Save, Search, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 
-interface Service {
-  id: string;
-  name: string;
-  category: string;
-  unit: string;
-  price: number;
+export interface CatalogServiceItem {
+  id?: string;
+  title: string;
   description: string;
+  unit: string;
+  suggestedPrice: number;
+  averageDays: string;
+  notes?: string;
+  materials?: string;
+  createdAt?: any;
 }
 
-export const ServicesCatalog: React.FC = () => {
+const UNITS = ['m²', 'm', 'm³', 'un', 'pt (Ponto)', 'kg', 'saco', 'litro', 'peça', 'dia', 'verba'];
+
+interface ServicesCatalogProps {
+  onBack?: () => void;
+  onSelectForQuote?: (service: CatalogServiceItem) => void;
+}
+
+export function ServicesCatalog({ onBack, onSelectForQuote }: ServicesCatalogProps) {
   const { user, isGuest } = useAuth();
-  const { triggerGuestAlert } = useAuthModal();
-  
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<CatalogServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
-  
   const [filter, setFilter] = useState('');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
-  
-  const [formData, setFormData] = useState({ name: '', category: 'Alvenaria', unit: 'm�', price: '', description: '' });
+  const [editingService, setEditingService] = useState<CatalogServiceItem | null>(null);
+
+  // Form
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [unit, setUnit] = useState('m²');
+  const [priceInput, setPriceInput] = useState('');
+  const [averageDays, setAverageDays] = useState('');
+  const [notes, setNotes] = useState('');
+  const [materials, setMaterials] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (user && !isGuest) {
-      loadServices();
+      const q = query(collection(db, 'users', user.uid, 'services_catalog'));
+      const unsub = onSnapshot(q, (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as CatalogServiceItem));
+        data.sort((a, b) => a.title.localeCompare(b.title));
+        setServices(data);
+        setLoading(false);
+      }, (err) => {
+        console.error(err);
+        setServices([]);
+        setLoading(false);
+      });
+      return () => unsub();
     } else {
-      setServices([]);
+      // LocalStorage for guest
+      try {
+        const local = localStorage.getItem('co_services_catalog');
+        if (local) {
+          setServices(JSON.parse(local));
+        } else {
+          setServices([]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
       setLoading(false);
     }
   }, [user, isGuest]);
 
-  const loadServices = async () => {
-    if (!user) return;
-    try {
-      setLoading(true);
-      const q = query(collection(db, 'users', user.uid, 'services'));
-      const querySnapshot = await getDocs(q);
-      const loaded: Service[] = [];
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        loaded.push({
-          id: docSnap.id,
-          name: data.name || '',
-          category: data.category || '',
-          unit: data.unit || 'm�',
-          price: data.price || 0,
-          description: data.description || ''
-        });
-      });
-      loaded.sort((a, b) => a.name.localeCompare(b.name));
-      setServices(loaded);
-    } catch (error) {
-      console.error("Error loading services:", error);
-      toast.error("Erro ao carregar servi�os");
-    } finally {
-      setLoading(false);
-    }
+  const saveToLocal = (items: CatalogServiceItem[]) => {
+    localStorage.setItem('co_services_catalog', JSON.stringify(items));
   };
 
-  const filteredServices = services.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || s.category.toLowerCase().includes(filter.toLowerCase()));
-
-  const openNewService = () => {
-    if (isGuest) {
-      triggerGuestAlert();
-      return;
-    }
+  const openAddModal = () => {
     setEditingService(null);
-    setFormData({ name: '', category: 'Alvenaria', unit: 'm�', price: '', description: '' });
+    setTitle('');
+    setDescription('');
+    setUnit('m²');
+    setPriceInput('');
+    setAverageDays('');
+    setNotes('');
+    setMaterials('');
     setIsModalOpen(true);
   };
 
-  const openEditService = (service: Service) => {
-    if (isGuest) {
-      triggerGuestAlert();
-      return;
-    }
-    setEditingService(service);
-    setFormData({ name: service.name, category: service.category, unit: service.unit, price: service.price.toString(), description: service.description });
+  const openEditModal = (srv: CatalogServiceItem) => {
+    setEditingService(srv);
+    setTitle(srv.title);
+    setDescription(srv.description || '');
+    setUnit(srv.unit || 'm²');
+    setPriceInput(srv.suggestedPrice ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(srv.suggestedPrice) : '');
+    setAverageDays(srv.averageDays || '');
+    setNotes(srv.notes || '');
+    setMaterials(srv.materials || '');
     setIsModalOpen(true);
   };
 
-  const saveService = async () => {
-    if (!formData.name || !formData.price) {
-      toast.error("Nome e valor s�o obrigat�rios");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      toast.error('O título do serviço é obrigatório.');
       return;
     }
-    if (!user) return;
-    
+
+    setSubmitting(true);
+    const numericPrice = priceInput ? parseInt(priceInput.replace(/\D/g, '')) / 100 : 0;
+
+    const serviceData: CatalogServiceItem = {
+      title,
+      description,
+      unit,
+      suggestedPrice: numericPrice,
+      averageDays,
+      notes,
+      materials,
+    };
+
     try {
-      if (editingService) {
-        const docRef = doc(db, 'users', user.uid, 'services', editingService.id);
-        await updateDoc(docRef, {
-          name: formData.name,
-          category: formData.category,
-          unit: formData.unit,
-          price: parseFloat(formData.price.replace(',', '.')),
-          description: formData.description,
-          updatedAt: serverTimestamp()
-        });
-        toast.success("Serviço atualizado com sucesso!");
+      if (user && !isGuest) {
+        if (editingService?.id) {
+          const docRef = doc(db, 'users', user.uid, 'services_catalog', editingService.id);
+          await updateDoc(docRef, { ...serviceData, updatedAt: serverTimestamp() });
+          toast.success('Serviço atualizado!');
+        } else {
+          await addDoc(collection(db, 'users', user.uid, 'services_catalog'), {
+            ...serviceData,
+            createdAt: serverTimestamp()
+          });
+          toast.success('Serviço adicionado ao catálogo!');
+        }
       } else {
-        await addDoc(collection(db, 'users', user.uid, 'services'), {
-          name: formData.name,
-          category: formData.category,
-          unit: formData.unit,
-          price: parseFloat(formData.price.replace(',', '.')),
-          description: formData.description,
-          createdAt: serverTimestamp()
-        });
-        toast.success("Serviço cadastrado com sucesso!");
+        // Guest mode
+        if (editingService?.id) {
+          const updated = services.map(s => s.id === editingService.id ? { ...s, ...serviceData } : s);
+          setServices(updated);
+          saveToLocal(updated);
+        } else {
+          const newItem = { id: crypto.randomUUID(), ...serviceData };
+          const updated = [...services, newItem];
+          setServices(updated);
+          saveToLocal(updated);
+        }
+        toast.success('Serviço salvo localmente!');
       }
       setIsModalOpen(false);
-      loadServices();
-    } catch (error) {
-      console.error("Error saving service:", error);
-      toast.error("Erro ao salvar serviço");
+    } catch (e) {
+      console.error(e);
+      toast.error('Erro ao salvar serviço.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const deleteService = async (id: string) => {
-    if (isGuest) {
-      triggerGuestAlert();
-      return;
-    }
-    if (!user) return;
-    if (confirm('Tem certeza que deseja excluir este serviço do catálogo?')) {
-      try {
-        await deleteDoc(doc(db, 'users', user.uid, 'services', id));
-        toast.success("Serviço removido");
-        loadServices();
-      } catch (error) {
-        console.error("Error deleting service:", error);
-        toast.error("Erro ao excluir serviço");
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este serviço do catálogo?')) return;
+    try {
+      if (user && !isGuest) {
+        await deleteDoc(doc(db, 'users', user.uid, 'services_catalog', id));
+      } else {
+        const updated = services.filter(s => s.id !== id);
+        setServices(updated);
+        saveToLocal(updated);
       }
+      toast.success('Serviço removido.');
+    } catch (e) {
+      console.error(e);
+      toast.error('Erro ao remover serviço.');
     }
   };
+
+  const filteredServices = services.filter(s =>
+    s.title.toLowerCase().includes(filter.toLowerCase()) ||
+    s.description?.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
   return (
-    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', marginBottom: 4 }}>Meu Cat�logo</h1>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Gerencie seus servi�os padr�o</p>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px 20px' }}>
+      
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {onBack && (
+            <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', padding: 0 }}>
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Catálogo de Serviços</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '2px 0 0' }}>Serviços cadastrados com preços e prazos padrão</p>
+          </div>
         </div>
-        <button className="btn-primary" onClick={openNewService} style={{ width: 48, height: 48, borderRadius: 24, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Plus size={24} />
+
+        <button onClick={openAddModal} className="btn-primary" style={{ padding: '8px 16px', borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Plus size={16} /> Novo Serviço
         </button>
       </div>
 
-      <div className="input-icon-wrapper" style={{ marginBottom: 24 }}>
-        <Search size={20} />
-        <input 
-          type="text" 
-          placeholder="Buscar servi�o ou categoria..." 
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="input-field"
-        />
-      </div>
-
-      {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-          Carregando cat�logo...
-        </div>
-      ) : services.length === 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 24px', textAlign: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
-          <div style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(30, 58, 138, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-            <Briefcase size={40} color="var(--color-primary)" opacity={0.8} />
-          </div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Cat�logo Vazio</h2>
-          <p style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 32, maxWidth: 300, lineHeight: 1.5 }}>
-            Cadastre seus servi�os padr�o (M�o de obra, projetos, consultorias) para agilizar na hora de criar novos or�amentos.
-          </p>
-          <button 
-            className="btn-primary" onClick={openNewService}
-            style={{ borderRadius: 20, padding: '16px 32px', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}
-          >
-            <Plus size={20} /> Cadastrar Servi�o
-          </button>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {filteredServices.map(service => (
-            <div key={service.id} className="glass-panel" style={{ padding: 16, borderRadius: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{service.name}</h3>
-                  </div>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', backgroundColor: 'var(--bg-surface)', padding: '4px 8px', borderRadius: 8 }}>{service.category}</span>
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => openEditService(service)} className="btn-icon" style={{ width: 32, height: 32 }}><Edit2 size={16} /></button>
-                  <button onClick={() => deleteService(service.id)} className="btn-icon" style={{ width: 32, height: 32, color: 'var(--color-danger)' }}><Trash2 size={16} /></button>
-                </div>
-              </div>
-              {service.description && (
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.4 }}>{service.description}</p>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-surface)', padding: 12, borderRadius: 12, marginTop: 8 }}>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Valor de tabela:</span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: '#10B981' }}>R$ {service.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>/ {service.unit}</span></span>
-              </div>
-            </div>
-          ))}
-
-          {filteredServices.length === 0 && (
-            <div style={{ textAlign: 'center', padding: 40 }}>
-              <Briefcase size={48} color="var(--border-light)" style={{ margin: '0 auto 16px' }} />
-              <p style={{ color: 'var(--text-muted)' }}>Nenhum servi�o encontrado na busca.</p>
-            </div>
-          )}
+      {/* Search Filter */}
+      {services.length > 0 && (
+        <div style={{ position: 'relative', marginBottom: 20 }}>
+          <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 14, top: 13 }} />
+          <input
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            placeholder="Buscar serviço no catálogo..."
+            className="input-premium"
+            style={{ paddingLeft: 42, height: 44 }}
+          />
         </div>
       )}
 
-      {/* MODAL */}
+      {/* Services List */}
+      {loading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="skeleton-glass" style={{ height: 120, borderRadius: 16 }} />
+          <div className="skeleton-glass" style={{ height: 120, borderRadius: 16 }} />
+        </div>
+      ) : services.length === 0 ? (
+        <div className="glass-panel" style={{ padding: 40, borderRadius: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Briefcase size={32} />
+          </div>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Seu Catálogo está Vazio</h3>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0, maxWidth: 300, lineHeight: 1.4 }}>
+            Cadastre os serviços que você presta (Pintura, Elétrica, Gesso, Alvenaria) com preço por m² ou unidade para orçar rapidamente.
+          </p>
+          <button onClick={openAddModal} className="btn-primary" style={{ padding: '12px 24px', borderRadius: 14, fontSize: 14, marginTop: 4 }}>
+            + Cadastrar Primeiro Serviço
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {filteredServices.map(srv => (
+            <motion.div
+              key={srv.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-panel"
+              style={{ padding: 18, borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 12 }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{srv.title}</h3>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', display: 'inline-block', marginTop: 4 }}>
+                    {srv.unit}
+                  </span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
+                    {srv.suggestedPrice > 0 ? fmt(srv.suggestedPrice) : 'Preço Sob Consulta'}
+                  </span>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block' }}>
+                    por {srv.unit}
+                  </span>
+                </div>
+              </div>
+
+              {srv.description && (
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                  {srv.description}
+                </p>
+              )}
+
+              {/* Extra Badges */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 12, color: 'var(--text-muted)', paddingTop: 6, borderTop: '1px solid var(--border-subtle)' }}>
+                {srv.averageDays && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Clock size={14} color="var(--color-primary)" /> Prazo médio: {srv.averageDays}
+                  </span>
+                )}
+                {srv.materials && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Package size={14} color="#F59E0B" /> Materiais: {srv.materials}
+                  </span>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8 }}>
+                {onSelectForQuote ? (
+                  <button
+                    onClick={() => onSelectForQuote(srv)}
+                    className="btn-primary"
+                    style={{ padding: '6px 14px', borderRadius: 10, fontSize: 12 }}
+                  >
+                    Usar no Orçamento
+                  </button>
+                ) : <div />}
+
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => openEditModal(srv)} style={{ background: 'var(--bg-elevated)', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                    <Edit3 size={15} />
+                  </button>
+                  <button onClick={() => srv.id && handleDelete(srv.id)} style={{ background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EF4444', cursor: 'pointer' }}>
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="glass-panel" style={{ width: '100%', maxWidth: 400, borderRadius: 24, padding: 24, maxHeight: '90vh', overflowY: 'auto' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                  {editingService ? 'Editar Servi�o' : 'Novo Servi�o'}
-                </h2>
-                <button className="btn-icon" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div className="input-group">
-                  <label>Nome do Servi�o *</label>
-                  <input type="text" className="input-field" style={{ padding: '0 16px' }} value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ex: Reboco Interno" />
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div className="input-group">
-                    <label>Categoria</label>
-                    <select className="select-field" style={{ padding: '0 16px' }} value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                      <option value="Alvenaria">Alvenaria</option>
-                      <option value="Hidr�ulica">Hidr�ulica</option>
-                      <option value="El�trica">El�trica</option>
-                      <option value="Pintura">Pintura</option>
-                      <option value="Acabamento">Acabamento</option>
-                      <option value="Projeto">Projeto</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div className="input-group">
-                    <label>Unidade</label>
-                    <select className="select-field" style={{ padding: '0 16px' }} value={formData.unit} onChange={e => setFormData({...formData, unit: e.target.value})}>
-                      <option value="m�">m�</option>
-                      <option value="m">m</option>
-                      <option value="un">un (unidade)</option>
-                      <option value="dia">dia</option>
-                      <option value="hr">hora</option>
-                      <option value="pt">ponto</option>
-                      <option value="global">global</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="input-group">
-                  <label>Valor Padr�o (R$) *</label>
-                  <input type="text" className="input-field" style={{ padding: '0 16px' }} value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="0.00" />
-                </div>
-
-                <div className="input-group">
-                  <label>Descri��o Opcional</label>
-                  <textarea className="textarea-field" style={{ padding: '16px', height: 80, resize: 'none' }} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Detalhes do servi�o..." />
-                </div>
-              </div>
-
-              <button className="btn-primary" onClick={saveService} style={{ width: '100%', padding: 16, borderRadius: 16, marginTop: 24, fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <Check size={20} /> Salvar Servi�o
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+              onClick={() => setIsModalOpen(false)}
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="glass-panel"
+              style={{ width: '100%', maxWidth: 500, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: '24px 20px 40px', position: 'relative', zIndex: 1, maxHeight: '85vh', overflowY: 'auto' }}
+            >
+              <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', top: 20, right: 20, background: 'var(--bg-elevated)', border: 'none', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                <X size={18} />
               </button>
+
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 20 }}>
+                {editingService ? 'Editar Serviço' : 'Novo Serviço no Catálogo'}
+              </h3>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                    Nome do Serviço *
+                  </label>
+                  <input
+                    required
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="Ex: Pintura Acrílica Residencial (2 Demãos)"
+                    className="input-premium"
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                      Unidade de Medida
+                    </label>
+                    <select value={unit} onChange={e => setUnit(e.target.value)} className="input-premium" style={{ height: 44 }}>
+                      {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                      Preço Sugerido (R$)
+                    </label>
+                    <input
+                      value={priceInput}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        if (!val) setPriceInput('');
+                        else setPriceInput(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseInt(val) / 100));
+                      }}
+                      placeholder="R$ 0,00"
+                      className="input-premium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                    Prazo Médio Estimado
+                  </label>
+                  <input
+                    value={averageDays}
+                    onChange={e => setAverageDays(e.target.value)}
+                    placeholder="Ex: 5 a 7 dias úteis por 100m²"
+                    className="input-premium"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                    Descrição dos Procedimentos
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    placeholder="Detalhamento técnico do que está incluído no serviço..."
+                    className="input-premium"
+                    style={{ minHeight: 70, resize: 'vertical' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                    Materiais Típicos Utilizados
+                  </label>
+                  <input
+                    value={materials}
+                    onChange={e => setMaterials(e.target.value)}
+                    placeholder="Ex: Tinta acrílica premium, fita crepe, lixa 150, selador"
+                    className="input-premium"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>
+                    Observações & Recomendações
+                  </label>
+                  <input
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="Ex: Cliente deve fornecer água e energia no local"
+                    className="input-premium"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary"
+                  style={{ width: '100%', padding: 14, borderRadius: 14, marginTop: 6, display: 'flex', justifyContent: 'center', gap: 8 }}
+                >
+                  {submitting ? 'Salvando...' : <><Save size={18} /> Salvar Serviço no Catálogo</>}
+                </button>
+              </form>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
     </div>
   );
-};
+}

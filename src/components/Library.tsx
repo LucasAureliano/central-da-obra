@@ -8,7 +8,7 @@ interface LibraryItem {
   id: string;
   title: string;
   description: string;
-  category: 'abnt' | 'manuais' | 'seguranca' | 'calculos';
+  category: 'abnt' | 'manuais' | 'seguranca' | 'calculos' | 'contratos';
   size: string;
   date: string;
   isBookmarked?: boolean;
@@ -21,12 +21,14 @@ const initialLibraryData: LibraryItem[] = [
   { id: 'lib-4', title: 'NR 35 - Trabalho em Altura', description: 'Requisitos mínimos e medidas de proteção para o trabalho em altura.', category: 'seguranca', size: '1.8 MB', date: 'Atualizado em 2012' },
   { id: 'lib-5', title: 'Manual de Execução de Alvenaria Estrutural', description: 'Boas práticas, paginação e procedimentos para blocos de concreto e cerâmicos.', category: 'manuais', size: '12.4 MB', date: 'Janeiro 2024' },
   { id: 'lib-6', title: 'Guia Prático de Impermeabilização', description: 'Sistemas de impermeabilização rígidos e flexíveis para lajes, banheiros e fundações.', category: 'manuais', size: '5.6 MB', date: 'Março 2025' },
+  { id: 'lib-7', title: 'Modelo de Contrato de Empreitada Global', description: 'Documento padrão editável para contratação de mão de obra e material.', category: 'contratos', size: '1.2 MB', date: 'Abril 2024' },
+  { id: 'lib-8', title: 'Modelo de Contrato de Prestação de Serviços Técnicos', description: 'Para contratação de arquitetos e engenheiros (projetos e execução).', category: 'contratos', size: '1.1 MB', date: 'Fevereiro 2024' },
 ];
 
 export const Library: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState<'tudo' | 'abnt' | 'manuais' | 'seguranca' | 'calculos'>('tudo');
+  const [activeCategory, setActiveCategory] = useState<'tudo' | 'abnt' | 'manuais' | 'seguranca' | 'calculos' | 'contratos'>('tudo');
   const [items, setItems] = useState<LibraryItem[]>(initialLibraryData);
   const [calculations, setCalculations] = useState<any[]>([]);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -150,6 +152,13 @@ export const Library: React.FC = () => {
           style={{ padding: '8px 16px', fontSize: 13, border: '1px solid', borderColor: activeCategory === 'manuais' ? 'transparent' : 'var(--border-medium)', color: activeCategory === 'manuais' ? '#FFF' : 'var(--text-main)', backgroundColor: activeCategory === 'manuais' ? '#22c55e' : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
         >
           <BookOpen size={14} /> Manuais Práticos
+        </button>
+        <button 
+          onClick={() => setActiveCategory('contratos')}
+          className={`badge ${activeCategory === 'contratos' ? 'badge-orange' : ''}`}
+          style={{ padding: '8px 16px', fontSize: 13, border: '1px solid', borderColor: activeCategory === 'contratos' ? 'transparent' : 'var(--border-medium)', color: activeCategory === 'contratos' ? '#FFF' : 'var(--text-main)', backgroundColor: activeCategory === 'contratos' ? '#8b5cf6' : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+        >
+          <FileText size={14} /> Modelos de Contratos
         </button>
         <button 
           onClick={() => setActiveCategory('calculos')}

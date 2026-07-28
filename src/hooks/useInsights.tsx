@@ -206,6 +206,61 @@ export function useInsights() {
       }
     }
 
+    // --- PROVIDER SPECIALTY INSIGHTS ---
+    if (role === 'service' && profile?.specialty) {
+      const normSpec = profile.specialty.toLowerCase();
+      
+      if (normSpec.includes('eletric') || normSpec.includes('elétrica')) {
+        generatedInsights.push({
+          id: 'spec-eletrica',
+          icon: <Settings size={20} color="#F59E0B" />,
+          title: 'Dica de Elétrica',
+          description: 'Lembre-se sempre de conferir a NBR 5410 ao dimensionar os disjuntores e seções de fios das obras.',
+          priority: 'info',
+          category: 'technical',
+          date: now,
+          suggestedAction: 'Ver Dicas',
+          actionRoute: 'assistente'
+        });
+      } else if (normSpec.includes('encanador') || normSpec.includes('hidráulic')) {
+        generatedInsights.push({
+          id: 'spec-hidro',
+          icon: <Settings size={20} color="#3B82F6" />,
+          title: 'Dica de Hidráulica',
+          description: 'Teste de estanqueidade (pressurização) deve ser feito antes de fechar a alvenaria para evitar vazamentos invisíveis.',
+          priority: 'info',
+          category: 'technical',
+          date: now,
+          suggestedAction: 'Ver Dicas',
+          actionRoute: 'assistente'
+        });
+      } else if (normSpec.includes('pedreiro') || normSpec.includes('alvenaria')) {
+        generatedInsights.push({
+          id: 'spec-pedreiro',
+          icon: <Construction size={20} color="#EF4444" />,
+          title: 'Dica de Obra (Alvenaria)',
+          description: 'Não se esqueça de usar aditivos impermeabilizantes no baldrame e nas 3 primeiras fiadas para evitar umidade no rodapé.',
+          priority: 'info',
+          category: 'technical',
+          date: now,
+          suggestedAction: 'Ver Dicas',
+          actionRoute: 'assistente'
+        });
+      } else if (normSpec.includes('pintor')) {
+        generatedInsights.push({
+          id: 'spec-pintor',
+          icon: <Settings size={20} color="#8B5CF6" />,
+          title: 'Dica de Pintura',
+          description: 'Certifique-se de que a parede está totalmente seca e lixada antes de aplicar a primeira demão de selador.',
+          priority: 'info',
+          category: 'technical',
+          date: now,
+          suggestedAction: 'Ver Dicas',
+          actionRoute: 'assistente'
+        });
+      }
+    }
+
     // Async queries for Calculations & Shopping list (Only run if owner has active work, or general for others if needed. For now, keep it simple for owner)
     let unsubscribeCalcs: () => void = () => {};
     let unsubscribeShopping: () => void = () => {};

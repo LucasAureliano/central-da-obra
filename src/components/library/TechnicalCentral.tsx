@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Search, Compass, FileText, ChevronRight, Star } from 'lucide-react';
 import { TECHNICAL_ARTICLES, CATEGORIES, type TechnicalArticle } from '../../data/technicalLibrary';
 import { ArticleView } from './ArticleView';
+import { MarketIndexesWidget } from '../home/modules/MarketIndexesWidget';
 
 interface TechnicalCentralProps {
   initialArticleId?: string;
@@ -137,6 +138,8 @@ export function TechnicalCentral({ initialArticleId, onNavigate }: TechnicalCent
       </div>
 
       <div style={{ padding: '0 20px' }}>
+        
+        <MarketIndexesWidget />
         
         {/* Categories (Chips) */}
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12, margin: '0 -20px 16px', paddingLeft: 20, paddingRight: 20, scrollbarWidth: 'none' }}>

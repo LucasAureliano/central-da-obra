@@ -1,9 +1,6 @@
-/* Landing Page Specific Styles - Premium SaaS */
-
-/* Reset & Container */
 .landing-body {
   color: var(--text-main);
-  background-color: var(--bg-base);
+  background-color: #000000 !important;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
@@ -571,7 +568,7 @@
   height: 100vh;
   z-index: 0;
   overflow: hidden;
-  background-color: var(--bg-base);
+  background-color: #000000 !important;
 }
 
 .shader-bg-wrapper {
