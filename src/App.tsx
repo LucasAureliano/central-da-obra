@@ -278,8 +278,13 @@ function App() {
       return;
     }
 
-    if (title === 'Tendências') {
+    if (title === 'Tendências' || title === 'Studio de Interiores') {
       setActiveTab('studio-interiores');
+      return;
+    }
+    if (title === 'Projeto Elétrico' || title === 'Projeto Hidráulico' || title === 'Projeto Automação') {
+      setMenuTitle(title);
+      setActiveTab('placeholder');
       return;
     }
     if (title === 'nova-despesa') {

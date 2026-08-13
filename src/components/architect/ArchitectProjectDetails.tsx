@@ -216,12 +216,12 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
 
         {activeTab === 'financeiro' && (
           <div style={{ marginLeft: -16, marginRight: -16 }}>
-            <Finance workId={project.id} embedded />
+            <Finance workId={project.id} embedded parentCollection="projects" />
           </div>
         )}
 
         {activeTab === 'documentos' && (
-          <DocumentsView workId={project.id} />
+          <DocumentsView workId={project.id} parentCollection="projects" />
         )}
 
         {activeTab === 'vistorias' && (
@@ -238,7 +238,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
 
         {activeTab === 'materiais' && (
           <div style={{ marginLeft: -16, marginRight: -16 }}>
-            <Shopping workId={project.id} embedded />
+            <Shopping workId={project.id} embedded parentCollection="projects" />
           </div>
         )}
 

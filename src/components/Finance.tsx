@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorks } from '../contexts/WorksContext';
 import { db } from '../lib/firebase';
-import { collection, query, onSnapshot, addDoc, Timestamp, orderBy, updateDoc, doc, increment } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, Timestamp, orderBy, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { Plus, Wallet, CheckCircle2, Clock, X, Trash2, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -26,12 +26,14 @@ interface Expense {
   workName?: string;
 }
 
-export function Finance({ initialShowAddModal = false, onBack, workId, embedded }: { initialShowAddModal?: boolean; onBack?: () => void; workId?: string; embedded?: boolean }) {
+export function Finance({ initialShowAddModal = false, onBack, workId, embedded, parentCollection = 'works' }: { initialShowAddModal?: boolean; onBack?: () => void; workId?: string; embedded?: boolean; parentCollection?: 'works' | 'projects' }) {
   const { user, isGuest, profile } = useAuth();
   const { works, activeWork, primaryWork } = useWorks();
   
   const isGlobal = !workId;
-  const currentWork = workId ? works.find(w => w.id === workId) : ((profile?.role === 'owner' ? primaryWork : activeWork) || (works.length > 0 ? works[0] : null));
+  const currentWork = workId 
+    ? (parentCollection === 'projects' ? { id: workId, name: 'Projeto (Fixo)' } : works.find(w => w.id === workId)) 
+    : ((profile?.role === 'owner' ? primaryWork : activeWork) || (works.length > 0 ? works[0] : null));
   const workIdsStr = isGlobal ? works.map(w => w.id).sort().join(',') : (currentWork?.id || '');
 
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,7 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded 
   const [paymentMethod, setPaymentMethod] = useState('');
   const [notes, setNotes] = useState('');
   const [selectedWorkId, setSelectedWorkId] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (showAddModal) {
@@ -82,7 +85,7 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded 
 
     worksToQuery.forEach(w => {
       const qExpenses = query(
-        collection(db, `works/${w.id}/expenses`),
+        collection(db, `${parentCollection}/${w.id}/expenses`),
         orderBy('date', 'desc')
       );
 
@@ -112,33 +115,40 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded 
     });
 
     return () => unsubscribes.forEach(u => u());
-  }, [user, isGuest, workIdsStr]);
+  }, [user, isGuest, workIdsStr, parentCollection]);
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
-    const targetWork = works.find(w => w.id === selectedWorkId);
-    if (!title || amount <= 0 || !targetWork) return;
+    if (isGlobal && !selectedWorkId) {
+      toast.error('Selecione uma obra');
+      return;
+    }
 
+    const targetWork = isGlobal ? works.find(w => w.id === selectedWorkId) : currentWork;
+    if (!targetWork) return;
+
+    setIsSubmitting(true);
     try {
-      const newExpense: Omit<Expense, 'id'> = {
+      const newExpense = {
         title,
-        amount,
+        amount: Number(amount),
         category,
         status,
         date: Timestamp.fromDate(new Date(`${date}T12:00:00`)),
-        supplier,
+        supplier: '',
+        link: '',
         paymentMethod,
         notes,
         workId: targetWork.id,
-        createdAt: Timestamp.now()
+        createdAt: serverTimestamp()
       };
 
-      await addDoc(collection(db, `works/${targetWork.id}/expenses`), newExpense);
+      await addDoc(collection(db, `${parentCollection}/${targetWork.id}/expenses`), newExpense);
       
-      if (status === 'Pago') {
+      if (status === 'Pago' && parentCollection === 'works') {
         const workRef = doc(db, 'works', targetWork.id);
         await updateDoc(workRef, {
-          spent: increment(amount)
+          actualCost: increment(amount)
         });
       }
       
@@ -152,6 +162,33 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded 
     } catch (err) {
       console.error("Error adding expense", err);
       toast.error('Erro ao adicionar lançamento');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleToggleStatus = async (exp: Expense) => {
+    try {
+      const newStatus = exp.status === 'Pago' ? 'Pendente' : 'Pago';
+      await updateDoc(doc(db, `${parentCollection}/${exp.workId}/expenses`, exp.id!), {
+        status: newStatus
+      });
+      
+      if (parentCollection === 'works' && exp.workId) {
+        if (newStatus === 'Pago') {
+          updateDoc(doc(db, 'works', exp.workId), {
+            actualCost: increment(exp.amount)
+          });
+        } else if (exp.status === 'Pago') {
+          updateDoc(doc(db, 'works', exp.workId), {
+            actualCost: increment(-exp.amount)
+          });
+        }
+      }
+      toast.success('Status atualizado');
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao atualizar status');
     }
   };
 
@@ -161,13 +198,13 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded 
     
     try {
       await import('firebase/firestore').then(({ deleteDoc }) => 
-        deleteDoc(doc(db, `works/${exp.workId}/expenses`, exp.id!))
+        deleteDoc(doc(db, `${parentCollection}/${exp.workId}/expenses`, exp.id!))
       );
       
-      if (exp.status === 'Pago') {
+      if (exp.status === 'Pago' && parentCollection === 'works') {
         const workRef = doc(db, 'works', exp.workId);
         await updateDoc(workRef, {
-          spent: increment(-exp.amount)
+          actualCost: increment(-exp.amount)
         });
       }
       toast.success('Lançamento excluído');

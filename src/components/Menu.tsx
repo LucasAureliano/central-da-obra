@@ -372,6 +372,15 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           ]
         },
         {
+          title: 'Projetos Complementares',
+          items: [
+            { icon: <Palette size={20} />, label: 'Studio de Interiores', color: '#EC4899', action: () => onMenuSelect('Studio de Interiores') },
+            { icon: <Lightbulb size={20} />, label: 'Projeto Elétrico', color: '#EAB308', action: () => onMenuSelect('Projeto Elétrico') },
+            { icon: <Briefcase size={20} />, label: 'Projeto Hidráulico', color: '#0EA5E9', action: () => onMenuSelect('Projeto Hidráulico') },
+            { icon: <Wrench size={20} />, label: 'Automação (Smart)', color: '#10B981', action: () => onMenuSelect('Projeto Automação') },
+          ]
+        },
+        {
           title: 'Configurações',
           items: [
             { icon: <User size={20} />, label: 'Perfil Profissional (CREA/CAU)', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },

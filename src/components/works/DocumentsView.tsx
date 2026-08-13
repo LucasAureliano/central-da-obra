@@ -7,9 +7,10 @@ import { useAuth } from '../../contexts/AuthContext';
 
 interface DocumentsViewProps {
   workId: string;
+  parentCollection?: 'works' | 'projects';
 }
 
-export function DocumentsView({ workId }: DocumentsViewProps) {
+export function DocumentsView({ workId, parentCollection = 'works' }: DocumentsViewProps) {
   const { profile } = useAuth();
   const isOwner = profile?.role === 'owner';
   const [documents, setDocuments] = useState<any[]>([]);
@@ -20,12 +21,12 @@ export function DocumentsView({ workId }: DocumentsViewProps) {
   const categories = ['Projetos', 'Contratos', 'ART/RRT', 'Notas Fiscais', 'Garantias', 'Fotos', 'Outros'];
 
   useEffect(() => {
-    const q = query(collection(db, `works/${workId}/documents`));
+    const q = query(collection(db, `${parentCollection}/${workId}/documents`));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setDocuments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
-  }, [workId]);
+  }, [workId, parentCollection]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,20 +51,19 @@ export function DocumentsView({ workId }: DocumentsViewProps) {
         alert('Erro ao fazer upload. Verifique se o Firebase Storage está ativado e as regras de segurança permitem upload.');
       }, 
       async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        
-        await addDoc(collection(db, `works/${workId}/documents`), {
-          name: file.name,
-          category: selectedCategory,
-          url: downloadURL,
-          size: file.size,
-          type: file.type,
-          uploadedAt: serverTimestamp(),
-          storagePath: `works/${workId}/${selectedCategory}/${safeName}`
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+          await addDoc(collection(db, `${parentCollection}/${workId}/documents`), {
+            name: file.name,
+            category: selectedCategory,
+            url: downloadURL,
+            size: file.size,
+            type: file.type,
+            uploadedAt: serverTimestamp(),
+            storagePath: `${parentCollection}/${workId}/${selectedCategory}/${safeName}`
+          });
+          setUploading(false);
+          setProgress(0);
         });
-        
-        setUploading(false);
-        setProgress(0);
       }
     );
   };
@@ -74,7 +74,7 @@ export function DocumentsView({ workId }: DocumentsViewProps) {
     try {
       const fileRef = ref(storage, docObj.storagePath);
       await deleteObject(fileRef);
-      await deleteDoc(doc(db, `works/${workId}/documents`, docObj.id));
+      await deleteDoc(doc(db, `${parentCollection}/${workId}/documents`, docObj.id));
     } catch (err) {
       console.error(err);
       alert('Erro ao excluir documento.');

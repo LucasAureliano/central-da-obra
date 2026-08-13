@@ -22,10 +22,12 @@ interface ShoppingItem {
   calcName: string;
 }
 
-export function Shopping({ workId, embedded }: { workId?: string, embedded?: boolean }) {
+export function Shopping({ workId, embedded, parentCollection = 'works' }: { workId?: string, embedded?: boolean, parentCollection?: 'works' | 'projects' }) {
   const { user, profile } = useAuth();
   const { works, activeWork, primaryWork } = useWorks();
-  const currentWork = workId ? works.find(w => w.id === workId) : ((profile?.role === 'owner' ? primaryWork : activeWork) || (works.length > 0 ? works[0] : null));
+  const currentWork = workId 
+    ? (parentCollection === 'projects' ? { id: workId, name: 'Projeto (Fixo)' } : works.find(w => w.id === workId))
+    : ((profile?.role === 'owner' ? primaryWork : activeWork) || (works.length > 0 ? works[0] : null));
   const [calcItems, setCalcItems] = useState<ShoppingItem[]>([]);
   const [manualItems, setManualItems] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
       return; 
     }
 
-    const qCalc = query(collection(db, 'works', currentWork.id, 'calculations'));
+    const qCalc = query(collection(db, `${parentCollection}`, currentWork.id, 'calculations'));
     const unsubCalc = onSnapshot(qCalc, (calcSnap) => {
       const workItems: ShoppingItem[] = [];
       calcSnap.forEach(docSnap => {
@@ -73,7 +75,7 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
     });
 
     return () => unsubCalc();
-  }, [user, currentWork]);
+  }, [user, currentWork, parentCollection]);
 
   // Fetch manual shopping items for the active work
   useEffect(() => {
@@ -81,7 +83,7 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
       setManualItems([]);
       return;
     }
-    const qManual = query(collection(db, 'works', currentWork.id, 'shopping'));
+    const qManual = query(collection(db, `${parentCollection}`, currentWork.id, 'shopping'));
     const unsubManual = onSnapshot(qManual, (snap) => {
       const items: ShoppingItem[] = [];
       snap.docs.forEach(docSnap => {
@@ -102,7 +104,7 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
       setManualItems(items);
     });
     return () => unsubManual();
-  }, [user, currentWork]);
+  }, [user, currentWork, parentCollection]);
 
   const handleTogglePurchased = async (item: ShoppingItem) => {
     try {
@@ -113,7 +115,7 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
         const expenseWorkId = item.workId || currentWork?.id;
         if (expenseWorkId) {
           const amount = Number(item.quantity) * (item.unitPrice || 0);
-          await addDoc(collection(db, 'works', expenseWorkId, 'expenses'), {
+          await addDoc(collection(db, `${parentCollection}`, expenseWorkId, 'expenses'), {
             title: `Compra: ${item.name}`,
             amount: amount,
             category: 'Materiais',
@@ -132,14 +134,14 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
 
       // Manual item update
       if (item.matIndex === -1 && item.calcId) {
-        const manualRef = doc(db, 'works', item.workId, 'shopping', item.calcId);
+        const manualRef = doc(db, `${parentCollection}`, item.workId, 'shopping', item.calcId);
         await updateDoc(manualRef, { isPurchased: isNowPurchased });
         return;
       }
 
       // Calculation item update (existing logic)
-      const calcRef = doc(db, 'works', item.workId, 'calculations', item.calcId);
-      const calcSnap = await getDocs(query(collection(db, 'works', item.workId, 'calculations')));
+      const calcRef = doc(db, `${parentCollection}`, item.workId, 'calculations', item.calcId);
+      const calcSnap = await getDocs(query(collection(db, `${parentCollection}`, item.workId, 'calculations')));
       const calcDoc = calcSnap.docs.find(d => d.id === item.calcId);
       if (!calcDoc) return;
 
@@ -161,16 +163,13 @@ export function Shopping({ workId, embedded }: { workId?: string, embedded?: boo
   };
 
   const handleAddManualItem = async () => {
-    if (!newName.trim()) return;
-    if (newQty <= 0) return;
-    if (newPrice < 0) return;
+    if (!newName.trim() || newQty <= 0 || !currentWork) return;
     try {
-      if (!currentWork) return;
-      await addDoc(collection(db, 'works', currentWork.id, 'shopping'), {
+      await addDoc(collection(db, `${parentCollection}`, currentWork.id, 'shopping'), {
         name: newName.trim(),
         quantity: newQty,
         unit: newUnit,
-        unitPrice: newPrice,
+        unitPrice: Number(newPrice) || 0,
         isPurchased: false,
         createdAt: serverTimestamp()
       });

@@ -227,13 +227,7 @@ export function BuilderDashboard({ onNavigate }: { onNavigate: (tab: string) => 
   const DEFAULT_ORDER = [
     'operacoes',
     'obras',
-    'financeiro',
-    'equipes',
-    'compras',
-    'agenda',
-    'biblioteca',
-    'indicadores',
-    'dicas'
+    'indicadores'
   ];
 
   const WIDGET_NAMES = {

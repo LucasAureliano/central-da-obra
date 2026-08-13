@@ -317,14 +317,6 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
     'projetos',
     'acompanhamento',
     'agenda',
-    'vistorias',
-    'studio-interiores',
-    'luminotecnico',
-    'eletrico',
-    'hidraulico',
-    'automacao',
-    'biblioteca',
-    'dicas'
   ];
 
   const WIDGET_NAMES = {
