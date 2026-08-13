@@ -1,4 +1,5 @@
-import { Camera, Briefcase, MessageCircle } from 'lucide-react';
+import React from 'react';
+import { Instagram, Briefcase, MessageCircle } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 
 interface InstitutionalFooterProps {
@@ -42,7 +43,7 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
             </p>
             <div className="footer-socials">
               <a href="https://www.instagram.com/centralobra.app/" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
-                <Camera size={20} />
+                <Instagram size={20} />
               </a>
               <a href="https://linkedin.com/company/centralobra" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">
                 <Briefcase size={20} />
