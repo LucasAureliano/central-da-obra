@@ -31,16 +31,6 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
     }
     metaDesc.setAttribute('content', 'Planejamento, gestão financeira, compras, normas e mais de 80 calculadoras de materiais integradas em um único aplicativo para a construção civil.');
 
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement;
-      setScrolled(target.scrollTop > 50);
-    };
-    
-    const scrollContainer = document.querySelector('.landing-body');
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScroll);
-    }
-    
     // Add Schema.org structured data dynamically
     const scriptId = 'schema-org-data';
     if (!document.getElementById(scriptId)) {
@@ -64,9 +54,6 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
     }
 
     return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', handleScroll);
-      }
     };
   }, []);
 
@@ -99,7 +86,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
   }
 
   return (
-    <div className="landing-body">
+    <div className="landing-body" onScroll={(e) => setScrolled((e.target as HTMLElement).scrollTop > 50)}>
       {/* Background Elements */}
       <div className="landing-bg">
         {/* Dark mesh gradient background for professional look */}

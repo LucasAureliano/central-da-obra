@@ -100,9 +100,7 @@
 }
 
 .landing-navbar.scrolled {
-  background-color: rgba(11, 11, 11, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background-color: #000000;
   border-bottom: 1px solid var(--border-subtle);
   height: 70px;
 }
