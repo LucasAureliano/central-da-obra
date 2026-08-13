@@ -43,7 +43,7 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
               Plataforma inteligente para construção civil. Orçamentos, normas e calculadoras em um só lugar.
             </p>
             <div className="footer-socials">
-              <a href="https://instagram.com/centralobra" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
+              <a href="https://www.instagram.com/centralobra.app/" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
                 <Camera size={20} />
               </a>
               <a href="https://linkedin.com/company/centralobra" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">
@@ -61,7 +61,6 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
             <ul className="footer-links">
               <li><button onClick={() => onNavigate('history')} className="footer-link">Sobre nós</button></li>
               <li><a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="footer-link">Recursos</a></li>
-              <li><button onClick={() => onNavigate('careers')} className="footer-link">Carreiras</button></li>
               <li><button onClick={() => onNavigate('contact')} className="footer-link">Contato</button></li>
             </ul>
           </div>

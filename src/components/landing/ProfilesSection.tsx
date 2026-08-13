@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { HardHat, Briefcase, Home } from 'lucide-react';
+import { HardHat, Briefcase, Home, Building2 } from 'lucide-react';
 
 const profiles = [
   {
@@ -22,6 +22,13 @@ const profiles = [
     description: "Vai construir ou reformar? Saiba para onde está indo seu dinheiro. Proteja-se de desperdícios e compras erradas.",
     color: "#10B981",
     bg: "rgba(16, 185, 129, 0.1)"
+  },
+  {
+    icon: <Building2 size={32} strokeWidth={1.5} />,
+    title: "Construtoras",
+    description: "Gestão completa de múltiplos canteiros. Centralize o financeiro, compras, medições e cronogramas da sua equipe.",
+    color: "#8B5CF6",
+    bg: "rgba(139, 92, 246, 0.1)"
   }
 ];
 
@@ -40,7 +47,7 @@ export function ProfilesSection() {
           <p className="landing-section-subtitle">Diferentes perfis, uma mesma necessidade: ter previsibilidade e controle absoluto sobre a obra.</p>
         </motion.div>
 
-        <div className="grid-cols-3">
+        <div className="grid-cols-4">
           {profiles.map((profile, index) => (
             <motion.div 
               key={index} 

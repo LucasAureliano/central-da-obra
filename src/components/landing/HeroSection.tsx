@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronRight, Play } from 'lucide-react';
 
@@ -7,12 +8,17 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onRegister }: HeroSectionProps) {
-  const handleScrollToFeatures = () => {
-    const element = document.getElementById('recursos');
-    if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
+  const [showDemo, setShowDemo] = useState(false);
+
+  const handleShowDemo = () => {
+    setShowDemo(true);
+    setTimeout(() => {
+      const element = document.getElementById('demo-view');
+      if (element) {
+        const top = element.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
@@ -72,27 +78,30 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             <button onClick={onRegister} className="btn-landing-primary" style={{ flex: '1 1 180px' }}>
               Começar Grátis <ArrowRight size={18} />
             </button>
-            <button onClick={handleScrollToFeatures} className="btn-landing-secondary" style={{ flex: '1 1 180px' }}>
+            <button onClick={handleShowDemo} className="btn-landing-secondary" style={{ flex: '1 1 180px' }}>
               Ver Demonstração <Play size={18} />
             </button>
           </motion.div>
           
-          <motion.div 
-            className="mockup-window"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', height: '600px', display: 'flex', flexDirection: 'column' }}
-          >
-            <div className="mockup-header">
-              <div className="mockup-dot red"></div>
-              <div className="mockup-dot yellow"></div>
-              <div className="mockup-dot green"></div>
-            </div>
-            <div style={{ position: 'relative', width: '100%', flex: 1, background: 'var(--bg-base)', overflow: 'hidden', borderRadius: '0 0 16px 16px' }}>
-              <iframe src="/?preview=true" style={{ width: '100%', height: '100%', border: 'none' }} title="Interface do Aplicativo" />
-            </div>
-          </motion.div>
+          {showDemo && (
+            <motion.div 
+              id="demo-view"
+              className="mockup-window"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', height: '600px', display: 'flex', flexDirection: 'column' }}
+            >
+              <div className="mockup-header">
+                <div className="mockup-dot red"></div>
+                <div className="mockup-dot yellow"></div>
+                <div className="mockup-dot green"></div>
+              </div>
+              <div style={{ position: 'relative', width: '100%', flex: 1, background: 'var(--bg-base)', overflow: 'hidden', borderRadius: '0 0 16px 16px' }}>
+                <iframe src="/?preview=true" style={{ width: '100%', height: '100%', border: 'none' }} title="Interface do Aplicativo" />
+              </div>
+            </motion.div>
+          )}
 
         </div>
       </div>

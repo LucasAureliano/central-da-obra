@@ -6,9 +6,11 @@
   background-size: 200% 200% !important;
   animation: bgGradientMove 15s ease infinite alternate;
   background-attachment: fixed !important;
+  height: 100vh;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
