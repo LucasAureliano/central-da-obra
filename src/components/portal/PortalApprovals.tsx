@@ -37,10 +37,7 @@ export default function PortalApprovals({ workId }: PortalApprovalsProps) {
         fetched.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
         if (fetched.length === 0) {
-          setApprovals([
-            { id: '1', title: 'Aprovação de Orçamento Extra', description: 'Compra de revestimentos premium para a sala de estar, conforme solicitado na última reunião.', status: 'pendente', amount: 15400.50, date: new Date().toISOString(), requiresApproval: true },
-            { id: '2', title: 'Aditivo de Prazo', description: 'Adição de 15 dias no cronograma devido a atrasos na entrega de esquadrias por parte do fornecedor.', status: 'Aprovado', date: new Date(Date.now() - 5 * 86400000).toISOString(), requiresApproval: true },
-          ]);
+          setApprovals([]);
         } else {
           setApprovals(fetched);
         }
@@ -56,15 +53,6 @@ export default function PortalApprovals({ workId }: PortalApprovalsProps) {
   const handleApprove = async (id: string) => {
     setProcessingId(id);
     try {
-      // If we are using mock data, we just update local state
-      if (approvals.find(a => a.id === id)?.id === '1' && id.length === 1) {
-        setTimeout(() => {
-          setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: 'Aprovado' } : a));
-          setProcessingId(null);
-        }, 800);
-        return;
-      }
-
       await updateDoc(doc(db, 'works', workId, 'pendencies', id), { 
         status: 'Aprovado' 
       });
@@ -80,14 +68,6 @@ export default function PortalApprovals({ workId }: PortalApprovalsProps) {
   const handleReject = async (id: string) => {
     setProcessingId(id);
     try {
-      if (approvals.find(a => a.id === id)?.id === '1' && id.length === 1) {
-        setTimeout(() => {
-          setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: 'rejeitado' } : a));
-          setProcessingId(null);
-        }, 800);
-        return;
-      }
-
       await updateDoc(doc(db, 'works', workId, 'pendencies', id), { 
         status: 'rejeitado' 
       });

@@ -119,6 +119,7 @@ export function PostApprovalModal({ isOpen, onClose, quoteData, onNavigate }: Po
         budget: quoteData.grandTotal,
         status: 'Em andamento',
         progress: 0,
+        roles: {},
         createdAt: serverTimestamp(),
       });
       setCreatedWork(true);

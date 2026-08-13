@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Code Linting
+        run: npm run lint
+        continue-on-error: true # Warning only for now
+
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+
+      - name: Security Check
+        run: npm audit --audit-level=high
+
+      - name: Build Project
+        run: npm run build

@@ -99,6 +99,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ role, onComp
             progress: 0,
             image: null,
             colorTheme: defaultThemeColors[Math.floor(Math.random() * defaultThemeColors.length)],
+            roles: {},
             createdAt: serverTimestamp(),
           });
 

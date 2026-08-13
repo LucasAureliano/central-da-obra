@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
 import { Home, Info, Square, Layers, Sparkles, Building, Briefcase } from 'lucide-react';
@@ -31,9 +32,7 @@ export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
 
   const [inputMethod, setInputMethod] = useState('');
   const [area, setArea] = useState('');
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '' }]);
   const [hasEaves, setHasEaves] = useState<boolean | null>(null);
   const [eaves, setEaves] = useState('0.5'); // Beiral 50cm default
   
@@ -52,16 +51,13 @@ export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
     if (inputMethod === 'area') {
       roofArea = parseFloat(area) || 0;
     } else {
-      const w = parseFloat(width) || 0;
-      const l = parseFloat(length) || 0;
       const beiral = hasEaves ? (parseFloat(eaves) || 0) : 0;
       
-      // Adiciona o beiral nas extremidades pertinentes
-      // Simplificação: 2 lados para largura, 2 lados para comprimento se for 4 águas.
-      // Se for 2 águas, o beiral entra em 2 lados apenas no sentido do caimento, e em 2 lados na empena.
-      // Para simplificar e garantir segurança, adicionamos em todos os lados do contorno da planta.
-      const totalW = w + (beiral * 2);
-      const totalL = l + (beiral * 2);
+      const totalA = surfaces.reduce((acc, s) => {
+        const totalW = (parseFloat(s.d1) || 0) + (beiral * 2);
+        const totalL = (parseFloat(s.d2) || 0) + (beiral * 2);
+        return acc + (totalW * totalL);
+      }, 0);
       
       // Fator multiplicador de inclinação média
       const INCLINATION_FACTOR_HIGH = 1.05;
@@ -71,7 +67,7 @@ export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
         inclFactor = INCLINATION_FACTOR_LOW; // ~10% inclinação
       }
       
-      roofArea = (totalW * totalL) * inclFactor;
+      roofArea = totalA * inclFactor;
     }
     return Math.max(0, roofArea);
   };
@@ -96,7 +92,7 @@ export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
     const areaWithLoss = roofArea * loss;
 
     const metrics: CalcResultItem[] = [
-      { label: 'Área Plana (Projeção)', value: (inputMethod === 'area' ? parseFloat(area) : (parseFloat(width)*parseFloat(length))).toFixed(2), unit: 'm²' },
+      { label: 'Área Plana (Projeção)', value: (inputMethod === 'area' ? parseFloat(area) : surfaces.reduce((acc, s) => acc + (parseFloat(s.d1)||0)*(parseFloat(s.d2)||0), 0)).toFixed(2), unit: 'm²' },
       { label: 'Área Inclinada c/ Perda', value: areaWithLoss.toFixed(2), unit: 'm²', highlight: true },
       { label: 'Perda Considerada', value: `${lossRate}`, unit: '%' },
     ];
@@ -122,8 +118,8 @@ export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
       materials.push({ name: tileName, quantity: totalTiles, unit });
 
       // Cumeeiras
-      if (parseInt(roofWaters) > 1) {
-        let maxDim = Math.max(parseFloat(width)||0, parseFloat(length)||0);
+      if (parseInt(roofWaters) > 1 && tileType) {
+        let maxDim = Math.max(...surfaces.map(s => Math.max(parseFloat(s.d1)||0, parseFloat(s.d2)||0)));
         if (inputMethod === 'area') maxDim = Math.sqrt(roofArea);
         
         let ridgeTiles = 0;
@@ -234,19 +230,18 @@ export function RoofingCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
             </div>
           ) : (
             <>
-              <div className="input-group">
-                <label>Comprimento Externo (m)</label>
-                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 10" />
-              </div>
-              <div className="input-group">
-                <label>Largura Externa (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 5" />
-              </div>
+              <MultiSurfaceInput
+                surfaces={surfaces}
+                onChange={setSurfaces}
+                d1Label="Comprimento/Largura (m)"
+                d2Label="Comprimento/Extensão (m)"
+                title="Áreas do Telhado"
+              />
             </>
           )}
         </div>
       ),
-      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : (parseFloat(width) > 0 && parseFloat(length) > 0)
+      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : surfaces.every(s => parseFloat(s.d1) > 0 && parseFloat(s.d2) > 0)
     },
     inputMethod !== 'area' ? {
       id: 'eaves_ask',

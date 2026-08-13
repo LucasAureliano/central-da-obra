@@ -97,38 +97,33 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
   };
 
   return (
-    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', marginBottom: 4 }}>Funil Comercial</h1>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Gerencie seus orçamentos e serviços</p>
+    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: 1000 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', margin: 0, lineHeight: 1.2 }}>
+            Orçamentos
+          </h1>
+          <button 
+            onClick={() => onNavigate && onNavigate('novo-orcamento')}
+            className="btn-primary btn-3d"
+            style={{ borderRadius: 12, padding: '10px 16px', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)' }}
+          >
+            <Plus size={18} /> Novo Orçamento
+          </button>
         </div>
-        <button 
-          className="btn-primary" 
-          onClick={() => onNavigate && onNavigate('novo-orcamento')}
-          style={{ width: 48, height: 48, borderRadius: 24, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-        >
-          <Plus size={24} />
-        </button>
-      </div>
 
-      <div style={{ position: 'relative', marginBottom: 24 }}>
-        <Search size={20} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: 14 }} />
-        <input 
-          type="text" 
-          placeholder="Buscar por cliente ou serviço..." 
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          style={{ 
-            width: '100%', 
-            padding: '14px 16px 14px 48px', 
-            borderRadius: 16, 
-            border: '1px solid var(--border-light)', 
-            backgroundColor: 'var(--bg-elevated)', 
-            color: 'var(--text-main)',
-            fontSize: 15
-          }} 
-        />
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
+            <Search size={18} />
+          </div>
+          <input 
+            type="text"
+            placeholder="Buscar por cliente ou serviço..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            style={{ width: '100%', backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 16, padding: '16px 16px 16px 44px', fontSize: 15, color: 'var(--text-main)', outline: 'none', transition: 'border-color 0.2s' }}
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -152,7 +147,7 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 16, margin: '0 -20px', paddingLeft: 20, paddingRight: 20 }} className="hide-scrollbar">
+        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 16, margin: '0 -20px', paddingLeft: 20, paddingRight: 20, width: '100%', maxWidth: 1040 }} className="hide-scrollbar">
           {STATUSES.map(status => {
             const columnQuotes = quotes.filter(q => q.status === status && (q.client.toLowerCase().includes(filter.toLowerCase()) || q.service.toLowerCase().includes(filter.toLowerCase())));
             

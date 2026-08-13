@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
 import { Layers, Frame, Box, HardHat, Droplet, Info, Gauge } from 'lucide-react';
@@ -35,9 +36,7 @@ export function ConcreteMixCalc({ onBack, onNavigate }: { onBack: () => void, on
   
   const [volume, setVolume] = useState('');
   
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  const [thickness, setThickness] = useState('');
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '', d3: '' }]);
 
   const [fck, setFck] = useState<SelectOption | null>(null);
   
@@ -51,8 +50,8 @@ export function ConcreteMixCalc({ onBack, onNavigate }: { onBack: () => void, on
 
   const parsedVolume = useMemo(() => {
     if (inputMethod === 'volume') return parseFloat(volume) || 0;
-    return (parseFloat(width) || 0) * (parseFloat(length) || 0) * (parseFloat(thickness) || 0);
-  }, [inputMethod, volume, width, length, thickness]);
+    return surfaces.reduce((acc, s) => acc + (parseFloat(s.d1) || 0) * (parseFloat(s.d2) || 0) * (parseFloat(s.d3 || '') || 0), 0);
+  }, [inputMethod, volume, surfaces]);
 
   const calculateResults = () => {
     const baseVol = parsedVolume;
@@ -149,20 +148,7 @@ export function ConcreteMixCalc({ onBack, onNavigate }: { onBack: () => void, on
               <input type="number" className="input-premium" value={volume} onChange={e => setVolume(e.target.value)} placeholder="Ex: 5.5" />
             </div>
           ) : (
-            <>
-              <div className="input-group">
-                <label>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 10" />
-              </div>
-              <div className="input-group">
-                <label>Largura (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 0.15" />
-              </div>
-              <div className="input-group">
-                <label>Altura / Profundidade (m)</label>
-                <input type="number" className="input-premium" value={thickness} onChange={e => setThickness(e.target.value)} placeholder="Ex: 0.40" />
-              </div>
-            </>
+            <MultiSurfaceInput surfaces={surfaces} onChange={setSurfaces} d1Label="Largura (m)" d2Label="Comprimento (m)" d3Label="Altura / Profundidade (m)" title="Áreas de Concretagem" />
           )}
         </div>
       ),

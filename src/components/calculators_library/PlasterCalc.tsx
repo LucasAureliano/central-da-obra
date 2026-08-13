@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { Sparkles, Info } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
@@ -13,9 +14,7 @@ export function PlasterCalc({ onBack }: { onBack: () => void }) {
   const [target, setTarget] = useState('');
   const [inputMethod, setInputMethod] = useState('');
   const [area, setArea] = useState('');
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '' }]);
   // New States for Sanca and Lighting
   const [hasSanca, setHasSanca] = useState<boolean | null>(null);
   const [hasSpots, setHasSpots] = useState<boolean | null>(null);
@@ -33,7 +32,7 @@ export function PlasterCalc({ onBack }: { onBack: () => void }) {
     if (inputMethod === 'area') {
       baseArea = parseFloat(area) || 0;
     } else {
-      baseArea = (parseFloat(width) || 0) * (parseFloat(length) || 0);
+      baseArea = surfaces.reduce((acc, s) => acc + (parseFloat(s.d1) || 0) * (parseFloat(s.d2) || 0), 0);
     }
     return Math.max(0, baseArea);
   };
@@ -130,19 +129,12 @@ export function PlasterCalc({ onBack }: { onBack: () => void }) {
             </div>
           ) : (
             <>
-              <div className="input-group">
-                <label>Largura (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 3.5" />
-              </div>
-              <div className="input-group">
-                <label>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 4.5" />
-              </div>
-            </>
+                <MultiSurfaceInput surfaces={surfaces} onChange={setSurfaces} d1Label="Comprimento/Largura (m)" d2Label="Comprimento/Extensão (m)" />
+              </>
           )}
         </div>
       ),
-      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : (parseFloat(width) > 0 && parseFloat(length) > 0)
+      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : surfaces.every(s => parseFloat(s.d1) > 0 && parseFloat(s.d2) > 0)
     },
     {
       id: 'details_sanca',

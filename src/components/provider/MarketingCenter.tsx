@@ -41,10 +41,10 @@ export function MarketingCenter({ onBack }: { onBack: () => void }) {
     toast.success('Copy gerado com sucesso!');
   };
 
-  const averageRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : '5.0';
+  const averageRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : '0.0';
 
   return (
-    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px 20px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 24px 20px', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 24 }}>
         <button 
@@ -74,9 +74,9 @@ export function MarketingCenter({ onBack }: { onBack: () => void }) {
         {activeTab === 'reviews' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="glass-panel" style={{ padding: 24, borderRadius: 24, marginBottom: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <div style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-main)' }}>{averageRating}</div>
+              <div style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-main)' }}>{averageRating === '0.0' ? '-' : averageRating}</div>
               <div style={{ display: 'flex', gap: 4, color: '#F59E0B', marginBottom: 8 }}>
-                {[1,2,3,4,5].map(i => <Star key={i} size={20} fill={i <= parseFloat(averageRating) ? 'currentColor' : 'none'} />)}
+                {[1,2,3,4,5].map(i => <Star key={i} size={20} fill={i <= parseFloat(averageRating) && averageRating !== '0.0' ? 'currentColor' : 'none'} />)}
               </div>
               <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>{reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'}</div>
             </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { Puzzle, Plus, Trash2, X, Save, ArrowLeft } from 'lucide-react';
+import { Puzzle, Plus, Trash2, X, Save, ArrowLeft, Layers, History, Image as ImageIcon, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 
@@ -26,6 +26,7 @@ const DISCIPLINES = [
   'Hidrossanitário',
   'Elétrico',
   'Climatização (HVAC)',
+  'Automação',
   'Prevenção contra Incêndio (PPCI)'
 ];
 
@@ -40,6 +41,8 @@ export function ProjectCoordination({ onBack }: ProjectCoordinationProps) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClash, setEditingClash] = useState<ProjectClash | null>(null);
+  
+  const [activeTab, setActiveTab] = useState<'clashes' | 'overlay' | 'history'>('clashes');
 
   // Form states
   const [projectName, setProjectName] = useState('');
@@ -196,12 +199,36 @@ export function ProjectCoordination({ onBack }: ProjectCoordinationProps) {
           </div>
         </div>
 
-        <button onClick={openAddModal} className="btn-primary" style={{ padding: '8px 16px', borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button onClick={openAddModal} className="btn-primary" style={{ padding: '8px 16px', borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, opacity: activeTab === 'clashes' ? 1 : 0, pointerEvents: activeTab === 'clashes' ? 'auto' : 'none' }}>
           <Plus size={16} /> Novo Conflito
         </button>
       </div>
 
-      {/* Clashes List */}
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
+        {[
+          { id: 'clashes', label: 'Relatório de Clashes', icon: Puzzle },
+          { id: 'overlay', label: 'Sobreposição Visual', icon: Layers },
+          { id: 'history', label: 'Histórico de Revisões', icon: History }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            style={{
+              padding: '10px 16px', borderRadius: 20, fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6,
+              backgroundColor: activeTab === tab.id ? 'var(--color-primary)' : 'var(--bg-surface)',
+              color: activeTab === tab.id ? '#FFF' : 'var(--text-muted)',
+              border: activeTab === tab.id ? 'none' : '1px solid var(--border-subtle)', cursor: 'pointer'
+            }}
+          >
+            <tab.icon size={16} /> {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {activeTab === 'clashes' && (
+          <motion.div key="clashes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div className="skeleton-glass" style={{ height: 120, borderRadius: 20 }} />
@@ -256,6 +283,61 @@ export function ProjectCoordination({ onBack }: ProjectCoordinationProps) {
           ))}
         </div>
       )}
+          </motion.div>
+        )}
+
+        {activeTab === 'overlay' && (
+          <motion.div key="overlay" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <div className="glass-panel" style={{ padding: 24, borderRadius: 24, textAlign: 'center' }}>
+              <ImageIcon size={48} color="var(--text-muted)" style={{ margin: '0 auto 16px' }} />
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Sobreposição de Plantas 2D/3D</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24, maxWidth: 400, margin: '0 auto 24px' }}>
+                Ative e desative camadas das disciplinas (Arquitetura, Estrutural, Elétrico) para identificar colisões visuais antes da obra.
+              </p>
+              
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
+                {['Arquitetura', 'Estrutura', 'Hidráulica', 'Elétrica'].map((layer, idx) => (
+                  <div key={idx} style={{ padding: '8px 16px', borderRadius: 20, backgroundColor: idx < 2 ? 'var(--color-primary-alpha)' : 'var(--bg-elevated)', color: idx < 2 ? 'var(--color-primary)' : 'var(--text-muted)', border: `1px solid ${idx < 2 ? 'var(--color-primary)' : 'var(--border-subtle)'}`, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                    {idx < 2 && <CheckCircle2 size={14} />}
+                    Camada: {layer}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ width: '100%', height: 300, backgroundColor: '#1A1A1A', borderRadius: 16, border: '1px dashed var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222), linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222)', backgroundSize: '20px 20px', backgroundPosition: '0 0, 10px 10px', opacity: 0.2 }} />
+                <span style={{ fontSize: 14, color: 'var(--text-muted)', position: 'relative', zIndex: 1 }}>[ Visualizador BIM / DXF em Breve ]</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'history' && (
+          <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <div className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 20 }}>Revisões Estruturais e Atualizações</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {[
+                  { rev: 'Rev 03', date: 'Hoje, 10:30', desc: 'Alteração na locação dos pilares P12 e P14 devido a interferência com tubulação de esgoto.' },
+                  { rev: 'Rev 02', date: 'Há 2 dias', desc: 'Ajuste de pé-direito no pavimento térreo (arquitetura x estrutura).' },
+                  { rev: 'Rev 01', date: 'Há 1 semana', desc: 'Emissão inicial para compatibilização.' }
+                ].map((r, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 16, position: 'relative' }}>
+                    {i !== 2 && <div style={{ position: 'absolute', left: 19, top: 40, bottom: -20, width: 2, backgroundColor: 'var(--border-subtle)' }} />}
+                    <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 800, fontSize: 12 }}>
+                      {r.rev}
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>{r.date}</span>
+                      <p style={{ fontSize: 14, color: 'var(--text-main)', margin: '4px 0 0', lineHeight: 1.4 }}>{r.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Add Modal */}
       <AnimatePresence>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Home, ChevronDown, Star, DollarSign, ShoppingCart, ChevronRight, TrendingDown, Package, CheckCircle, ArrowRight } from 'lucide-react';
+import { Home, ChevronDown, Star, DollarSign, ShoppingCart, ChevronRight, TrendingDown, Package, CheckCircle, ArrowRight, Activity, X } from 'lucide-react';
 import { InsightsWidget } from './InsightsWidget';
 import { CalculatorsCentralWidget } from './CalculatorsCentralWidget';
 import { TipsWidget } from './TipsWidget';
@@ -11,9 +11,79 @@ import { PrimaryWorkSelector } from '../../ui/PrimaryWorkSelector';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
+// ─── Modal: Raio-X da Obra ────────────────────────────────────────────────────
+function RaioXModal({ isOpen, onClose, primaryWork, stagesInfo, budget, spent }: any) {
+  if (!isOpen) return null;
+
+  const balance = budget - spent;
+  
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="glass-panel"
+        style={{ position: 'relative', width: '100%', maxWidth: 400, borderRadius: 24, padding: 24, zIndex: 1 }}
+      >
+        <button onClick={onClose} style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <X size={20} />
+        </button>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+          <div style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Activity size={24} />
+          </div>
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-main)', margin: 0 }}>Raio-X da Obra</h2>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Diagnóstico instantâneo</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Diagnóstico Financeiro */}
+          <div style={{ padding: 14, borderRadius: 16, backgroundColor: 'var(--bg-elevated)', borderLeft: `4px solid ${balance >= 0 ? '#10B981' : '#EF4444'}` }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', display: 'block', marginBottom: 2 }}>
+              {balance >= 0 ? '🟢 Financeiro Saudável' : '🔴 Orçamento Ultrapassado'}
+            </span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              {balance >= 0 
+                ? `Você tem um saldo positivo de R$ ${balance.toLocaleString('pt-BR')} para concluir a obra.` 
+                : `Você ultrapassou o orçamento em R$ ${Math.abs(balance).toLocaleString('pt-BR')}.`}
+            </span>
+          </div>
+
+          {/* Diagnóstico de Cronograma */}
+          <div style={{ padding: 14, borderRadius: 16, backgroundColor: 'var(--bg-elevated)', borderLeft: `4px solid ${stagesInfo.nextStage ? '#F59E0B' : '#10B981'}` }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', display: 'block', marginBottom: 2 }}>
+              {stagesInfo.nextStage ? '🟡 Cronograma em Andamento' : '🟢 Cronograma Concluído'}
+            </span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              {stagesInfo.nextStage 
+                ? `A etapa atual é "${stagesInfo.nextStage}". Faltam ${stagesInfo.total - stagesInfo.completed} etapas.` 
+                : 'Todas as etapas cadastradas foram concluídas.'}
+            </span>
+          </div>
+
+          {/* Compras Pendentes (Mockado simples pro contexto atual) */}
+          <div style={{ padding: 14, borderRadius: 16, backgroundColor: 'var(--bg-elevated)', borderLeft: '4px solid #F59E0B' }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', display: 'block', marginBottom: 2 }}>
+              🟡 Compras
+            </span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              Existem compras pendentes de aprovação que podem impactar a próxima etapa.
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 // ─── Widget: Minha Obra Principal ──────────────────────────────────────────────
 function MinhaObraWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string) => void; primaryWork: Work }) {
   const [stagesInfo, setStagesInfo] = useState({ total: 0, completed: 0, nextStage: '' });
+  const [showRaioX, setShowRaioX] = useState(false);
 
   useEffect(() => {
     if (!primaryWork?.id) return;
@@ -122,14 +192,32 @@ function MinhaObraWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string
         </div>
 
         {/* CTA */}
-        <button
-          onClick={() => onNavigate('obras')}
-          className="btn-primary"
-          style={{ width: '100%', borderRadius: 12, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-        >
-          Abrir Obra <ArrowRight size={16} />
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => setShowRaioX(true)}
+            className="btn-secondary"
+            style={{ flex: 1, borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            <Activity size={16} /> Raio-X
+          </button>
+          <button
+            onClick={() => onNavigate('obras')}
+            className="btn-primary"
+            style={{ flex: 1, borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            Abrir Obra <ArrowRight size={16} />
+          </button>
+        </div>
       </div>
+
+      <RaioXModal 
+        isOpen={showRaioX} 
+        onClose={() => setShowRaioX(false)} 
+        primaryWork={primaryWork} 
+        stagesInfo={stagesInfo} 
+        budget={budget} 
+        spent={spent} 
+      />
     </motion.div>
   );
 }

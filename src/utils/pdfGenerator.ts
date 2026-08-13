@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import logoUrl from '/logo-centralobra.png?url';
 
 interface PDFExportParams {
   work: any;
@@ -8,47 +9,44 @@ interface PDFExportParams {
   profile?: any;
 }
 
-export function drawHeader(doc: jsPDF, userName: string, userEmail: string, workName?: string) {
+export function drawHeader(doc: jsPDF, userName: string, _userEmail: string, workName?: string, logoBase64?: string | null) {
   const pageWidth = doc.internal.pageSize.getWidth();
+  const centerX = pageWidth / 2;
 
-  doc.setFillColor(255, 107, 0);
-  doc.rect(0, 0, pageWidth, 70, 'F');
+  let currentY = 20;
 
-  doc.setFillColor(220, 80, 0);
-  doc.rect(0, 55, pageWidth, 15, 'F');
-
-  doc.setFillColor(255, 255, 255);
-  doc.roundedRect(20, 14, 42, 42, 8, 8, 'F');
-  doc.setFillColor(255, 107, 0);
-  doc.roundedRect(24, 18, 34, 34, 6, 6, 'F');
-  doc.setFillColor(255, 255, 255);
-  doc.rect(28, 38, 26, 4, 'F');
-  doc.roundedRect(31, 24, 20, 16, 4, 4, 'F');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.setTextColor(255, 255, 255);
-  doc.text('CentralObra', 72, 32);
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(255, 255, 255);
-  doc.text('Gestão inteligente de obras', 72, 46);
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(255, 255, 255);
-  const rightX = pageWidth - 20;
-  doc.text(userName || 'Usuário', rightX, 28, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(userEmail || '', rightX, 40, { align: 'right' });
-  if (workName) {
-    doc.text(`Obra: ${workName}`, rightX, 50, { align: 'right' });
-    doc.text(new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }), rightX, 60, { align: 'right' });
+  if (logoBase64) {
+    const imgWidth = 140;
+    const imgHeight = 50; 
+    doc.addImage(logoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
+    currentY += imgHeight + 20;
   } else {
-    doc.text(new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }), rightX, 50, { align: 'right' });
+    // Fallback: Ícone Dourado Centralizado
+    doc.setFillColor(212, 175, 55);
+    doc.rect(centerX - 16, currentY, 32, 32, 'F');
+    doc.setFillColor(255, 255, 255);
+    doc.rect(centerX - 12, currentY + 18, 24, 4, 'F');
+    doc.rect(centerX - 8, currentY + 8, 16, 12, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(26);
+    doc.setTextColor(17, 24, 39);
+    doc.text('CentralObra', centerX, currentY + 55, { align: 'center' });
+    currentY += 75;
   }
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(107, 114, 128);
+  doc.text(`Responsável: ${userName || 'Usuário'}`, centerX, currentY, { align: 'center' });
+  currentY += 15;
+  if (workName) {
+    doc.text(`Obra: ${workName}  |  Data: ${new Date().toLocaleDateString('pt-BR')}`, centerX, currentY, { align: 'center' });
+  } else {
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, centerX, currentY, { align: 'center' });
+  }
+
+  return currentY + 20;
 }
 
 export function drawFooter(doc: jsPDF) {
@@ -78,26 +76,28 @@ export function drawFooter(doc: jsPDF) {
   doc.text(`Página ${currentPage} de ${pageCount}`, pageWidth - 20, pageHeight - 26, { align: 'right' });
 }
 
-export function generateBudgetPDF({ work, user, calculations, profile }: PDFExportParams) {
+export async function generateBudgetPDF({ work, user, calculations, profile }: PDFExportParams) {
   const doc = new jsPDF('p', 'pt', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
+  const centerX = pageWidth / 2;
 
   const userName = profile?.name || user?.displayName || user?.email || 'Usuário';
   const userEmail = user?.email || '';
 
-  drawHeader(doc, userName, userEmail);
+  const logoBase64 = await fetchImageAsBase64(logoUrl);
+  let y = drawHeader(doc, userName, userEmail, work?.name, logoBase64);
 
-  let y = 95;
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(30, 30, 30);
-  doc.text('Orçamento de Obra', 40, y);
+  doc.setTextColor(17, 24, 39);
+  doc.text('Orçamento de Obra', centerX, y, { align: 'center' });
 
-  y += 8;
-  doc.setFillColor(255, 107, 0);
-  doc.rect(40, y, 80, 3, 'F');
+  y += 20;
+  doc.setDrawColor(229, 231, 235);
+  doc.setLineWidth(1);
+  doc.line(40, y, pageWidth - 40, y);
 
-  y += 22;
+  y += 20;
   doc.setFillColor(250, 250, 250);
   doc.roundedRect(30, y, pageWidth - 60, 90, 6, 6, 'F');
   doc.setDrawColor(230, 230, 230);
@@ -143,8 +143,7 @@ export function generateBudgetPDF({ work, user, calculations, profile }: PDFExpo
 
     if (y > 680) {
       doc.addPage();
-      drawHeader(doc, userName, userEmail);
-      y = 90;
+      y = drawHeader(doc, userName, userEmail, work?.name, logoBase64) + 20;
     }
 
     doc.setFontSize(14);
@@ -209,8 +208,7 @@ export function generateBudgetPDF({ work, user, calculations, profile }: PDFExpo
 
   if (y > 720) {
     doc.addPage();
-    drawHeader(doc, userName, userEmail);
-    y = 90;
+    y = drawHeader(doc, userName, userEmail, work?.name, logoBase64) + 20;
   }
 
   doc.setFillColor(255, 107, 0);
@@ -242,7 +240,24 @@ export function generateBudgetPDF({ work, user, calculations, profile }: PDFExpo
 // NOVO: Geração de PDF Comercial Profissional (Estilo Stripe/Linear)
 // --------------------------------------------------------------------------------------
 
-export function generateCommercialQuotePDF({
+const fetchImageAsBase64 = async (url: string): Promise<string | null> => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar imagem", error);
+    return null;
+  }
+};
+
+export async function generateCommercialQuotePDF({
   client,
   workData,
   services,
@@ -268,56 +283,89 @@ export function generateCommercialQuotePDF({
   const doc = new jsPDF('p', 'pt', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 40;
-
-  
   const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  // 1. Header Profissional (Branco / Minimalista)
-  // Draw CentralObra Logo
-  doc.setFillColor(255, 107, 0); // Orange
-  doc.roundedRect(margin, margin + 4, 24, 24, 4, 4, 'F');
-  doc.setFillColor(255, 255, 255);
-  doc.rect(margin + 5, margin + 17, 14, 2, 'F');
-  doc.roundedRect(margin + 7, margin + 10, 10, 8, 2, 2, 'F');
+  // 1. Header Profissional (Centralizado com tema Escuro/Dourado)
+  const centerX = pageWidth / 2;
 
+  let currentY = margin;
+
+  // Tenta carregar a logo oficial
+  const logoBase64 = await fetchImageAsBase64(logoUrl);
+  
+  if (logoBase64) {
+    // Desenha a imagem centralizada (Ex: 120x120 proporção)
+    const imgWidth = 140;
+    const imgHeight = 50; 
+    doc.addImage(logoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
+    currentY += imgHeight + 20;
+  } else {
+    // Fallback: Ícone de "Prédio/Casa" Dourado Centralizado
+    doc.setFillColor(212, 175, 55); // Dourado
+    doc.rect(centerX - 16, currentY, 32, 32, 'F');
+    doc.setFillColor(255, 255, 255);
+    doc.rect(centerX - 12, currentY + 18, 24, 4, 'F');
+    doc.rect(centerX - 8, currentY + 8, 16, 12, 'F');
+
+    // "CentralObra" App Name Abaixo do Logo
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(26);
+    doc.setTextColor(17, 24, 39); // Quase Preto
+    doc.text('CentralObra', centerX - 30, currentY + 55, { align: 'center' });
+    
+    // Ponto Laranja
+    doc.setFillColor(249, 115, 22); // Laranja
+    doc.rect(centerX + 40, currentY + 50, 4, 4, 'F');
+    currentY += 75;
+  }
+
+  // Proposta Comercial Title below it
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(24);
-  doc.setTextColor(17, 24, 39); // Gray 900
-  doc.text('PROPOSTA COMERCIAL', margin + 34, margin + 24);
+  doc.setFontSize(14);
+  doc.setTextColor(212, 175, 55); // Dourado
+  doc.text('PROPOSTA COMERCIAL', centerX, currentY, { align: 'center' });
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(107, 114, 128); // Gray 500
-  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, margin + 45);
-  doc.text(`Validade: ${conditions.validade || '15 dias'}`, margin, margin + 57);
+  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}  |  Validade: ${conditions.validade || '15 dias'}`, centerX, currentY + 13, { align: 'center' });
 
-  // Logo ou Nome da Empresa a direita
-  const rightAlign = pageWidth - margin;
+  currentY += 35;
+
+  // Informações do Prestador Centralizadas
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(17, 24, 39);
   const prestadorName = profile?.companyName || profile?.name || 'CentralObra Pro';
-  doc.text(prestadorName, rightAlign, margin + 20, { align: 'right' });
+  doc.text(prestadorName, centerX, currentY, { align: 'center' });
   
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(107, 114, 128);
-  let rightY = margin + 33;
-  if (profile?.documentNumber) { doc.text(`CPF/CNPJ: ${profile.documentNumber}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
-  if (profile?.registry) { doc.text(`Reg: ${profile.registry}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
-  if (profile?.whatsapp || profile?.phone) { doc.text(`Tel/Whats: ${profile.whatsapp || profile.phone}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
-  if (profile?.pixKey) { doc.text(`Chave PIX: ${profile.pixKey}`, rightAlign, rightY, { align: 'right' }); rightY += 12; }
-  if (profile?.email) { doc.text(profile.email, rightAlign, rightY, { align: 'right' }); rightY += 12; }
+  
+  let prestadorInfo: string[] = [];
+  if (profile?.documentNumber) prestadorInfo.push(`CPF/CNPJ: ${profile.documentNumber}`);
+  if (profile?.registry) prestadorInfo.push(`Reg: ${profile.registry}`);
+  if (profile?.whatsapp || profile?.phone) prestadorInfo.push(`Tel/Whats: ${profile.whatsapp || profile.phone}`);
+  if (profile?.pixKey) prestadorInfo.push(`PIX: ${profile.pixKey}`);
+  
+  if (prestadorInfo.length > 0) {
+    doc.text(prestadorInfo.join('  •  '), centerX, currentY + 12, { align: 'center' });
+  }
+  if (profile?.email) {
+    doc.text(profile.email, centerX, currentY + 22, { align: 'center' });
+  }
 
   // Divider
+  currentY += 35;
   doc.setDrawColor(229, 231, 235); // Gray 200
   doc.setLineWidth(1);
-  doc.line(margin, Math.max(margin + 65, rightY + 5), pageWidth - margin, Math.max(margin + 65, rightY + 5));
+  doc.line(margin, currentY, pageWidth - margin, currentY);
 
-  let currentY = margin + 95;
+  currentY += 20;
 
   // 2. Blocos de Cliente e Obra
-  // Cliente
+  // Cliente (Left)
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(156, 163, 175); // Gray 400
@@ -334,24 +382,24 @@ export function generateCommercialQuotePDF({
   if (client.phone) doc.text(client.phone, margin, currentY + 30);
   if (client.email) doc.text(client.email, margin, currentY + 44);
 
-  // Obra
-  const midX = pageWidth / 2;
+  // Obra (Right)
+  const rightX = pageWidth - margin;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(156, 163, 175);
-  doc.text('LOCAL DA OBRA', midX, currentY);
+  doc.text('LOCAL DA OBRA', rightX, currentY, { align: 'right' });
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(17, 24, 39);
-  doc.text(workData.name || 'Nome da Obra', midX, currentY + 16);
+  doc.text(workData.name || 'Nome da Obra', rightX, currentY + 16, { align: 'right' });
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(75, 85, 99);
-  if (workData.address) doc.text(workData.address, midX, currentY + 30);
+  if (workData.address) doc.text(workData.address, rightX, currentY + 30, { align: 'right' });
 
-  currentY += 80;
+  currentY += 70;
 
   // Função Helper para tabelas profissionais
   const drawMinimalTable = (title: string, head: string[][], body: any[][]) => {
@@ -360,7 +408,7 @@ export function generateCommercialQuotePDF({
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(17, 24, 39);
-    doc.text(title, margin, currentY);
+    doc.text(title, centerX, currentY, { align: 'center' });
     currentY += 10;
 
     autoTable(doc, {

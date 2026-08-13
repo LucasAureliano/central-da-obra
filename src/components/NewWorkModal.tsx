@@ -7,6 +7,7 @@ import { generateDefaultStages } from '../lib/ChecklistGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useWorks } from '../contexts/WorksContext';
+import { useGuestGuard } from '../hooks/useGuestGuard';
 
 interface NewWorkModalProps {
   isOpen: boolean;
@@ -47,10 +48,13 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
     setBudgetInput(formatted);
   };
 
+  const { requireAuth } = useGuestGuard();
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!requireAuth('criar uma nova obra')) return;
     if (!user || !name) return;
 
     setIsSubmitting(true);
@@ -70,11 +74,12 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
         progress: 0,
         image: null,
         colorTheme: randomColor,
+        roles: {},
         createdAt: serverTimestamp(),
       });
       
-      // Auto-generate default stages (Checklist)
-      const defaultStages = generateDefaultStages();
+      // Auto-generate default stages (Checklist) based on specialty
+      const defaultStages = generateDefaultStages(profile?.specialty);
       const batch = writeBatch(db);
       defaultStages.forEach(stage => {
         const stageRef = doc(collection(db, `works/${newWorkRef.id}/stages`));
@@ -96,9 +101,9 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
       setBudgetInput('');
       setDeadline('');
       toast.success('Obra criada com sucesso!');
-    } catch (error) {
-      console.error('Error adding document: ', error);
-      toast.error('Erro ao salvar a obra.');
+    } catch (error: any) {
+      console.error('Error saving work:', error);
+      toast.error(`Erro ao salvar a obra: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setIsSubmitting(false);
     }

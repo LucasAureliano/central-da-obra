@@ -12,7 +12,89 @@ export interface Stage {
   order: number;
 }
 
-export const generateDefaultStages = (): Stage[] => {
+export const generateDefaultStages = (specialty?: string | null): Stage[] => {
+  const spec = (specialty || '').toLowerCase();
+  
+  if (spec.includes('eletric') || spec.includes('elétrica')) {
+    return [
+      {
+        id: 'stage_1', title: 'Infraestrutura e Tubulação', order: 1,
+        tasks: [
+          { id: 't1_1', title: 'Corte de alvenaria e chumbação', isCompleted: false },
+          { id: 't1_2', title: 'Passagem de condutes', isCompleted: false },
+          { id: 't1_3', title: 'Fixação das caixinhas', isCompleted: false }
+        ]
+      },
+      {
+        id: 'stage_2', title: 'Fiação e Cabeamento', order: 2,
+        tasks: [
+          { id: 't2_1', title: 'Passagem de cabos de fora', isCompleted: false },
+          { id: 't2_2', title: 'Passagem de cabos de lógica/antena', isCompleted: false },
+          { id: 't2_3', title: 'Fechamento de emendas', isCompleted: false }
+        ]
+      },
+      {
+        id: 'stage_3', title: 'Acabamentos e Quadro', order: 3,
+        tasks: [
+          { id: 't3_1', title: 'Montagem do Quadro de Distribuição (QDC)', isCompleted: false },
+          { id: 't3_2', title: 'Instalação de tomadas e interruptores', isCompleted: false },
+          { id: 't3_3', title: 'Instalação de luminárias e testes', isCompleted: false }
+        ]
+      }
+    ];
+  }
+
+  if (spec.includes('encanador') || spec.includes('hidr')) {
+    return [
+      {
+        id: 'stage_1', title: 'Infraestrutura Hidráulica', order: 1,
+        tasks: [
+          { id: 't1_1', title: 'Rasgo na alvenaria', isCompleted: false },
+          { id: 't1_2', title: 'Tubulação de água fria e quente', isCompleted: false },
+          { id: 't1_3', title: 'Tubulação de esgoto', isCompleted: false }
+        ]
+      },
+      {
+        id: 'stage_2', title: 'Testes', order: 2,
+        tasks: [
+          { id: 't2_1', title: 'Teste de estanqueidade / pressurização', isCompleted: false },
+          { id: 't2_2', title: 'Fechamento da alvenaria', isCompleted: false }
+        ]
+      },
+      {
+        id: 'stage_3', title: 'Louças e Metais', order: 3,
+        tasks: [
+          { id: 't3_1', title: 'Instalação de vasos sanitários e pias', isCompleted: false },
+          { id: 't3_2', title: 'Instalação de torneiras e registros', isCompleted: false },
+          { id: 't3_3', title: 'Teste final de vazão', isCompleted: false }
+        ]
+      }
+    ];
+  }
+
+  if (spec.includes('pintor') || spec.includes('pintura')) {
+    return [
+      {
+        id: 'stage_1', title: 'Preparação', order: 1,
+        tasks: [
+          { id: 't1_1', title: 'Proteção de pisos e móveis', isCompleted: false },
+          { id: 't1_2', title: 'Lixamento das superfícies', isCompleted: false },
+          { id: 't1_3', title: 'Aplicação de massa corrida', isCompleted: false }
+        ]
+      },
+      {
+        id: 'stage_2', title: 'Fundo e Acabamento', order: 2,
+        tasks: [
+          { id: 't1_1', title: 'Lixamento da massa', isCompleted: false },
+          { id: 't1_2', title: 'Aplicação do fundo preparador/selador', isCompleted: false },
+          { id: 't1_3', title: 'Demãos de tinta', isCompleted: false },
+          { id: 't1_4', title: 'Limpeza pós-obra', isCompleted: false }
+        ]
+      }
+    ];
+  }
+
+  // Padrão para construção geral
   return [
     {
       id: 'stage_1',

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useWorks } from '../../contexts/WorksContext';
-import { ArrowLeft, MapPin, HardHat, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, MapPin, HardHat, CheckCircle2, LayoutDashboard, CalendarDays, Wallet, Truck, FileText, Image as ImageIcon, Users } from 'lucide-react';
 import { InteractiveSchedule } from '../owner/InteractiveSchedule';
 import { ProviderWorkFinance } from './ProviderWorkFinance';
 import { DocumentsView } from '../works/DocumentsView';
 import { ShareWorkView } from '../works/ShareWorkView';
 import { WorkDiary } from '../works/WorkDiary';
+import { SuppliersManager } from '../builder/SuppliersManager';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -17,7 +18,7 @@ interface ProviderWorkDashboardProps {
 }
 
 export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financeiro' | 'fotos' | 'connect' | 'anotacoes'>('resumo');
+  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financeiro' | 'fornecedores' | 'fotos' | 'connect' | 'anotacoes'>('resumo');
   const { works } = useWorks();
   const work = works.find(w => w.id === workId);
   const [serviceType, setServiceType] = useState(work?.providerServiceType || '');
@@ -37,7 +38,7 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
   if (!work) return null;
 
   return (
-    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px 20px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 24px 20px', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 24 }}>
@@ -65,25 +66,31 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
       </div>
 
       {/* Navigation Tabs */}
-      <div className="hide-scrollbar" style={{ display: 'flex', gap: 24, overflowX: 'auto', borderBottom: '1px solid var(--border-subtle)', marginBottom: 24, paddingBottom: 12 }}>
-        <button onClick={() => setActiveTab('resumo')} style={{ ...tabStyle(activeTab === 'resumo'), borderBottom: activeTab === 'resumo' ? '2px solid var(--color-primary)' : 'none' }}>
-          Resumo
-        </button>
-        <button onClick={() => setActiveTab('cronograma')} style={{ ...tabStyle(activeTab === 'cronograma'), borderBottom: activeTab === 'cronograma' ? '2px solid var(--color-primary)' : 'none' }}>
-          Cronograma
-        </button>
-        <button onClick={() => setActiveTab('financeiro')} style={{ ...tabStyle(activeTab === 'financeiro'), borderBottom: activeTab === 'financeiro' ? '2px solid var(--color-primary)' : 'none' }}>
-          Financeiro
-        </button>
-        <button onClick={() => setActiveTab('anotacoes')} style={{ ...tabStyle(activeTab === 'anotacoes'), borderBottom: activeTab === 'anotacoes' ? '2px solid var(--color-primary)' : 'none' }}>
-          Anotações
-        </button>
-        <button onClick={() => setActiveTab('fotos')} style={{ ...tabStyle(activeTab === 'fotos'), borderBottom: activeTab === 'fotos' ? '2px solid var(--color-primary)' : 'none' }}>
-          Galeria
-        </button>
-        <button onClick={() => setActiveTab('connect')} style={{ ...tabStyle(activeTab === 'connect'), borderBottom: activeTab === 'connect' ? '2px solid var(--color-primary)' : 'none' }}>
-          Connect
-        </button>
+      <div className="hide-scrollbar" style={{ display: 'flex', gap: 8, padding: '14px 20px', borderBottom: '1px solid var(--border-subtle)', overflowX: 'auto', marginBottom: 24 }}>
+        {[
+          { id: 'resumo', label: 'Resumo', icon: <LayoutDashboard size={14} /> },
+          { id: 'cronograma', label: 'Cronograma', icon: <CalendarDays size={14} /> },
+          { id: 'financeiro', label: 'Financeiro', icon: <Wallet size={14} /> },
+          { id: 'fornecedores', label: 'Fornecedores', icon: <Truck size={14} /> },
+          { id: 'anotacoes', label: 'Anotações', icon: <FileText size={14} /> },
+          { id: 'fotos', label: 'Galeria', icon: <ImageIcon size={14} /> },
+          { id: 'connect', label: 'Connect', icon: <Users size={14} /> }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: '7px 14px', borderRadius: 10, whiteSpace: 'nowrap',
+              border: activeTab === tab.id ? '1.5px solid var(--color-primary)' : '1px solid var(--border-subtle)',
+              backgroundColor: activeTab === tab.id ? 'var(--color-primary-alpha)' : 'transparent',
+              color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--text-muted)',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s'
+            }}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Tab Content */}
@@ -153,6 +160,12 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
           {activeTab === 'financeiro' && (
             <motion.div key="financeiro" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               <ProviderWorkFinance workId={workId} />
+            </motion.div>
+          )}
+
+          {activeTab === 'fornecedores' && (
+            <motion.div key="fornecedores" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+              <SuppliersManager onBack={() => setActiveTab('resumo')} />
             </motion.div>
           )}
 

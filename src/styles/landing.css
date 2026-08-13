@@ -1,11 +1,22 @@
 .landing-body {
   color: var(--text-main);
-  background-color: #000000 !important;
+  background: linear-gradient(135deg, #1e1e2d 0%, #08080b 100%), 
+              radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
+              radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.15), transparent 40%) !important;
+  background-size: 200% 200% !important;
+  animation: bgGradientMove 15s ease infinite alternate;
+  background-attachment: fixed !important;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+@keyframes bgGradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .landing-container {
@@ -568,7 +579,7 @@
   height: 100vh;
   z-index: 0;
   overflow: hidden;
-  background-color: #000000 !important;
+  background: radial-gradient(circle at top right, #1a1a24 0%, #080808 100%);
 }
 
 .shader-bg-wrapper {

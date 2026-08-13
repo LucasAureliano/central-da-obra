@@ -4,6 +4,15 @@ import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ClientPortalConnectModal } from './ClientPortalConnectModal';
+import { ProjectTechnicalJournal } from './ProjectTechnicalJournal';
+import { ProjectInspections } from './ProjectInspections';
+import { InteractiveSchedule } from '../owner/InteractiveSchedule';
+import { Finance } from '../Finance';
+import { DocumentsView } from '../works/DocumentsView';
+import { Shopping } from '../Shopping';
+import { ProjectPhotoGallery } from './ProjectPhotoGallery';
+import { BimCompatibilityView } from './BimCompatibilityView';
+import { ProjectReportsView } from './ProjectReportsView';
 
 interface ArchitectProjectDetailsProps {
   projectId: string;
@@ -11,7 +20,7 @@ interface ArchitectProjectDetailsProps {
 }
 
 export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectDetailsProps) {
-  const { user, isGuest } = useAuth();
+  const { user, profile, isGuest } = useAuth();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'cliente' | 'financeiro' | 'documentos' | 'vistorias' | 'diario' | 'fotos' | 'materiais' | 'compatibilizacao' | 'relatorios'>('resumo');
@@ -190,20 +199,8 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
         )}
 
         {activeTab === 'cronograma' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Etapas do Projeto</h3>
-            {project.phases && project.phases.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {project.phases.map((ph: any) => (
-                  <div key={ph.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, backgroundColor: 'var(--bg-elevated)', borderRadius: 12 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{ph.name}</span>
-                    <span className={ph.completed ? 'status-chip status-active' : 'status-chip'}>{ph.completed ? 'Concluído' : 'Pendente'}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Nenhuma etapa cadastrada.</p>
-            )}
+          <div style={{ marginLeft: -16, marginRight: -16 }}>
+            <InteractiveSchedule projectId={projectId} embedded={true} />
           </div>
         )}
 
@@ -218,59 +215,39 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
         )}
 
         {activeTab === 'financeiro' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Honorários & Custos de Projeto</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Gerencie medições de projeto e parcelas de contrato.</p>
+          <div style={{ marginLeft: -16, marginRight: -16 }}>
+            <Finance workId={project.id} embedded />
           </div>
         )}
 
         {activeTab === 'documentos' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Documentos & Pranchas PDF/DWG</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Armazene pranchas de projeto e memoriais descritivos.</p>
-          </div>
+          <DocumentsView workId={project.id} />
         )}
 
         {activeTab === 'vistorias' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Vistorias Técnicas da Obra</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Checklists e laudos de vistoria de campo vinculados.</p>
-          </div>
+          <ProjectInspections projectId={project.id} />
         )}
 
         {activeTab === 'diario' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Diário de Obra Técnico</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Acompanhamento diário com registros climáticos e de equipe.</p>
-          </div>
+          <ProjectTechnicalJournal projectId={project.id} />
         )}
 
         {activeTab === 'fotos' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Galeria de Fotos da Obra</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Registro fotográfico de evolução técnica.</p>
-          </div>
+          <ProjectPhotoGallery projectId={project.id} />
         )}
 
         {activeTab === 'materiais' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Especificação de Materiais</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Tabela de revestimentos, louças e acabamentos.</p>
+          <div style={{ marginLeft: -16, marginRight: -16 }}>
+            <Shopping workId={project.id} embedded />
           </div>
         )}
 
         {activeTab === 'compatibilizacao' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Compatibilização (BIM Clashes)</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Registro de interferências entre Arquitetura, Estrutura e Instalações.</p>
-          </div>
+          <BimCompatibilityView projectId={project.id} />
         )}
 
         {activeTab === 'relatorios' && (
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Relatórios e Laudos PDF</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Emissão de laudos com QR Code e assinatura profissional.</p>
-          </div>
+          <ProjectReportsView projectId={project.id} />
         )}
       </div>
 
@@ -278,8 +255,8 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
       <ClientPortalConnectModal
         isOpen={showConnectModal}
         onClose={() => setShowConnectModal(false)}
-        projectName={project.name}
-        clientName={project.client}
+        project={project}
+        providerProfile={profile}
       />
     </div>
   );

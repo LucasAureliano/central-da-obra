@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { ArrowLeft, MapPin, Calendar, DollarSign, Activity, Share2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, DollarSign, Activity, Share2, LayoutDashboard, CalendarDays, Wallet, Package, Calculator, FolderOpen, Users } from 'lucide-react';
 import { DocumentsView } from './works/DocumentsView';
 import { BudgetList } from './works/BudgetList';
 import { ShareWorkView } from './works/ShareWorkView';
@@ -152,43 +152,31 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       </div>
 
       {/* Tabs */}
-      <div className="hide-scrollbar" style={{ display: 'flex', gap: 16, padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
-        <button 
-          onClick={() => setActiveTab('resumo')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'resumo' ? 700 : 600, color: activeTab === 'resumo' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'resumo' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          Resumo
-        </button>
-        <button 
-          onClick={() => setActiveTab('cronograma')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'cronograma' ? 700 : 600, color: activeTab === 'cronograma' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'cronograma' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          Cronograma
-        </button>
-        <button 
-          onClick={() => setActiveTab('financas')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'financas' ? 700 : 600, color: activeTab === 'financas' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'financas' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          Finanças
-        </button>
-        <button 
-          onClick={() => setActiveTab('compras')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'compras' ? 700 : 600, color: activeTab === 'compras' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'compras' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          Materiais
-        </button>
-        <button 
-          onClick={() => setActiveTab('orcamento')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'orcamento' ? 700 : 600, color: activeTab === 'orcamento' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'orcamento' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          Orçamentos
-        </button>
-        <button 
-          onClick={() => setActiveTab('compartilhamento')}
-          style={{ background: 'none', border: 'none', fontSize: 14, fontWeight: activeTab === 'compartilhamento' ? 700 : 600, color: activeTab === 'compartilhamento' ? 'var(--color-primary)' : 'var(--text-muted)', borderBottom: activeTab === 'compartilhamento' ? '2px solid var(--color-primary)' : 'none', paddingBottom: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          Compartilhamento
-        </button>
+      <div className="hide-scrollbar" style={{ display: 'flex', gap: 8, padding: '14px 20px', borderBottom: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
+        {[
+          { id: 'resumo', label: 'Resumo', icon: <LayoutDashboard size={14} /> },
+          { id: 'cronograma', label: 'Cronograma', icon: <CalendarDays size={14} /> },
+          { id: 'financas', label: 'Finanças', icon: <Wallet size={14} /> },
+          { id: 'compras', label: 'Materiais', icon: <Package size={14} /> },
+          { id: 'orcamento', label: 'Orçamentos', icon: <Calculator size={14} /> },
+          { id: 'documentos', label: 'Documentos', icon: <FolderOpen size={14} /> },
+          { id: 'compartilhamento', label: 'Compartilhamento', icon: <Users size={14} /> }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: '7px 14px', borderRadius: 10, whiteSpace: 'nowrap',
+              border: activeTab === tab.id ? '1.5px solid var(--color-primary)' : '1px solid var(--border-subtle)',
+              backgroundColor: activeTab === tab.id ? 'var(--color-primary-alpha)' : 'transparent',
+              color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--text-muted)',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s'
+            }}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Content */}

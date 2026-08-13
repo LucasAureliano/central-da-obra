@@ -106,8 +106,8 @@ export function MinhaEmpresaWidget({ onNavigate }: { onNavigate: (tab: string) =
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.1 }}
-      className="card-mesh-gradient"
-      style={{ padding: 24, borderRadius: 24, marginBottom: 24 }}
+      className="card-mesh-gradient card-3d"
+      style={{ padding: 24, borderRadius: 24, marginBottom: 24, perspective: 1000 }}
     >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -151,28 +151,37 @@ export function MinhaEmpresaWidget({ onNavigate }: { onNavigate: (tab: string) =
       {/* Footer Quick Access Buttons */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         <button
-          onClick={() => onNavigate('novo-orcamento')}
-          style={{ padding: '12px 8px', background: '#FFF', color: 'var(--color-primary)', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: 'pointer', textAlign: 'center' }}
+          className="btn-3d"
+          onPointerDown={(e) => { e.stopPropagation(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate('novo-orcamento'); }}
+          style={{ padding: '12px 8px', background: '#FFF', color: 'var(--color-primary)', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: 'pointer', textAlign: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}
         >
           + Orçamento
         </button>
         <button
-          onClick={() => onNavigate('obras')}
-          style={{ padding: '12px 8px', background: '#FFF', color: 'var(--color-primary)', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: 'pointer', textAlign: 'center' }}
+          className="btn-3d"
+          onPointerDown={(e) => { e.stopPropagation(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate('obras'); }}
+          style={{ padding: '12px 8px', background: 'rgba(255,255,255,0.15)', color: '#FFF', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'center', backdropFilter: 'blur(10px)', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }}
         >
           Minhas Obras
         </button>
         <button
-          onClick={() => onNavigate('meus-servicos')}
-          style={{ padding: '12px 8px', background: 'rgba(255,255,255,0.15)', color: '#FFF', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center' }}
+          className="btn-3d"
+          onPointerDown={(e) => { e.stopPropagation(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate('catalogo-servicos'); }}
+          style={{ padding: '12px 8px', background: 'rgba(255,255,255,0.15)', color: '#FFF', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'center', backdropFilter: 'blur(10px)', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }}
         >
-          Serviços ({stats.activeServicesCount})
+          Meus Serviços
         </button>
         <button
-          onClick={() => onNavigate('catalogo-servicos')}
-          style={{ padding: '12px 8px', background: 'rgba(255,255,255,0.15)', color: '#FFF', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center' }}
+          className="btn-3d"
+          onPointerDown={(e) => { e.stopPropagation(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate('marketing'); }}
+          style={{ position: 'relative', padding: '12px 8px', background: 'rgba(255,255,255,0.15)', color: '#FFF', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'center', overflow: 'hidden', backdropFilter: 'blur(10px)', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }}
         >
-          Catálogo
+          Marketing
+          <div style={{ position: 'absolute', top: -4, right: -4, background: '#F43F5E', color: '#FFF', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 8, transform: 'rotate(12deg)', whiteSpace: 'nowrap', boxShadow: '0 2px 4px rgba(244,63,94,0.4)' }}>NOVO</div>
         </button>
       </div>
     </motion.div>

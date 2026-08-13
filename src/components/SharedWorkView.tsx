@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Briefcase, MapPin, Calendar, CheckCircle2, Circle, User, Phone, Mail } from 'lucide-react';
 import { CustomLogo } from './CustomLogo';
@@ -21,25 +21,15 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
         }
         
         const linkData = snap.docs[0].data();
-        const docRef = doc(db, 'works', linkData.workId);
-        const docSnap = await getDoc(docRef);
         
-        if (docSnap.exists()) {
-          const workData = { id: docSnap.id, ...docSnap.data() } as any;
-          setWork(workData);
-          
-          if (workData.userId) {
-            try {
-              const profileSnap = await getDoc(doc(db, 'users', workData.userId, 'business_profile', 'main'));
-              if (profileSnap.exists()) {
-                setProviderProfile(profileSnap.data());
-              }
-            } catch (e) {
-              console.error('Error fetching provider profile', e);
-            }
-          }
+        if (linkData.workData) {
+          setWork({ id: linkData.workId, ...linkData.workData });
         } else {
-          setErrorMsg('Obra não encontrada.');
+          setErrorMsg('Dados da obra indisponíveis.');
+        }
+
+        if (linkData.providerProfile) {
+          setProviderProfile(linkData.providerProfile);
         }
       } catch (err) {
         console.error(err);
@@ -170,35 +160,35 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
           </div>
         </div>
 
-          {providerProfile && (
-            <div className="card-premium" style={{ marginTop: 24, padding: 24 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <User size={24} />
-                </div>
-                <div>
-                  <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
-                    {providerProfile.companyName || providerProfile.legalName || 'Profissional / Empresa'}
-                  </h2>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Responsável pela execução/serviços</p>
-                </div>
+        {providerProfile && (
+          <div className="card-premium" style={{ marginTop: 24, padding: 24 }}>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <User size={24} />
               </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
-                {providerProfile.phone && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-main)' }}>
-                    <Phone size={16} color="var(--text-muted)" /> {providerProfile.phone}
-                  </div>
-                )}
-                {providerProfile.email && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-main)' }}>
-                    <Mail size={16} color="var(--text-muted)" /> {providerProfile.email}
-                  </div>
-                )}
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+                  {providerProfile.companyName || providerProfile.legalName || 'Profissional / Empresa'}
+                </h2>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Responsável pela execução/serviços</p>
               </div>
             </div>
-          )}
-        </main>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+              {providerProfile.phone && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-main)' }}>
+                  <Phone size={16} color="var(--text-muted)" /> {providerProfile.phone}
+                </div>
+              )}
+              {providerProfile.email && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-main)' }}>
+                  <Mail size={16} color="var(--text-muted)" /> {providerProfile.email}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

@@ -28,6 +28,7 @@ export const ClientsManager: React.FC = () => {
     phone: '',
     whatsapp: '',
     address: '',
+    documentNumber: '',
     notes: '',
     photoUrl: '',
     nextVisit: '',
@@ -58,6 +59,7 @@ export const ClientsManager: React.FC = () => {
           phone: data.phone || '',
           whatsapp: data.whatsapp || data.phone || '',
           address: data.address || '',
+          documentNumber: data.documentNumber || '',
           notes: data.notes || '',
           photoUrl: data.photoUrl || '',
           lastVisit: data.lastVisit || '-',
@@ -88,7 +90,7 @@ export const ClientsManager: React.FC = () => {
       return;
     }
     setEditingClient(null);
-    setFormData({ name: '', email: '', phone: '', whatsapp: '', address: '', notes: '', photoUrl: '', nextVisit: '' });
+    setFormData({ name: '', email: '', phone: '', whatsapp: '', address: '', documentNumber: '', notes: '', photoUrl: '', nextVisit: '' });
     setIsModalOpen(true);
   };
 
@@ -104,6 +106,7 @@ export const ClientsManager: React.FC = () => {
       email: client.email || '',
       phone: client.phone || '',
       whatsapp: client.whatsapp || client.phone || '',
+      documentNumber: client.documentNumber || '',
       address: client.address || '',
       notes: client.notes || '',
       photoUrl: client.photoUrl || '',
@@ -128,6 +131,7 @@ export const ClientsManager: React.FC = () => {
           phone: formData.phone,
           whatsapp: formData.whatsapp || formData.phone,
           address: formData.address,
+          documentNumber: formData.documentNumber,
           notes: formData.notes,
           photoUrl: formData.photoUrl,
           nextVisit: formData.nextVisit,
@@ -141,6 +145,7 @@ export const ClientsManager: React.FC = () => {
           phone: formData.phone,
           whatsapp: formData.whatsapp || formData.phone,
           address: formData.address,
+          documentNumber: formData.documentNumber,
           notes: formData.notes,
           photoUrl: formData.photoUrl,
           nextVisit: formData.nextVisit,
@@ -338,9 +343,15 @@ export const ClientsManager: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>E-mail</label>
-                  <input type="email" className="input-premium" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="joao@email.com" />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>E-mail</label>
+                    <input type="email" className="input-premium" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="joao@email.com" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>CPF/CNPJ</label>
+                    <input type="text" className="input-premium" value={formData.documentNumber} onChange={e => setFormData({...formData, documentNumber: e.target.value})} placeholder="000.000.000-00" />
+                  </div>
                 </div>
 
                 <div>

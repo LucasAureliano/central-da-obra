@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,6 +15,18 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase App Check if Site Key is provided
+if (typeof window !== 'undefined' && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+  // @ts-ignore - Setting debug token for local development
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.DEV ? true : false;
+  
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true
+  });
+}
+
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);

@@ -5,6 +5,7 @@ import './index.css';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { AuthModalProvider } from './contexts/AuthModalContext.tsx';
 import { WorksProvider } from './contexts/WorksContext.tsx';
+import { BuilderProvider } from './contexts/BuilderContext.tsx';
 
 // Optional: register the PWA service worker automatically
 if ('serviceWorker' in navigator) {
@@ -21,7 +22,9 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       <AuthModalProvider>
         <WorksProvider>
-          <App />
+          <BuilderProvider>
+            <App />
+          </BuilderProvider>
         </WorksProvider>
       </AuthModalProvider>
     </AuthProvider>

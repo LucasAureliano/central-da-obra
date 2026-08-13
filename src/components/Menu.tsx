@@ -38,6 +38,7 @@ import {
   Wrench,
   Link,
   ShieldCheck,
+  ShieldAlert,
   Calculator,
   HelpCircle
 } from 'lucide-react';
@@ -172,8 +173,17 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             <div>
               <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{userName}</h3>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                <ShieldCheck size={13} color="#8B5CF6" />
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#8B5CF6' }}>CAU / CREA Verificado</span>
+                {profile?.creaCau ? (
+                  <>
+                    <ShieldCheck size={13} color="#8B5CF6" />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#8B5CF6' }}>CAU / CREA Verificado</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldAlert size={13} color="var(--text-muted)" />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>CAU / CREA Não Informado</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

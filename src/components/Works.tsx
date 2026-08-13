@@ -129,7 +129,7 @@ export function Works({ onWorkSelect }: WorksProps) {
   };
 
   return (
-    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 0 20px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 24px 20px', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>

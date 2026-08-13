@@ -2,41 +2,184 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to read and write their own profile and shopping lists
+    
+    // ==========================================
+    // FUNÇÕES AUXILIARES E DE SEGURANÇA (RBAC)
+    // ==========================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isWorkOwner(workData) {
+      return isOwner(workData.userId);
+    }
+    
+    function getWorkRole(workId) {
+      // Retorna a role ('owner', 'manager', 'editor', 'viewer') armazenada no dicionário roles do documento da obra
+      let workDoc = get(/databases/$(database)/documents/works/$(workId));
+      return workDoc.data.get('roles', {}).get(request.auth.uid, null);
+    }
+
+    function hasWorkAccess(workId) {
+      let workDoc = get(/databases/$(database)/documents/works/$(workId));
+      // É dono diretamente, ou está no dicionário de roles.
+      return isOwner(workDoc.data.userId) || getWorkRole(workId) != null;
+    }
+
+    function hasWorkWriteAccess(workId) {
+      let workDoc = get(/databases/$(database)/documents/works/$(workId));
+      let role = getWorkRole(workId);
+      return isOwner(workDoc.data.userId) || role == 'owner' || role == 'manager' || role == 'editor';
+    }
+
+    function hasWorkManagerAccess(workId) {
+      let workDoc = get(/databases/$(database)/documents/works/$(workId));
+      let role = getWorkRole(workId);
+      return isOwner(workDoc.data.userId) || role == 'owner' || role == 'manager';
+    }
+
+    // ==========================================
+    // REGRAS DE USUÁRIOS E PERFIL
+    // ==========================================
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isOwner(userId) || (isAuthenticated() && request.query.limit <= 10); // Permitir buscar perfil público
+      allow write: if isOwner(userId);
       
       match /shopping/{itemId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
     }
 
-    // Allow users to read and write their own works
+    // ==========================================
+    // REGRAS DE OBRAS (WORKS) E ISOLAMENTO (TENANCY)
+    // ==========================================
     match /works/{workId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Para criar a obra, a pessoa deve ser a dona (request.resource.data.userId == request.auth.uid)
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
       
-      // Allow users to read and write calculations inside their works
-      match /calculations/{calcId} {
-        allow read, write: if request.auth != null && get(/databases/$(database)/documents/works/$(workId)).data.userId == request.auth.uid;
-      }
+      // Para ler a obra, deve ser o dono primário ou ter uma role designada.
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || resource.data.get('roles', {}).keys().hasAny([request.auth.uid]));
+      
+      // Para atualizar a obra, deve ser dono, manager ou editor.
+      allow update: if isAuthenticated() && (request.auth.uid == resource.data.userId || resource.data.get('roles', {}).get(request.auth.uid, '') in ['owner', 'manager', 'editor']);
+      
+      // Somente o dono primário ou owner podem excluir a obra
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.userId || resource.data.get('roles', {}).get(request.auth.uid, '') == 'owner');
 
-      // Allow users to read and write expenses inside their works
+      // ==========================================
+      // SUB-COLEÇÕES DAS OBRAS
+      // ==========================================
+
+      // Despesas e Custos (Proteção Financeira)
       match /expenses/{expenseId} {
-        allow read, write: if request.auth != null && get(/databases/$(database)/documents/works/$(workId)).data.userId == request.auth.uid;
+        // Todos com acesso a obra podem ler despesas
+        allow read: if hasWorkAccess(workId);
+        // Apenas Editores ou superiores podem escrever
+        allow write: if hasWorkWriteAccess(workId);
+      }
+
+      match /procurements/{procId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+
+      match /employees/{employeeId} {
+        allow read: if hasWorkAccess(workId);
+        // Gerenciamento de equipe exige nível Manager
+        allow write: if hasWorkManagerAccess(workId);
+      }
+      
+      match /equipments/{equipId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkManagerAccess(workId);
+      }
+
+      match /suppliers/{supplierId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+      
+      match /quotes/{quoteId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+      
+      match /schedule/{scheduleId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+
+      match /stages/{stageId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+
+      match /schedule_stages/{stageId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+
+      match /documents/{docId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+      
+      match /reports/{reportId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+      
+      match /daily_logs/{logId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
       }
     }
 
-    // Generic calculations collection
-    match /calculations/{calcId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    // ==========================================
+    // PROJETOS (ARQUITETURA) E SUB-COLEÇÕES
+    // ==========================================
+    match /projects/{projectId} {
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
+
+      match /inspections/{inspectionId} {
+        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+      }
+
+      match /journal/{journalId} {
+        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+      }
     }
 
-    // Feedbacks collection (Users can create, only admin/owner can read - for now anyone authenticated can create)
+    // ==========================================
+    // CÁLCULOS E ORÇAMENTOS INDEPENDENTES
+    // ==========================================
+    match /calculations/{calcId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
+    }
+
+    // ==========================================
+    // FEEDBACK E RELATÓRIOS DO SISTEMA
+    // ==========================================
     match /feedbacks/{feedbackId} {
-      allow create: if request.auth != null;
-      allow read: if false; // Only accessible via Firebase Console for now
+      allow create: if isAuthenticated();
+      allow read, update, delete: if false; // Somente leitura pelo console do Firebase
+    }
+    // ==========================================
+    // LINKS COMPARTILHADOS (PORTAL DO CLIENTE)
+    // ==========================================
+    match /shared_links/{linkId} {
+      // Qualquer um pode ler um link pelo token para acessar a obra (a query fará filtro pelo token)
+      allow read: if true;
+      // Somente autenticados (profissionais) podem gerar links
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
     }
   }
 }

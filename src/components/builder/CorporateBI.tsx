@@ -1,88 +1,221 @@
-import { Activity, Target, BarChart3, ArrowLeft } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { BarChart2, PieChart, Activity, Download, Filter, Target, ArrowLeft } from 'lucide-react';
+import { useWorks } from '../../contexts/WorksContext';
+import { useBuilder } from '../../contexts/BuilderContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { generateCorporateReportPDF } from '../../lib/CorporateReportPDF';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, LineChart, Line, ComposedChart } from 'recharts';
 
 export function CorporateBI({ onBack }: { onBack?: () => void }) {
+  const { works, isLoadingWorks } = useWorks();
+  const { employees, equipments } = useBuilder();
+  const { profile } = useAuth();
 
-  // Curva S Mock Data points for Physical vs Financial
-  const sCurvePoints = [
-    { month: 'Jan', physical: 8, financial: 10 },
-    { month: 'Fev', physical: 18, financial: 22 },
-    { month: 'Mar', physical: 32, financial: 35 },
-    { month: 'Abr', physical: 48, financial: 45 },
-    { month: 'Mai', physical: 65, financial: 60 },
-    { month: 'Jun', physical: 82, financial: 78 },
-  ];
+  const handleExportPDF = async () => {
+    const totalBudget = works.reduce((acc, w) => acc + (w.budget || 0), 0);
+    const totalSpent = works.reduce((acc, w) => acc + (w.spent || 0), 0);
+    const delayedWorks = works.filter(w => w.status === 'Atrasada').length;
+    const activeWorks = works.filter(w => w.status === 'Em Andamento').length;
+
+    await generateCorporateReportPDF({
+      builderName: profile?.name || 'Construtora',
+      totalWorks: works.length,
+      activeWorks,
+      delayedWorks,
+      totalBudget,
+      totalSpent,
+      activeEmployees: employees.filter(e => e.status === 'Ativo').length,
+      equipmentInUse: equipments.filter(eq => eq.status === 'Em Uso').length,
+      worksDetails: works
+    });
+  };
+
+  // Dynamic Curva S (Avanço Físico)
+  // Baseado no progresso médio das obras ativas
+  const curvaSData = useMemo(() => {
+    if (works.length === 0) return [];
+    
+    // Simulate S-Curve based on actual average progress vs expected
+    const avgProgress = works.reduce((acc, w) => acc + (w.progress || 0), 0) / works.length;
+    // Expected progress could be calculated based on start/end dates if available
+    // For now, we project a standard S-curve reaching the current average progress
+    const now = new Date();
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const currentMonthIndex = now.getMonth();
+    
+    const data = [];
+    for (let i = 5; i >= 0; i--) {
+      let monthIdx = currentMonthIndex - i;
+      if (monthIdx < 0) monthIdx += 12;
+      
+      const factor = 1 - (i * 0.2); // Simple linear approach for the last 6 months
+      
+      data.push({
+        name: months[monthIdx],
+        Previsto: Math.min(100, Math.round((avgProgress + 10) * factor)),
+        Realizado: Math.round(avgProgress * factor)
+      });
+    }
+    return data;
+  }, [works]);
+
+  const profitByWorkData = works.map(w => ({
+    name: w.name,
+    Receita: w.budget || 0,
+    Custo: w.spent || 0,
+    Lucro: (w.budget || 0) - (w.spent || 0),
+    Margem: w.budget ? (((w.budget - (w.spent || 0)) / w.budget) * 100).toFixed(1) : 0
+  }));
+
+  const globalStatus = {
+    totalWorks: works.length,
+    delayedWorks: works.filter(w => w.status === 'Atrasada').length,
+    totalBudget: works.reduce((acc, w) => acc + (w.budget || 0), 0),
+    totalSpent: works.reduce((acc, w) => acc + (w.spent || 0), 0)
+  };
 
   return (
-    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px 20px' }}>
-      
-      {/* Top Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+    <div className="page-container" style={{ paddingBottom: 100 }}>
+      <header className="page-header" style={{ marginBottom: 24, padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {onBack && (
-            <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', padding: 0 }}>
-              <ArrowLeft size={20} />
+            <button onClick={onBack} className="back-button">
+              <ArrowLeft size={24} />
             </button>
           )}
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Indicadores BI & Curva S</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '2px 0 0' }}>Dashboards analíticos de avanço físico vs financeiro corporativo</p>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <BarChart2 size={28} color="#8B5CF6" />
+              Indicadores BI
+            </h1>
+            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 14 }}>Business Intelligence e Curva S</p>
           </div>
         </div>
-      </div>
-
-      {/* 1. CURVA S DE PROGRESSO */}
-      <div className="glass-panel" style={{ padding: 22, borderRadius: 24, marginBottom: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Activity size={18} color="#8B5CF6" /> Curva S Executiva (Avanço Físico x Financeiro)
-            </h3>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Média acumulada de todas as obras ativas</span>
-          </div>
-
-          <div style={{ display: 'flex', gap: 12, fontSize: 11, fontWeight: 700 }}>
-            <span style={{ color: '#8B5CF6', display: 'flex', alignItems: 'center', gap: 4 }}>● Físico (%)</span>
-            <span style={{ color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 4 }}>● Financeiro (%)</span>
-          </div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={handleExportPDF} className="btn-primary" style={{ padding: '8px 16px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 8, height: 40 }}>
+            <Download size={18} />
+            Exportar Relatório
+          </button>
         </div>
+      </header>
 
-        {/* Visual S-Curve Bar Chart */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: 160, paddingTop: 20, borderBottom: '1px solid var(--border-subtle)' }}>
-          {sCurvePoints.map(pt => (
-            <div key={pt.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: 4 }}>
-              <div style={{ width: '60%', display: 'flex', gap: 3, alignItems: 'flex-end', height: '80%' }}>
-                {/* Physical Bar */}
-                <div style={{ flex: 1, height: `${pt.physical}%`, backgroundColor: '#8B5CF6', borderRadius: '4px 4px 0 0' }} />
-                {/* Financial Bar */}
-                <div style={{ flex: 1, height: `${pt.financial}%`, backgroundColor: '#F59E0B', borderRadius: '4px 4px 0 0' }} />
+      {isLoadingWorks ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+          <div className="loading-spinner" />
+        </div>
+      ) : (
+        <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+          {/* Main KPIs */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Activity size={16} color="#3B82F6" /> SPI (Schedule Performance Index)
               </div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>{pt.month}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
-          Avanço Físico Atual: <strong style={{ color: '#8B5CF6' }}>82%</strong> • Desembolso Financeiro: <strong style={{ color: '#F59E0B' }}>78%</strong> (Obra no prazo e dentro do custo)
-        </div>
-      </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-main)' }}>
+                {(() => {
+                   let totalEV = 0;
+                   let totalPV = 0;
+                   works.forEach(w => {
+                     const ev = (w.budget || 0) * (w.progress || 0) / 100;
+                     let pv = ev;
+                     if (w.createdAt && w.deadline) {
+                       const start = w.createdAt.toDate ? w.createdAt.toDate() : new Date(w.createdAt);
+                       const end = new Date(w.deadline);
+                       const now = new Date();
+                       const totalDays = (end.getTime() - start.getTime()) || 1;
+                       const passedDays = Math.max(0, Math.min(totalDays, now.getTime() - start.getTime()));
+                       pv = (w.budget || 0) * (passedDays / totalDays);
+                     }
+                     totalEV += ev;
+                     totalPV += pv;
+                   });
+                   if (totalPV === 0) return '1.00';
+                   return (totalEV / totalPV).toFixed(2);
+                })()}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Cronograma vs Previsto (Ideal = 1.0)</div>
+            </motion.div>
 
-      {/* 2. PRODUTIVIDADE E COMPRAS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-        <div className="glass-panel" style={{ padding: 18, borderRadius: 20 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Target size={16} color="#10B981" /> Produtividade de Campo
-          </h4>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#10B981', display: 'block' }}>94.2%</span>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Cumprimento de metas semanais de cronograma</span>
-        </div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Target size={16} color="#10B981" /> CPI (Cost Performance Index)
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-main)' }}>
+                {(() => {
+                   let totalEV = 0;
+                   let totalAC = 0;
+                   works.forEach(w => {
+                     totalEV += (w.budget || 0) * (w.progress || 0) / 100;
+                     totalAC += (w.spent || 0);
+                   });
+                   if (totalAC === 0) return '1.00';
+                   return (totalEV / totalAC).toFixed(2);
+                })()}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Custo vs Valor Agregado (Ideal &gt; 1.0)</div>
+            </motion.div>
 
-        <div className="glass-panel" style={{ padding: 18, borderRadius: 20 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <BarChart3 size={16} color="#3B82F6" /> Eficiência de Suprimentos
-          </h4>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#3B82F6', display: 'block' }}>91.5%</span>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Compras entregues dentro do prazo previsto</span>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-panel" style={{ padding: 20, borderRadius: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <PieChart size={16} color="#F59E0B" /> Atraso Geral
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-main)' }}>
+                  {globalStatus.totalWorks > 0 ? Math.round((globalStatus.delayedWorks / globalStatus.totalWorks) * 100) : 0}%
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Obras da carteira atrasadas</div>
+            </motion.div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
+            {/* Curva S */}
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 20 }}>Curva S Agregada (Avanço Físico %)</h3>
+              <div style={{ height: 320, width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={curvaSData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-subtle)', borderRadius: 12, color: 'var(--text-main)' }}
+                    />
+                    <Legend iconType="circle" />
+                    <Line type="monotone" dataKey="Previsto" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} strokeDasharray="5 5" />
+                    <Line type="monotone" dataKey="Realizado" stroke="#10B981" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Margem de Lucro por Obra */}
+          {profitByWorkData.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 20 }}>Margem Líquida por Obra</h3>
+              <div style={{ height: 350, width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={profitByWorkData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis yAxisId="left" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$${val/1000}k`} />
+                    <YAxis yAxisId="right" orientation="right" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-subtle)', borderRadius: 12, color: 'var(--text-main)' }}
+                    />
+                    <Legend />
+                    <Bar yAxisId="left" dataKey="Lucro" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    <Line yAxisId="right" type="monotone" dataKey="Margem" stroke="#8B5CF6" strokeWidth={3} dot={{ r: 4 }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+          )}
+
         </div>
-      </div>
+      )}
     </div>
   );
 }

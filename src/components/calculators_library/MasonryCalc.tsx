@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
 import { Grid, Info, Plus, Trash2, Box, Boxes, Layers } from 'lucide-react';
@@ -27,9 +28,7 @@ export function MasonryCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
   const [inputMethod, setInputMethod] = useState('');
   
   const [area, setArea] = useState('');
-  const [width, setWidth] = useState('');
-  const [height, setHeight] = useState('');
-
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '' }]);
   const [hasOpenings, setHasOpenings] = useState<boolean | null>(null);
   const [openings, setOpenings] = useState<{ id: string; w: string; h: string; q: string }[]>([]);
 
@@ -44,8 +43,8 @@ export function MasonryCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
 
   const parsedBaseArea = useMemo(() => {
     if (inputMethod === 'area') return parseFloat(area) || 0;
-    return (parseFloat(width) || 0) * (parseFloat(height) || 0);
-  }, [inputMethod, area, width, height]);
+    return surfaces.reduce((acc, s) => acc + (parseFloat(s.d1) || 0) * (parseFloat(s.d2) || 0), 0);
+  }, [inputMethod, area, surfaces]);
 
   const openingsArea = useMemo(() => {
     if (!hasOpenings) return 0;
@@ -172,15 +171,8 @@ export function MasonryCalc({ onBack, onNavigate }: { onBack: () => void, onNavi
             </div>
           ) : (
             <>
-              <div className="input-group">
-                <label>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 5.0" />
-              </div>
-              <div className="input-group">
-                <label>Altura (m)</label>
-                <input type="number" className="input-premium" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ex: 2.8" />
-              </div>
-            </>
+                <MultiSurfaceInput surfaces={surfaces} onChange={setSurfaces} d1Label="Comprimento/Largura (m)" d2Label="Altura (m)" />
+              </>
           )}
         </div>
       ),

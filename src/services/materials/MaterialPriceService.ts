@@ -1,4 +1,4 @@
-
+import { auth } from '../../lib/firebase';
 export interface MaterialPrice {
   id: string;
   name: string;
@@ -35,8 +35,22 @@ class MaterialPriceService {
     }
 
     try {
+      let token = '';
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          token = await user.getIdToken();
+        }
+      } catch (e) {
+        console.warn('Could not get auth token for prices API');
+      }
+
       // Usamos a URL absoluta para funcionar no localhost sem proxy do Vite e evitar Vercel Protection em previews
-      const response = await fetch(`https://centralobra-black.vercel.app/api/prices?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://centralobra-black.vercel.app/api/prices?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Falha ao buscar preços: ' + response.status);
@@ -108,7 +122,20 @@ class MaterialPriceService {
 
     // Busca os que faltaram
     try {
-      const response = await fetch(`https://centralobra-black.vercel.app/api/prices?materials=${encodeURIComponent(missingQueries.join(','))}`);
+      let token = '';
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          token = await user.getIdToken();
+        }
+      } catch (e) {}
+
+      const response = await fetch(`https://centralobra-black.vercel.app/api/prices?materials=${encodeURIComponent(missingQueries.join(','))}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
       if (response.ok) {
         const result = await response.json();
         const data = result.data || {};

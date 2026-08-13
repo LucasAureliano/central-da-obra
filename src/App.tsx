@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2026 CentralObra. All rights reserved.
+ * PROPRIETARY AND CONFIDENTIAL
+ * This software and its documentation are proprietary to CentralObra.
+ */
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardRouter } from './components/DashboardRouter';
@@ -40,7 +45,7 @@ import { ServicesManager } from './components/provider/ServicesManager';
 import { ReceiptsManager } from './components/provider/ReceiptsManager';
 import { ProfessionalFinance } from './components/provider/ProfessionalFinance';
 import { AppSettings } from './components/AppSettings';
-import { ArchitecturalTrends } from './components/owner/ArchitecturalTrends';
+import { InteriorDesignStudio } from './components/architect/InteriorDesignStudio';
 import { InteractiveSchedule } from './components/owner/InteractiveSchedule';
 import { TeamManagement } from './components/TeamManagement';
 import { Agenda } from './components/Agenda';
@@ -55,11 +60,19 @@ import { ProjectCoordination } from './components/architect/ProjectCoordination'
 import { ExecutiveTimeline } from './components/builder/ExecutiveTimeline';
 import { EquipmentControl } from './components/builder/EquipmentControl';
 import { OperationsHR } from './components/builder/OperationsHR';
+import { BuilderOperationsCenter } from './components/builder/BuilderOperationsCenter';
+import { BuilderWorks } from './components/builder/BuilderWorks';
+import { BuilderTeams } from './components/builder/BuilderTeams';
+import { BuilderSuppliers } from './components/builder/BuilderSuppliers';
+import { BuilderEquipment } from './components/builder/BuilderEquipment';
+import { BuilderProcurement } from './components/builder/BuilderProcurement';
+import { BuilderCorporateFinance } from './components/builder/BuilderCorporateFinance';
 import { QuoteWizard } from './components/provider/QuoteWizard';
 import { SmartAssistant } from './components/assistant/SmartAssistant';
 import { OwnerWorkDetails } from './components/owner/OwnerWorkDetails';
 import { MarketingCenter } from './components/provider/MarketingCenter';
 import { ReviewPublicPage } from './components/provider/ReviewPublicPage';
+import { AppLayout, AuthModals } from './components/layout';
 
 function App() {
   const { user, profile, loading, isGuest } = useAuth();
@@ -266,7 +279,7 @@ function App() {
     }
 
     if (title === 'Tendências') {
-      setActiveTab('tendencias');
+      setActiveTab('studio-interiores');
       return;
     }
     if (title === 'nova-despesa') {
@@ -277,7 +290,7 @@ function App() {
       setActiveTab('projeto-luminotecnico');
       return;
     }
-    if (title === 'Controle de Projetos') {
+    if (title === 'Controle de Projetos' || title === 'Projetos' || title === 'projetos') {
       setActiveTab('controle-projetos');
       return;
     }
@@ -395,7 +408,14 @@ function App() {
 
     switch(activeTab) {
       case 'inicio': return <DashboardRouter key="inicio" onNavigate={handleNavigate} />;
-      case 'obras': return <Works key="obras" onWorkSelect={(id) => setSelectedWorkId(id)} />;
+      case 'obras': 
+        if (activeRole === 'architect' || activeRole === 'engineer') {
+          return <ProjectControl key="projetos" />;
+        }
+        if (activeRole === 'builder') {
+          return <BuilderWorks key="obras" onWorkSelect={(id) => setSelectedWorkId(id)} />;
+        }
+        return <Works key="obras" onWorkSelect={(id) => setSelectedWorkId(id)} />;
       case 'assistente': return <SmartAssistant key="assistente" onNavigate={handleNavigate} />;
       case 'ferramentas': return <CalculatorsWizard key="ferramentas" onNavigate={handleNavigate} initialQuery={activeWizardQuery || undefined} />;
       case 'calculos': return <CalculatorsWizard key="calculos" onNavigate={handleNavigate} initialQuery={activeWizardQuery || undefined} />;
@@ -404,11 +424,16 @@ function App() {
       case 'central-tecnica': return <TechnicalCentral key="central" onNavigate={handleNavigate} initialArticleId={activeArticleId || undefined} />;
       case 'relatorios': return <Reports key="relatorios" />;
       case 'compras': return <Shopping key="compras" />;
-      case 'orcamentos': return activeRole === 'service' ? <CommercialQuotes key="orcamentos" /> : <PlaceholderScreen key="orcamentos" title="Orçamentos" onBack={() => handleNavigate('inicio')} />;
+      case 'centro-compras':
+        if (activeRole === 'builder') {
+          return <BuilderProcurement key="centro-compras" onBack={() => handleNavigate('inicio')} />;
+        }
+        return <Shopping key="centro-compras" />;
+      case 'orcamentos': return activeRole === 'service' ? <CommercialQuotes key="orcamentos" onNavigate={handleNavigate} /> : <PlaceholderScreen key="orcamentos" title="Orçamentos" onBack={() => handleNavigate('inicio')} />;
       case 'clientes': return <ClientsManager key="clientes" />;
       case 'agenda-completa': return <Agenda key="agenda" />;
       case 'controle-projetos': return <ProjectControl key="projetos" />;
-      case 'tendencias': return <ArchitecturalTrends key="tendencias" onBack={() => handleNavigate('inicio')} />;
+      case 'studio-interiores': return <InteriorDesignStudio key="studio-interiores" onBack={() => handleNavigate('inicio')} />;
       case 'projeto-luminotecnico': return <LightingDesignEngine key="luminotecnico" onBack={() => handleNavigate('inicio')} />;
       case 'acompanhamento-obras': return <SiteVisitsManager key="acompanhamento" onBack={() => handleNavigate('inicio')} />;
       case 'compatibilizacao': return <ProjectCoordination key="compatibilizacao" onBack={() => handleNavigate('inicio')} />;
@@ -416,10 +441,19 @@ function App() {
       case 'vistorias': return <Inspections key="vistorias" />;
       case 'documentos-tecnicos': return <Documents key="documentos-tecnicos" />;
       case 'cronograma-medicoes': return activeRole === 'owner' ? <InteractiveSchedule key="cronograma-owner" onBack={() => handleNavigate('inicio')} /> : <Schedule key="cronograma-medicoes" />;
+      case 'centro-operacoes': 
+        if (activeRole === 'builder') {
+          return <BuilderOperationsCenter key="centro-operacoes" onBack={() => handleNavigate('inicio')} />;
+        }
+        return <ProjectControl key="projetos" />;
       case 'cronograma-geral': return activeRole === 'owner' ? <InteractiveSchedule key="cronograma-geral" onBack={() => handleNavigate('inicio')} /> : <ExecutiveTimeline key="cronograma" />;
       case 'cronograma': return <InteractiveSchedule key="cronograma-interactive" onBack={() => handleNavigate('inicio')} />;
-      case 'equipamentos': return <EquipmentControl key="equipamentos" onBack={() => handleNavigate('inicio')} />;
-      case 'rh-produtividade': return <OperationsHR key="rh" onBack={() => handleNavigate('inicio')} />;
+      case 'equipamentos': 
+        if (activeRole === 'builder') return <BuilderEquipment key="equipamentos" onBack={() => handleNavigate('inicio')} />;
+        return <EquipmentControl key="equipamentos" onBack={() => handleNavigate('inicio')} />;
+      case 'rh-produtividade': 
+        if (activeRole === 'builder') return <BuilderTeams key="rh" onBack={() => handleNavigate('inicio')} />;
+        return <OperationsHR key="rh" onBack={() => handleNavigate('inicio')} />;
       case 'novo-orcamento': return <QuoteWizard key="novo-orcamento" onFinish={() => setActiveTab('orcamentos')} />;
       case 'catalogo-servicos': return <ServicesCatalog key="catalogo" onBack={() => handleNavigate('inicio')} />;
       case 'meus-servicos': return <ServicesManager key="meus-servicos" onBack={() => handleNavigate('inicio')} />;
@@ -427,9 +461,16 @@ function App() {
       case 'nova-despesa': return <Finance key="nova-despesa" initialShowAddModal={true} onBack={() => handleNavigate('inicio')} />;
       case 'marketing': return <MarketingCenter key="marketing" onBack={() => handleNavigate('inicio')} />;
       case 'financeiro-profissional': return <ProfessionalFinance key="fin-pro" onBack={() => handleNavigate('inicio')} />;
-      case 'financeiro': return activeRole === 'service' ? <ProfessionalFinance key="financeiro-pro" onBack={() => handleNavigate('inicio')} /> : <Finance key="financeiro" initialShowAddModal={false} onBack={() => handleNavigate('inicio')} />;
+      case 'financeiro': 
+        if (activeRole === 'builder') {
+          return <BuilderCorporateFinance key="financeiro" onBack={() => handleNavigate('inicio')} />;
+        }
+        return activeRole === 'service' ? <ProfessionalFinance key="financeiro-pro" onBack={() => handleNavigate('inicio')} /> : <Finance key="financeiro" initialShowAddModal={false} onBack={() => handleNavigate('inicio')} />;
       case 'perfil': return <Profile key="perfil" />;
-      case 'equipe': return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;
+      case 'fornecedores': return <BuilderSuppliers key="fornecedores" onBack={() => handleNavigate('inicio')} />;
+      case 'equipe': 
+        if (activeRole === 'builder') return <BuilderTeams key="equipe" onBack={() => handleNavigate('menu')} />;
+        return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;
       case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
       case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => handleNavigate('menu')} />;
@@ -445,257 +486,22 @@ function App() {
             <PortalProvider>
               <div className="app-container">
                 <CustomToaster />
-      
-      {/* Desktop Sidebar Navigation */}
-      <aside className="sidebar-nav glass-panel">
-        <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border-subtle)', marginBottom: 16 }}>
-          <CustomLogo theme={theme} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 16px' }}>
-          <button 
-            className={`nav-item-desktop ${activeTab === 'inicio' ? 'active' : ''}`}
-            onClick={() => setActiveTab('inicio')}
-          >
-            <Home size={20} />
-            <span>Início</span>
-          </button>
-          
-          <button 
-            className={`nav-item-desktop ${activeTab === 'obras' ? 'active' : ''}`}
-            onClick={() => setActiveTab('obras')}
-          >
-            <Briefcase size={20} />
-            <span>Obras</span>
-          </button>
-
-          <button 
-            className={`nav-item-desktop ${activeTab === 'assistente' ? 'active' : ''}`}
-            onClick={() => setActiveTab('assistente')}
-          >
-            <Sparkles size={20} />
-            <span>Assistente</span>
-          </button>
-          
-          {activeRole === 'owner' ? (
-            <button 
-              className={`nav-item-desktop ${activeTab === 'calculos' ? 'active' : ''}`}
-              onClick={() => setActiveTab('calculos')}
-            >
-              <Calculator size={20} />
-              <span>Cálculos</span>
-            </button>
-          ) : (
-            <button 
-              className={`nav-item-desktop ${activeTab === 'agenda-completa' ? 'active' : ''}`}
-              onClick={() => setActiveTab('agenda-completa')}
-            >
-              <Calendar size={20} />
-              <span>Agenda</span>
-            </button>
-          )}
-
-          <button 
-            className={`nav-item-desktop ${activeTab === 'menu' ? 'active' : ''}`}
-            onClick={() => setActiveTab('menu')}
-          >
-            <MenuIcon size={20} />
-            <span>Menu</span>
-          </button>
-        </div>
-        <div style={{ flex: 1 }} />
-        <div style={{ padding: 20, borderTop: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ 
-            width: 32, 
-            height: 32, 
-            borderRadius: 16, 
-            backgroundColor: user ? 'var(--color-primary)' : 'var(--bg-glass)',
-            color: user ? '#FFF' : 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            fontSize: 14,
-            border: '1px solid var(--border-subtle)'
-          }}>
-            {user && user.email ? user.email[0].toUpperCase() : 'U'}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{user ? 'Minha Conta' : 'Visitante'}</span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{user ? user.email : 'Faça login para salvar'}</span>
-          </div>
-        </div>
-      </aside>
-
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
-        <GlobalHeader 
-          theme={theme} 
-          toggleTheme={toggleTheme} 
-          onOpenMenu={() => setActiveTab('menu')} 
-        />
-
-        {/* Main Content Area */}
-        <main className="main-content hide-scrollbar">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 15, scale: 0.98, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, scale: 0.98, filter: 'blur(4px)' }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ minHeight: '100%' }}
-            >
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </div>
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="bottom-nav glass-panel">
-        <button 
-          className={`nav-item ${activeTab === 'inicio' ? 'active' : ''}`}
-          onClick={() => setActiveTab('inicio')}
-        >
-          <div className="nav-icon-container">
-            <Home size={22} />
-          </div>
-          <span>Início</span>
-        </button>
-        
-        <button 
-          className={`nav-item ${activeTab === 'obras' ? 'active' : ''}`}
-          onClick={() => setActiveTab('obras')}
-        >
-          <div className="nav-icon-container">
-            <Briefcase size={22} />
-          </div>
-          <span>Obras</span>
-        </button>
-
-        <button 
-          className={`nav-item highlight-nav ${activeTab === 'assistente' ? 'active' : ''}`}
-          onClick={() => setActiveTab('assistente')}
-        >
-          <div className="nav-icon-container">
-            <Sparkles size={22} />
-          </div>
-          <span>Assistente</span>
-        </button>
-
-        {activeRole === 'owner' ? (
-          <button 
-            className={`nav-item ${activeTab === 'calculos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('calculos')}
-          >
-            <div className="nav-icon-container">
-              <Calculator size={22} />
-            </div>
-            <span>Cálculos</span>
-          </button>
-        ) : (
-          <button 
-            className={`nav-item ${activeTab === 'agenda-completa' ? 'active' : ''}`}
-            onClick={() => setActiveTab('agenda-completa')}
-          >
-            <div className="nav-icon-container">
-              <Calendar size={22} />
-            </div>
-            <span>Agenda</span>
-          </button>
-        )}
-
-        <button 
-          className={`nav-item ${activeTab === 'menu' ? 'active' : ''}`}
-          onClick={() => setActiveTab('menu')}
-        >
-          <div className="nav-icon-container">
-            <MenuIcon size={22} />
-          </div>
-          <span>Menu</span>
-        </button>
-      </nav>
-
-      {/* Auth Modal Overlay for Logged-in/Guest inside app */}
-      <AnimatePresence>
-        {showAuthModal && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
-            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <div className="glass-panel animate-fade-in" style={{ width: '90%', maxWidth: 400, borderRadius: 24, overflow: 'hidden', position: 'relative' }}>
-              <button 
-                onClick={closeAuthModal}
-                style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.1)', border: 'none', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', cursor: 'pointer', zIndex: 10 }}
-              >
-                <X size={18} />
-              </button>
-              {authView === 'login' ? <Login onGoToRegister={() => setAuthView('register')} theme={theme} /> : <Register onGoToLogin={() => setAuthView('login')} theme={theme} />}
-            </div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Guest Alert Modal */}
-      <AnimatePresence>
-        {showGuestAlert && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
-            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
-          }}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-panel"
-              style={{ width: '100%', maxWidth: 400, padding: 24, borderRadius: 24, position: 'relative' }}
-            >
-              <button 
-                onClick={closeGuestAlert}
-                style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
-              >
-                <X size={24} />
-              </button>
-              
-              <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                <LogIn size={24} />
-              </div>
-
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
-                Modo Visitante Limitado
-              </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.5, marginBottom: 24 }}>
-                Você está utilizando a plataforma como visitante. Para salvar projetos, obras e orçamentos de forma definitiva, você precisa criar uma conta gratuita.
-                <br /><br />
-                Deseja criar uma conta ou fazer login agora para ter acesso total?
-              </p>
-              
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button 
-                  onClick={closeGuestAlert}
-                  className="btn-secondary"
-                  style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600 }}
+                <AppLayout 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab} 
+                  theme={theme} 
+                  toggleTheme={toggleTheme} 
+                  user={user} 
+                  activeRole={activeRole as string}
                 >
-                  Continuar
-                </button>
-                <button 
-                  onClick={() => {
-                    closeGuestAlert();
-                    setAuthView('login');
-                    openAuthModal();
-                  }}
-                  className="btn-primary"
-                  style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600 }}
-                >
-                  Fazer Login
-                </button>
+                  {renderContent()}
+                </AppLayout>
+                <AuthModals 
+                  theme={theme} 
+                  authView={authView} 
+                  setAuthView={setAuthView} 
+                />
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
             </PortalProvider>
           </AssistantProvider>
         </MapsProvider>

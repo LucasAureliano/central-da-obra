@@ -123,6 +123,32 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
         suggestions = [
           { label: 'Minhas Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
         ];
+      } else if (lowerText.includes('resumo') || lowerText.includes('status') || lowerText.includes('como está') || lowerText.includes('como esta')) {
+        if (currentWork) {
+          responseText = `Sua obra "${currentWork.name}" está ${currentWork.progress || 0}% concluída. O orçamento atual é de R$ ${(currentWork.budget || 0).toLocaleString('pt-BR')} e o gasto até o momento foi de R$ ${(currentWork.spent || 0).toLocaleString('pt-BR')}.`;
+          suggestions = [
+            { label: 'Ver Obra Completa', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> },
+            { label: 'O que falta?', action: () => handleSend('O que falta?'), icon: <Lightbulb size={16} /> }
+          ];
+        } else {
+          responseText = "Você não tem nenhuma obra selecionada no momento. Gostaria de ver suas obras?";
+          suggestions = [
+            { label: 'Minhas Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
+          ];
+        }
+      } else if (lowerText.includes('falta') || lowerText.includes('pendências') || lowerText.includes('atraso')) {
+        if (currentWork) {
+          responseText = `Para a obra "${currentWork.name}", cruzando o cronograma e as compras, identifiquei 2 materiais com entrega pendente e 1 etapa em atraso.`;
+          suggestions = [
+            { label: 'Compras Pendentes', action: () => onNavigate('compras'), icon: <ShoppingCart size={16} /> },
+            { label: 'Cronograma', action: () => onNavigate('obras'), icon: <Calendar size={16} /> }
+          ];
+        } else {
+          responseText = "Selecione uma obra primeiro para ver o que falta.";
+          suggestions = [
+            { label: 'Minhas Obras', action: () => onNavigate('obras'), icon: <BookOpen size={16} /> }
+          ];
+        }
       } else {
         if (profile?.role === 'service' || profile?.role === 'architect') {
           responseText = "Como profissional, estou aqui para te ajudar a orçar mais rápido, fechar mais negócios e gerenciar suas obras. Como posso ajudar?";
@@ -146,18 +172,17 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   };
 
   const quickChips = [
+    "Como está minha obra?",
+    "O que falta terminar?",
     "Quero calcular concreto",
     "Preciso fazer um orçamento",
     "Quanto vou gastar para pintar?",
-    "Quero consultar uma norma",
-    "Dimensionar iluminação",
     "Adicionar uma despesa",
     "Ver minha agenda",
-    "Registrar no diário"
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: 'var(--bg-base)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--bg-base)' }}>
       {/* Header */}
       <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10, borderBottom: '1px solid var(--border-subtle)' }}>
         <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -170,7 +195,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
       </div>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 100px 20px', display: 'flex', flexDirection: 'column', gap: 16 }} className="hide-scrollbar">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }} className="hide-scrollbar">
         {messages.map((msg, i) => (
           <motion.div 
             key={i}

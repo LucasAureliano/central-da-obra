@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { Layers, FilePlus, X, Info } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
@@ -13,9 +14,7 @@ export function DrywallCalc({ onBack }: { onBack: () => void }) {
   const [target, setTarget] = useState('parede');
   const [inputMethod, setInputMethod] = useState('');
   const [area, setArea] = useState('');
-  const [width, setWidth] = useState('');
-  const [height, setHeight] = useState('');
-  
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '' }]);
   const [hasOpenings, setHasOpenings] = useState<boolean | null>(null);
   const [openings, setOpenings] = useState([{ w: '', h: '', qty: '1' }]);
   
@@ -40,7 +39,7 @@ export function DrywallCalc({ onBack }: { onBack: () => void }) {
     if (inputMethod === 'area') {
       baseArea = parseFloat(area) || 0;
     } else {
-      baseArea = (parseFloat(width) || 0) * (parseFloat(height) || 0);
+      baseArea = surfaces.reduce((acc, s) => acc + (parseFloat(s.d1) || 0) * (parseFloat(s.d2) || 0), 0);
     }
     return baseArea;
   };
@@ -182,19 +181,12 @@ export function DrywallCalc({ onBack }: { onBack: () => void }) {
             </div>
           ) : (
             <>
-              <div className="input-group">
-                <label>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 4.5" />
-              </div>
-              <div className="input-group">
-                <label>Altura (m)</label>
-                <input type="number" className="input-premium" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ex: 2.8" />
-              </div>
-            </>
+                <MultiSurfaceInput surfaces={surfaces} onChange={setSurfaces} d1Label="Comprimento/Largura (m)" d2Label="Altura (m)" />
+              </>
           )}
         </div>
       ),
-      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : (parseFloat(width) > 0 && parseFloat(height) > 0)
+      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : surfaces.every(s => parseFloat(s.d1) > 0 && parseFloat(s.d2) > 0)
     },
     {
       id: 'openings_ask',

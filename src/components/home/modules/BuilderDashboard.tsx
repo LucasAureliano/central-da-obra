@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ShoppingCart, Users, DollarSign, BarChart3, ChevronRight, MapPin } from 'lucide-react';
+import { ShoppingCart, Users, DollarSign, BarChart3, ChevronRight, MapPin, Calendar } from 'lucide-react';
 import { InsightsWidget } from './InsightsWidget';
 import { WorksManagementWidget } from './WorksManagementWidget';
 import { LibraryWidget } from './LibraryWidget';
@@ -186,6 +186,42 @@ function BIWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
   );
 }
 
+// ─── Widget inline: Agenda Corporativa ─────────────────────────────────────────
+function CorporateScheduleWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.27 }}
+      className="glass-panel"
+      style={{ padding: 20, borderRadius: 24, marginBottom: 24 }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+          <Calendar size={18} color="#EAB308" />
+          Agenda Corporativa
+        </h3>
+        <button
+          onClick={() => onNavigate('agenda-completa')}
+          style={{ background: 'none', border: 'none', color: '#EAB308', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+        >
+          Eventos Globais <ChevronRight size={14} />
+        </button>
+      </div>
+
+      <div style={{ padding: 14, backgroundColor: 'var(--bg-elevated)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Reuniões, Concretagens e Compras</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cronograma executivo</span>
+        </div>
+        <button onClick={() => onNavigate('agenda-completa')} className="btn-primary" style={{ padding: '8px 14px', borderRadius: 10, fontSize: 12 }}>
+          Abrir Agenda
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Dashboard principal da Construtora ───────────────────────────────────────
 export function BuilderDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const DEFAULT_ORDER = [
@@ -194,6 +230,7 @@ export function BuilderDashboard({ onNavigate }: { onNavigate: (tab: string) => 
     'financeiro',
     'equipes',
     'compras',
+    'agenda',
     'biblioteca',
     'indicadores',
     'dicas'
@@ -205,6 +242,7 @@ export function BuilderDashboard({ onNavigate }: { onNavigate: (tab: string) => 
     financeiro:  'Financeiro Corporativo',
     equipes:     'Equipes',
     compras:     'Centro de Compras',
+    agenda:      'Agenda Corporativa',
     biblioteca:  'Biblioteca Técnica',
     indicadores: 'Indicadores BI',
     dicas:       'Dicas',
@@ -212,14 +250,15 @@ export function BuilderDashboard({ onNavigate }: { onNavigate: (tab: string) => 
 
   const renderWidget = (id: string) => {
     switch (id) {
-      case 'operacoes':   return <OperationsCenterWidget onNavigate={onNavigate} />;
-      case 'obras':       return <WorksManagementWidget onNavigate={onNavigate} />;
-      case 'financeiro':  return <CorporateFinanceWidget onNavigate={onNavigate} />;
-      case 'equipes':     return <TeamsWidget onNavigate={onNavigate} />;
-      case 'compras':     return <ProcurementWidget onNavigate={onNavigate} />;
-      case 'biblioteca':  return <LibraryWidget onNavigate={onNavigate} />;
-      case 'indicadores': return <BIWidget onNavigate={onNavigate} />;
-      case 'dicas':       return <TipsWidget onNavigate={onNavigate} />;
+      case 'operacoes':   return <OperationsCenterWidget onNavigate={onNavigate} key="operacoes" />;
+      case 'obras':       return <WorksManagementWidget onNavigate={onNavigate} key="obras" />;
+      case 'financeiro':  return <CorporateFinanceWidget onNavigate={onNavigate} key="financeiro" />;
+      case 'equipes':     return <TeamsWidget onNavigate={onNavigate} key="equipes" />;
+      case 'compras':     return <ProcurementWidget onNavigate={onNavigate} key="compras" />;
+      case 'agenda':      return <CorporateScheduleWidget onNavigate={onNavigate} key="agenda" />;
+      case 'biblioteca':  return <LibraryWidget onNavigate={onNavigate} key="biblioteca" />;
+      case 'indicadores': return <BIWidget onNavigate={onNavigate} key="indicadores" />;
+      case 'dicas':       return <TipsWidget onNavigate={onNavigate} key="dicas" />;
       default:            return null;
     }
   };

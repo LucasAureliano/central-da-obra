@@ -18,25 +18,40 @@ export interface AssistantResponse {
 }
 
 class AssistantService {
-  /**
-   * Envia uma mensagem para a inteligência artificial.
-   * Utilizará fallback mockado se a API KEY não estiver configurada.
-   */
   async sendMessage(query: AssistantQuery): Promise<AssistantResponse> {
-    const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY;
-
-    if (!GEMINI_KEY) {
-      // Mock inteligente com atraso para simular rede
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return this.mockResponse(query.text);
-    }
-
     try {
-      // Aqui ficaria a chamada real para o Gemini via apiClient
-      // Exemplo:
-      // return await apiClient.post('/api/gemini/chat', query);
+      const { auth } = await import('../../lib/firebase');
+      const user = auth.currentUser;
       
-      throw new Error('API Real ainda não implementada no backend. Usando mock.');
+      let token = '';
+      if (user) {
+        token = await user.getIdToken();
+      }
+
+      const response = await fetch('/api/copilot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: query.text }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API retornou status ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        answer: data.reply || 'Não foi possível obter uma resposta.',
+        suggestions: [
+          { label: 'Central de Cálculos', actionKey: 'calculos' },
+          { label: 'Novo Orçamento', actionKey: 'novo-orcamento' }
+        ]
+      };
     } catch (err) {
       console.warn('[AssistantService] Falha na API real, usando fallback mock.', err);
       return this.mockResponse(query.text);

@@ -22,9 +22,12 @@ interface ArchitecturalProject {
   progress: number;
   phases: ProjectPhase[];
   deadline: string;
+  startDate?: string;
   builtArea?: number;
   coverUrl?: string;
   status?: string;
+  responsible?: string;
+  notes?: string;
 }
 
 const DEFAULT_PHASES = [
@@ -46,7 +49,7 @@ export const ProjectControl: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', client: '', type: 'Residencial', deadline: '', builtArea: '' });
+  const [formData, setFormData] = useState({ name: '', client: '', type: 'Residencial', deadline: '', startDate: '', builtArea: '', responsible: '', notes: '' });
 
   useEffect(() => {
     if (user && !isGuest) {
@@ -84,9 +87,12 @@ export const ProjectControl: React.FC = () => {
           progress: data.progress || 0,
           phases: data.phases || DEFAULT_PHASES,
           deadline: data.deadline || '',
+          startDate: data.startDate || '',
           builtArea: data.builtArea || 0,
           status: data.status || 'Em Estudo',
           coverUrl: data.coverUrl || '',
+          responsible: data.responsible || '',
+          notes: data.notes || '',
         });
       });
       setProjects(loaded);
@@ -113,8 +119,11 @@ export const ProjectControl: React.FC = () => {
         progress: 0,
         phases: DEFAULT_PHASES,
         deadline: formData.deadline,
+        startDate: formData.startDate,
         builtArea: parseFloat(formData.builtArea) || 0,
         status: 'Em Estudo',
+        responsible: formData.responsible,
+        notes: formData.notes,
         createdAt: new Date().toISOString()
       };
 
@@ -130,7 +139,7 @@ export const ProjectControl: React.FC = () => {
         toast.success("Projeto salvo localmente!");
       }
       setIsModalOpen(false);
-      setFormData({ name: '', client: '', type: 'Residencial', deadline: '', builtArea: '' });
+      setFormData({ name: '', client: '', type: 'Residencial', deadline: '', startDate: '', builtArea: '', responsible: '', notes: '' });
     } catch (error) {
       console.error("Error saving project:", error);
       toast.error("Erro ao criar projeto");
@@ -271,6 +280,22 @@ export const ProjectControl: React.FC = () => {
                 <div className="input-group">
                   <label>Previsão de Entrega</label>
                   <input type="text" className="input-field" style={{ padding: '0 16px' }} value={formData.deadline} onChange={e => setFormData({...formData, deadline: e.target.value})} placeholder="Ex: Dezembro/2026" />
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div className="input-group">
+                    <label>Data de Início</label>
+                    <input type="date" className="input-field" style={{ padding: '0 16px' }} value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Responsável</label>
+                    <input type="text" className="input-field" style={{ padding: '0 16px' }} value={formData.responsible} onChange={e => setFormData({...formData, responsible: e.target.value})} placeholder="Ex: Arq. João" />
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <label>Observações</label>
+                  <textarea className="input-field" style={{ padding: '12px 16px', minHeight: 80 }} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="Informações adicionais..." />
                 </div>
               </div>
 

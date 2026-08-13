@@ -22,9 +22,9 @@ export interface ScheduleStage {
 }
 
 export const getTemplates = (specialty?: string): Record<string, { name: string; stages: string[] }> => {
-  const normSpecialty = (specialty || '').toLowerCase();
+  const normSpecialty = (specialty || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  if (normSpecialty.includes('eletricista') || normSpecialty.includes('elétrica')) {
+  if (normSpecialty.includes('eletricista') || normSpecialty.includes('eletrica')) {
     return {
       eletrica_basica: {
         name: 'Instalação Elétrica Básica',
@@ -37,7 +37,7 @@ export const getTemplates = (specialty?: string): Record<string, { name: string;
     };
   }
 
-  if (normSpecialty.includes('encanador') || normSpecialty.includes('hidráulica')) {
+  if (normSpecialty.includes('encanador') || normSpecialty.includes('hidraulica')) {
     return {
       hidraulica_basica: {
         name: 'Instalação Hidráulica',
@@ -277,7 +277,7 @@ function StageItem({ stage, idx, handleToggleStage, openEditModal, handleDeleteS
   );
 }
 
-export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBack?: () => void; workId?: string; embedded?: boolean }) {
+export function InteractiveSchedule({ onBack, workId, projectId, embedded = false }: { onBack?: () => void; workId?: string; projectId?: string; embedded?: boolean }) {
   const { user, profile, isGuest } = useAuth();
   const { works, activeWork } = useWorks();
   const currentWork = workId ? works.find(w => w.id === workId) : (activeWork || (works.length > 0 ? works[0] : null));
@@ -297,7 +297,8 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
   const [selectedTemplateKey, setSelectedTemplateKey] = useState('casa_nova');
   const [loadingTemplate, setLoadingTemplate] = useState(false);
 
-  const currentWorkId = currentWork?.id;
+  const currentWorkId = projectId || currentWork?.id;
+  const collectionPath = projectId ? `projects/${projectId}/schedule_stages` : `works/${currentWorkId}/schedule_stages`;
 
   useEffect(() => {
     if (!user || !currentWorkId) {
@@ -308,7 +309,7 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
 
     setLoading(true);
     const qStages = query(
-      collection(db, `works/${currentWorkId}/schedule_stages`),
+      collection(db, collectionPath),
       orderBy('order', 'asc')
     );
 
@@ -336,7 +337,7 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
     }
   };
 
-  const TEMPLATE_MODELS = getTemplates(profile?.specialty);
+  const TEMPLATE_MODELS = getTemplates(currentWork?.providerServiceType || profile?.specialty);
 
   const handleToggleStage = async (stage: ScheduleStage) => {
     if (!currentWork) return;
@@ -398,10 +399,10 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
 
   const handleEditStage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!editStageId || !stageTitle.trim() || !currentWork || isGuest) return;
+    if (!editStageId || !stageTitle.trim() || !currentWorkId || isGuest) return;
 
     try {
-      await updateDoc(doc(db, `works/${currentWork.id}/schedule_stages`, editStageId), {
+      await updateDoc(doc(db, collectionPath, editStageId), {
         title: stageTitle,
         completed: stageCompleted,
         startDate: stageStartDate,
@@ -442,11 +443,11 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
   };
 
   const handleDeleteStage = async (stageId: string) => {
-    if (!currentWork) return;
+    if (!currentWorkId) return;
     if (!confirm('Deseja excluir esta etapa do cronograma?')) return;
 
     try {
-      await deleteDoc(doc(db, `works/${currentWork.id}/schedule_stages`, stageId));
+      await deleteDoc(doc(db, collectionPath, stageId));
       const remaining = stages.filter(s => s.id !== stageId);
       setStages(remaining);
       await updateWorkProgress(remaining);
@@ -458,12 +459,12 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
   };
 
   const handleReorder = async (newOrder: ScheduleStage[]) => {
-    if (!currentWork || isGuest) return;
+    if (!currentWorkId || isGuest) return;
     setStages(newOrder); // Optimistic UI
     try {
       const promises = newOrder.map((stage, idx) => {
         if (stage.id && stage.order !== idx + 1) {
-          return updateDoc(doc(db, `works/${currentWork.id}/schedule_stages`, stage.id), {
+          return updateDoc(doc(db, collectionPath, stage.id), {
             order: idx + 1
           });
         }
@@ -477,7 +478,7 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
   };
 
   const handleLoadTemplate = async () => {
-    if (!currentWork) return;
+    if (!user || !currentWorkId) return;
     const template = TEMPLATE_MODELS[selectedTemplateKey];
     if (!template) return;
 
@@ -495,13 +496,12 @@ export function InteractiveSchedule({ onBack, workId, embedded = false }: { onBa
           startDate: new Date().toISOString().split('T')[0],
           order: startOrder + i + 1
         };
-        await addDoc(collection(db, `works/${currentWork.id}/schedule_stages`), s);
-        newStagesList.push({ ...s, id: `temp-${i}` } as ScheduleStage);
+        const docRef = await addDoc(collection(db, collectionPath), s);
+        newStagesList.push({ ...s, id: docRef.id } as ScheduleStage);
       }
       
       const updatedList = [...stages, ...newStagesList];
       setStages(updatedList);
-      
       updateWorkProgress(updatedList);
       
       toast.success(`Modelo "${template.name}" carregado com sucesso!`);

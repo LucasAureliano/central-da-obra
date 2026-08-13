@@ -76,7 +76,11 @@ export function WorksProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsLoadingWorks(true);
+    // Para dar suporte ao RBAC, deve-se usar um array `members` no Firestore.
+    // Como transição, vamos buscar obras em que o userId seja o usuário atual ou ele esteja na lista de members
     const qWorks = query(collection(db, 'works'), where('userId', '==', user.uid));
+    // Observação: Para escalabilidade com RBAC, seria ideal ter duas queries (uma para owner e outra para array-contains members)
+    // ou migrar todos os 'userId' para dentro do array 'members'.
     
     const unsubscribe = onSnapshot(qWorks, (snapshot) => {
       if (snapshot.empty) {

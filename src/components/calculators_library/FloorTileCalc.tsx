@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { SearchableSelect } from './SearchableSelect';
 import type { SelectOption } from './SearchableSelect';
 import { Grid3X3, Info, Grid, Square, Maximize, PaintBucket } from 'lucide-react';
@@ -35,9 +36,7 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
   // States
   const [inputMethod, setInputMethod] = useState('');
   const [area, setArea] = useState('');
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '' }]);
   const [tileType, setTileType] = useState<SelectOption | null>(null);
   
   const [tileSizeObj, setTileSizeObj] = useState<SelectOption | null>(null);
@@ -63,8 +62,8 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
 
   const parsedBaseArea = useMemo(() => {
     if (inputMethod === 'area') return parseFloat(area) || 0;
-    return (parseFloat(width) || 0) * (parseFloat(length) || 0);
-  }, [inputMethod, area, width, length]);
+    return surfaces.reduce((acc, s) => acc + (parseFloat(s.d1) || 0) * (parseFloat(s.d2) || 0), 0);
+  }, [inputMethod, area, surfaces]);
 
   const parsedTileSize = useMemo(() => {
     if (tileSizeObj?.id === 'custom') {
@@ -95,7 +94,7 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
     if (hasSkirting) {
       let sL = parseFloat(skirtLength);
       if (!sL || isNaN(sL)) {
-        if (inputMethod === 'dim') sL = ((parseFloat(width) || 0) + (parseFloat(length) || 0)) * 2;
+        if (inputMethod === 'dim') sL = surfaces.reduce((acc, s) => acc + ((parseFloat(s.d1) || 0) + (parseFloat(s.d2) || 0)) * 2, 0);
         else sL = Math.sqrt(baseArea) * 4; // Approx perimeter of a square
       }
       skirtArea = sL * (sH / 100);
@@ -181,14 +180,12 @@ export function FloorTileCalc({ onBack }: { onBack: () => void }) {
             </div>
           ) : (
             <>
-              <div className="input-group">
-                <label>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 5" />
-              </div>
-              <div className="input-group">
-                <label>Largura (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 4" />
-              </div>
+              <MultiSurfaceInput
+                surfaces={surfaces}
+                onChange={setSurfaces}
+                d1Label="Comprimento/Largura (m)"
+                d2Label="Comprimento/Extensão (m)"
+              />
             </>
           )}
         </div>

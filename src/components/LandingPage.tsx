@@ -7,13 +7,6 @@ import { Building2, Clock, ThumbsUp, PenTool, ShieldCheck, Zap } from 'lucide-re
 import { HeroSection } from './landing/HeroSection';
 import { ProfilesSection } from './landing/ProfilesSection';
 import { FeaturesGridSection } from './landing/FeaturesGridSection';
-import { CalculatorsShowcase } from './landing/CalculatorsShowcase';
-import { LibraryDemoSection } from './landing/LibraryDemoSection';
-import { FinanceDemoSection } from './landing/FinanceDemoSection';
-import { ManagementDemoSection } from './landing/ManagementDemoSection';
-import { InsightsDemoSection } from './landing/InsightsDemoSection';
-import { HowItWorksTimeline } from './landing/HowItWorksTimeline';
-import { DifferentialsSection } from './landing/DifferentialsSection';
 import { FaqSection } from './landing/FaqSection';
 import { InstitutionalFooter } from './landing/InstitutionalFooter';
 import { GenericInfoPage } from './landing/GenericInfoPage';
@@ -136,10 +129,15 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
   }
 
   return (
-    <div className="landing-body" style={{ backgroundColor: '#000' }}>
+    <div className="landing-body">
       {/* Background Elements */}
-      <div className="landing-bg" style={{ backgroundColor: '#000', opacity: 1, zIndex: -1, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-        {/* Solid black background as requested */}
+      <div className="landing-bg">
+        {/* Dark mesh gradient background for professional look */}
+        <div className="shader-bg-wrapper">
+          <div className="shader-grid" style={{ opacity: 0.1 }}></div>
+          <div className="shader-glow-1" style={{ background: '#3b82f6', opacity: 0.05 }}></div>
+          <div className="shader-glow-2" style={{ background: '#8b5cf6', opacity: 0.05 }}></div>
+        </div>
       </div>
 
       {/* Navbar Premium */}
@@ -154,18 +152,17 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
           <div className="nav-center mobile-hidden">
             <a href="#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
             <a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
-            <a href="#demonstracao" onClick={(e) => handleScrollTo(e, 'demonstracao')} className="landing-nav-link animated-link">Demonstração</a>
             <a href="#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
           </div>
 
           <div className="nav-right mobile-hidden">
-            <button onClick={onLogin} className="landing-nav-link" style={{ fontWeight: 600 }}>Entrar</button>
-            <button onClick={onRegister} className="btn-landing-primary">Começar Grátis</button>
+            <button onClick={onLogin} className="landing-nav-link btn-3d" style={{ fontWeight: 600 }}>Entrar</button>
+            <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
           </div>
           
           {/* Mobile Only Button */}
           <div className="nav-mobile-only">
-            <button onClick={onLogin} className="btn-landing-primary" style={{ height: 40, padding: '0 16px', fontSize: 14 }}>Entrar</button>
+            <button onClick={onLogin} className="btn-landing-primary btn-3d" style={{ height: 40, padding: '0 16px', fontSize: 14 }}>Entrar</button>
           </div>
         </div>
       </nav>
@@ -178,29 +175,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       
       <div id="recursos">
         <FeaturesGridSection />
-        <div id="calculadoras">
-          <CalculatorsShowcase onRegister={onRegister} />
-        </div>
       </div>
-
-      <div id="demonstracao">
-        <div id="biblioteca">
-          <LibraryDemoSection />
-        </div>
-        <div id="gestao">
-          <FinanceDemoSection />
-        </div>
-        <ManagementDemoSection />
-        <div style={{ marginTop: '80px' }}>
-          <InsightsDemoSection />
-        </div>
-      </div>
-
-      <div id="como-funciona">
-        <HowItWorksTimeline />
-      </div>
-      
-      <DifferentialsSection />
 
       {/* Depoimentos Premium com Testimonial Stack (Mantido do original) */}
       <section id="depoimentos" className="landing-section">

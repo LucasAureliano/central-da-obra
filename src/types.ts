@@ -82,6 +82,7 @@ export interface Client {
   phone?: string;
   whatsapp?: string;
   address?: string;
+  documentNumber?: string;
   notes?: string;
   photoUrl?: string;
   servicesCount: number;

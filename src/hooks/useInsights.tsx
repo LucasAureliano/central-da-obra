@@ -143,9 +143,55 @@ export function useInsights() {
           category: 'finance',
           date: now,
           suggestedAction: 'Ver Painel',
-          actionRoute: 'obras'
+          actionRoute: 'centro-operacoes'
         });
       }
+    }
+
+    if (role === 'builder') {
+      const delayedWorksCount = works.filter(w => w.status === 'Atrasada').length;
+      if (delayedWorksCount > 0) {
+        generatedInsights.push({
+          id: 'builder-delayed',
+          icon: <AlertCircle size={20} color="#EF4444" />,
+          title: 'Obras Atrasadas',
+          description: `Há ${delayedWorksCount} obra(s) com cronograma atrasado precisando de ação corretiva imediata.`,
+          priority: 'critical',
+          category: 'execution',
+          date: now,
+          suggestedAction: 'Centro de Operações',
+          actionRoute: 'centro-operacoes'
+        });
+      }
+
+      const totalBudget = works.reduce((acc, w) => acc + (w.budget || 0), 0);
+      const totalSpent = works.reduce((acc, w) => acc + (w.spent || 0), 0);
+      if (totalBudget > 0 && totalSpent > totalBudget) {
+        generatedInsights.push({
+          id: 'builder-finance-critical',
+          icon: <DollarSign size={20} color="#EF4444" />,
+          title: 'Estouro de Custo Global',
+          description: `O custo realizado corporativo ultrapassou o orçado global. Verifique as margens das obras em andamento.`,
+          priority: 'critical',
+          category: 'finance',
+          date: now,
+          suggestedAction: 'DRE Consolidado',
+          actionRoute: 'financeiro'
+        });
+      } else if (totalBudget > 0 && (totalSpent / totalBudget) > 0.8) {
+        generatedInsights.push({
+          id: 'builder-finance-high',
+          icon: <TrendingUp size={20} color="#F59E0B" />,
+          title: 'Atenção às Margens',
+          description: `O custo global atingiu ${Math.round((totalSpent / totalBudget) * 100)}%. Monitore o planejamento de suprimentos e mão de obra.`,
+          priority: 'high',
+          category: 'finance',
+          date: now,
+          suggestedAction: 'Ver BI e Margens',
+          actionRoute: 'indicadores-bi'
+        });
+      }
+
       generatedInsights.push({
         id: 'builder-teams',
         icon: <Users size={20} color="#F59E0B" />,
@@ -207,10 +253,11 @@ export function useInsights() {
     }
 
     // --- PROVIDER SPECIALTY INSIGHTS ---
-    if (role === 'service' && profile?.specialty) {
-      const normSpec = profile.specialty.toLowerCase();
+    const effectiveSpecialty = profile?.specialty || activeWork?.providerServiceType || (works.length > 0 ? works[0].providerServiceType : '');
+    if (role === 'service' && effectiveSpecialty) {
+      const normSpec = effectiveSpecialty.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       
-      if (normSpec.includes('eletric') || normSpec.includes('elétrica')) {
+      if (normSpec.includes('eletric') || normSpec.includes('eletrica')) {
         generatedInsights.push({
           id: 'spec-eletrica',
           icon: <Settings size={20} color="#F59E0B" />,

@@ -1,17 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, Eye, Lock, Globe, X, ShieldCheck } from 'lucide-react';
+import { Copy, Check, Eye, Lock, Globe, X, ShieldCheck, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { portalService } from '../../services/portal/PortalService';
 
 interface ClientPortalConnectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  projectName: string;
-  clientName: string;
+  project: any;
+  providerProfile: any;
 }
 
-export function ClientPortalConnectModal({ isOpen, onClose, projectName, clientName }: ClientPortalConnectModalProps) {
+export function ClientPortalConnectModal({ isOpen, onClose, project, providerProfile }: ClientPortalConnectModalProps) {
   const [copied, setCopied] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const [permissions, setPermissions] = useState({
     photos: true,
     videos: true,
@@ -27,13 +31,28 @@ export function ClientPortalConnectModal({ isOpen, onClose, projectName, clientN
 
   if (!isOpen) return null;
 
-  const generatedLink = `https://centralobra.com/connect/${encodeURIComponent(projectName.toLowerCase().replace(/\s+/g, '-'))}?client=${encodeURIComponent(clientName)}`;
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(generatedLink);
-    setCopied(true);
-    toast.success('Link do CentralObra Connect copiado!');
-    setTimeout(() => setCopied(false), 2500);
+  const handleCopyLink = async () => {
+    if (generatedLink) {
+      navigator.clipboard.writeText(generatedLink);
+      setCopied(true);
+      toast.success('Link do CentralObra Connect copiado!');
+      setTimeout(() => setCopied(false), 2500);
+      return;
+    }
+    
+    setIsGenerating(true);
+    try {
+      const linkData = await portalService.generateClientPortalLink(project, providerProfile);
+      setGeneratedLink(linkData.shareableUrl);
+      navigator.clipboard.writeText(linkData.shareableUrl);
+      setCopied(true);
+      toast.success('Link gerado e copiado!');
+      setTimeout(() => setCopied(false), 2500);
+    } catch (e) {
+      toast.error('Erro ao gerar link de acesso');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const togglePerm = (key: keyof typeof permissions) => {
@@ -69,11 +88,11 @@ export function ClientPortalConnectModal({ isOpen, onClose, projectName, clientN
           {/* Generated Link Box */}
           <div className="glass-panel" style={{ padding: 14, borderRadius: 16, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 2 }}>Link Exclusivo do Cliente ({clientName})</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#3B82F6' }}>{generatedLink}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 2 }}>Link Exclusivo do Cliente ({project.client || 'Não informado'})</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#3B82F6' }}>{generatedLink || 'Gerar link ao copiar'}</span>
             </div>
-            <button onClick={handleCopyLink} className="btn-primary" style={{ padding: '8px 14px', borderRadius: 10, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Copiado' : 'Copiar'}
+            <button onClick={handleCopyLink} disabled={isGenerating} className="btn-primary" style={{ padding: '8px 14px', borderRadius: 10, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+              {isGenerating ? <Loader2 size={14} className="animate-spin" /> : copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Copiado' : isGenerating ? 'Gerando...' : 'Gerar e Copiar'}
             </button>
           </div>
 

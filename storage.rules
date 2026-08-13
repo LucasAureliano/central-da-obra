@@ -1,0 +1,65 @@
+rules_version = '2';
+
+// Regras rigorosas para o Firebase Storage
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Função auxiliar para verificar autenticação
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // ==========================================
+    // REGRAS DE USUÁRIOS E PERFIL
+    // ==========================================
+    match /users/{userId}/{allPaths=**} {
+      // Somente o próprio usuário pode ler ou escrever em sua pasta (ex: fotos de perfil, cnh)
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ==========================================
+    // REGRAS DE OBRAS (WORKS) E ISOLAMENTO
+    // ==========================================
+    match /works/{workId}/{allPaths=**} {
+      // Idealmente, a validação de acesso ao storage seria feita via custom claims
+      // Como estamos utilizando regras no Firestore (RBAC dict), o Storage não consegue
+      // ler o documento do Firestore de forma síncrona diretamente tão bem quanto custom claims,
+      // mas no Storage v2 é possível usar firestore.get.
+      
+      function hasWorkAccess() {
+        let workDoc = firestore.get(/databases/(default)/documents/works/$(workId));
+        return isAuthenticated() && (
+          workDoc.data.userId == request.auth.uid || 
+          workDoc.data.roles.keys().hasAny([request.auth.uid])
+        );
+      }
+      
+      function hasWorkWriteAccess() {
+        let workDoc = firestore.get(/databases/(default)/documents/works/$(workId));
+        return isAuthenticated() && (
+          workDoc.data.userId == request.auth.uid || 
+          workDoc.data.roles[request.auth.uid] in ['owner', 'manager', 'editor']
+        );
+      }
+
+      // Permite ler se for membro da obra
+      allow read: if hasWorkAccess();
+      
+      // Permite escrever se tiver nível editor, manager ou owner
+      allow write: if hasWorkWriteAccess();
+    }
+    
+    // ==========================================
+    // PUBLIC ASSETS (Ex: Portfólios públicos gerados pelo app)
+    // ==========================================
+    match /public/{allPaths=**} {
+      allow read: if true; // Qualquer um pode ver imagens públicas
+      allow write: if isAuthenticated(); // Somente usuários autenticados podem publicar algo público
+    }
+
+    // Bloqueia todo o resto por padrão
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

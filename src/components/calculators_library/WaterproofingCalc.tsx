@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WizardEngine } from './WizardEngine';
 import type { WizardStep } from './WizardEngine';
+import { MultiSurfaceInput, type SurfaceDimension } from './MultiSurfaceInput';
 import { ShieldCheck, Info } from 'lucide-react';
 import { BaseCalculatorLayout } from './BaseCalculatorLayout';
 import type { CalcResultItem, CalcMaterial } from './BaseCalculatorLayout';
@@ -11,9 +12,7 @@ export function WaterproofingCalc({ onBack }: { onBack: () => void }) {
   // States
   const [inputMethod, setInputMethod] = useState('');
   const [area, setArea] = useState('');
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  
+  const [surfaces, setSurfaces] = useState<SurfaceDimension[]>([{ id: Date.now(), d1: '', d2: '' }]);
   const [rodapes, setRodapes] = useState('0.2');
   
   const [type, setType] = useState<'asphaltic'|'polymeric'>('asphaltic');
@@ -34,18 +33,18 @@ export function WaterproofingCalc({ onBack }: { onBack: () => void }) {
     let baseArea = 0;
     let skirtingArea = 0;
     
-    const w = parseFloat(width) || 0;
-    const l = parseFloat(length) || 0;
     const r = parseFloat(rodapes) || 0;
 
     if (inputMethod === 'area') {
       baseArea = parseFloat(area) || 0;
-      // Aproximação de perímetro para área informada diretamente (assumindo forma quadrada)
-      const perimeter = Math.sqrt(baseArea) * 4;
-      skirtingArea = perimeter * r;
+      skirtingArea = 0; // Not calculating perimeter if only area is given, unless we estimate it?
+      // For simplicity, skip skirting if area is directly given and rodapes has no perimeter.
     } else {
-      baseArea = w * l;
-      skirtingArea = (w + l) * 2 * r;
+      baseArea = surfaces.reduce((acc, s) => acc + (parseFloat(s.d1) || 0) * (parseFloat(s.d2) || 0), 0);
+      const perimeter = surfaces.reduce((acc, s) => acc + ((parseFloat(s.d1) || 0) + (parseFloat(s.d2) || 0)) * 2, 0);
+      if (r > 0) {
+        skirtingArea = perimeter * r;
+      }
     }
 
     const totalArea = baseArea + skirtingArea;
@@ -121,15 +120,8 @@ export function WaterproofingCalc({ onBack }: { onBack: () => void }) {
             </div>
           ) : (
             <>
-              <div className="input-group">
-                <label>Largura (m)</label>
-                <input type="number" className="input-premium" value={width} onChange={e => setWidth(e.target.value)} placeholder="Ex: 3.5" />
-              </div>
-              <div className="input-group">
-                <label>Comprimento (m)</label>
-                <input type="number" className="input-premium" value={length} onChange={e => setLength(e.target.value)} placeholder="Ex: 4.5" />
-              </div>
-            </>
+                <MultiSurfaceInput surfaces={surfaces} onChange={setSurfaces} d1Label="Comprimento/Largura (m)" d2Label="Comprimento/Extensão (m)" />
+              </>
           )}
           
           <div className="input-group" style={{ marginTop: 16 }}>
@@ -139,7 +131,7 @@ export function WaterproofingCalc({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       ),
-      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : (parseFloat(width) > 0 && parseFloat(length) > 0)
+      isValid: inputMethod === 'area' ? parseFloat(area) > 0 : surfaces.every(s => parseFloat(s.d1) > 0 && parseFloat(s.d2) > 0)
     },
     {
       id: 'product_type',
