@@ -31,10 +31,15 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
     }
     metaDesc.setAttribute('content', 'Planejamento, gestão financeira, compras, normas e mais de 80 calculadoras de materiais integradas em um único aplicativo para a construção civil.');
 
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      setScrolled(target.scrollTop > 50);
     };
-    window.addEventListener('scroll', handleScroll);
+    
+    const scrollContainer = document.querySelector('.landing-body');
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+    }
     
     // Add Schema.org structured data dynamically
     const scriptId = 'schema-org-data';
@@ -59,7 +64,9 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
     }
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
     };
   }, []);
 
@@ -70,16 +77,14 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       setTimeout(() => {
         const element = document.getElementById(id);
         if (element) {
-          const top = element.getBoundingClientRect().top + window.scrollY - 80;
-          window.scrollTo({ top, behavior: 'smooth' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 100);
       return;
     }
     const element = document.getElementById(id);
     if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: 'smooth' });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -109,7 +114,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       <nav className={`landing-navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="landing-nav-container">
           <div className="nav-left">
-            <a href="#" className="logo-link" onClick={(e) => { e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'}) }}>
+            <a href="#" className="logo-link" onClick={(e) => { e.preventDefault(); document.querySelector('.landing-body')?.scrollTo({top:0, behavior:'smooth'}) }}>
               <Logo variant="horizontal" theme={theme} />
             </a>
           </div>

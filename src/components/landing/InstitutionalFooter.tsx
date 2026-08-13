@@ -15,16 +15,14 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
       setTimeout(() => {
         const element = document.getElementById(id);
         if (element) {
-          const top = element.getBoundingClientRect().top + window.scrollY - 80;
-          window.scrollTo({ top, behavior: 'smooth' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 100);
       return;
     }
     const element = document.getElementById(id);
     if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: 'smooth' });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       onNavigate('home');
     }
