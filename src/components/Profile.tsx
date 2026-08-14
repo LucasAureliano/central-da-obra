@@ -255,8 +255,8 @@ export function Profile() {
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 360, borderRadius: 28, padding: 24, textAlign: 'center' }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', flexDirection: 'column', padding: 20, overflowY: 'auto' }}>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 360, borderRadius: 28, padding: 24, textAlign: 'center', margin: 'auto' }}>
             <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Confirmar Saída</h3>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>Você precisará fazer login novamente para acessar suas obras salvas. Deseja continuar?</p>
             <div style={{ display: 'flex', gap: 12 }}>
@@ -269,8 +269,8 @@ export function Profile() {
 
       {/* Edit Profile Modal */}
       {showEditModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 440, borderRadius: 28, padding: 24, maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', flexDirection: 'column', padding: 20, overflowY: 'auto' }}>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 440, borderRadius: 28, padding: 24, position: 'relative', margin: 'auto' }}>
             <button onClick={() => setShowEditModal(false)} style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
               <X size={20} />
             </button>

@@ -63,29 +63,38 @@ export function SparkEffect({
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function Spark(this: any, x: number, y: number) {
-      this.x = x;
-      this.y = y;
-      this.age = 0;
-      this.acceleration = rand(OPT.acceleration[0], OPT.acceleration[1]);
-      this.color = OPT.randColor
-        ? `${rand(255, 255)},${rand(150, 220)},${rand(0, 50)}` 
-        : OPT.color;
-      this.opacity = OPT.maxopacity - this.age / (OPT.lifetime * rand(1, 10));
+    class SparkParticle {
+      x: number;
+      y: number;
+      age: number;
+      acceleration: number;
+      color: string;
+      opacity: number;
 
-      this.go = function () {
+      constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        this.age = 0;
+        this.acceleration = rand(OPT.acceleration[0], OPT.acceleration[1]);
+        this.color = OPT.randColor
+          ? `${rand(255, 255)},${rand(150, 220)},${rand(0, 50)}` 
+          : OPT.color;
+        this.opacity = OPT.maxopacity - this.age / (OPT.lifetime * rand(1, 10));
+      }
+
+      go() {
         this.x += OPT.speed * OPT.direction.x * this.acceleration / 1.5;
         this.y += OPT.speed * OPT.direction.y * this.acceleration / 1.5;
         // Gravity
         this.y += (this.age * 0.02);
         this.opacity = OPT.maxopacity - ++this.age / OPT.lifetime;
-      };
+      }
     }
 
     function addSpark() {
       let x = rand(-200, window.innerWidth + 200);
       let y = rand(-100, 0); // Always spawn above the screen so they fall down naturally
-      sparks.push(new (Spark as any)(x, y));
+      sparks.push(new SparkParticle(x, y));
     }
 
     function drawSpark(spark: any) {

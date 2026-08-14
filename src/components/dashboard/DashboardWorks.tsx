@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Briefcase, Plus, GripVertical } from 'lucide-react';
+import { Plus, GripVertical } from 'lucide-react';
 
 interface DashboardWorksProps {
   isGuest: boolean;

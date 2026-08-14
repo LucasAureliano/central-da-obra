@@ -176,7 +176,7 @@ export function ImportBudgetModal({ isOpen, onClose, onImport }: ImportBudgetMod
       backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 100, 
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
     }}>
-      <div className="modal-content glass-panel animate-fade-in" onClick={e => e.stopPropagation()} style={{
+      <div className="modal-content glass-panel modal-content-scroll animate-fade-in" onClick={e => e.stopPropagation()} style={{
         width: '100%', maxWidth: 600, backgroundColor: 'var(--bg-elevated)', 
         borderRadius: 24, padding: 32, position: 'relative'
       }}>

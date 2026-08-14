@@ -48,7 +48,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       setIsExpenseModalOpen(false);
       setExpenseTitle('');
       setExpenseAmount('');
-    } catch (err) {
+    } catch (_err) {
       toast.error('Erro ao adicionar despesa');
     } finally {
       setIsSubmitting(false);

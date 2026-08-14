@@ -6,7 +6,7 @@ import { TiltCard } from '../TiltCard';
 import { Skeleton } from '../ui/Skeleton';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorks } from '../../contexts/WorksContext';
-import { Plus, Calculator, Briefcase, Activity, Sparkles, Target, Users, Clock, AlertCircle, Calendar, CheckCircle, Clipboard, Camera, FileCheck, AlertTriangle, LayoutDashboard, FileSignature, ArrowRight } from 'lucide-react';
+import { Plus, Calculator, Briefcase, Activity, Users, Clock, AlertCircle, Calendar, CheckCircle, Clipboard, Camera, FileCheck, AlertTriangle, LayoutDashboard, FileSignature, ArrowRight } from 'lucide-react';
 
 const containerVariants: any = {
   hidden: { opacity: 0 },

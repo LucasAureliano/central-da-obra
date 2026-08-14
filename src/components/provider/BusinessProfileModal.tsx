@@ -205,7 +205,7 @@ export function BusinessProfileModal({ isOpen, onClose }: BusinessProfileModalPr
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="glass-panel"
+          className="glass-panel modal-content-scroll"
           style={{
             width: '100%',
             maxWidth: 540,

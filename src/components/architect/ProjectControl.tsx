@@ -74,7 +74,7 @@ export const ProjectControl: React.FC = () => {
   const loadProjects = async () => {
     try {
       setLoading(true);
-      const q = query(collection(db, 'projects'), where('userId', '==', user?.uid));
+      const q = query(collection(db, 'works'), where('userId', '==', user?.uid));
       const querySnapshot = await getDocs(q);
       const loaded: ArchitecturalProject[] = [];
       querySnapshot.forEach((docSnap) => {
@@ -128,7 +128,7 @@ export const ProjectControl: React.FC = () => {
       };
 
       if (user && !isGuest) {
-        await addDoc(collection(db, 'projects'), newProj);
+        await addDoc(collection(db, 'works'), newProj);
         toast.success("Projeto criado com sucesso!");
         loadProjects();
       } else {

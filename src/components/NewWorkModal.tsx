@@ -128,7 +128,7 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="glass-panel" 
+            className="glass-panel modal-content-scroll" 
             style={{ 
               position: 'relative', 
               width: '100%', 

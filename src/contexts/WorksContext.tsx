@@ -233,7 +233,7 @@ export function WorksProvider({ children }: { children: React.ReactNode }) {
       if (unsubExp) unsubExp();
       if (unsubStages) unsubStages();
     };
-  }, [primaryWork?.id]);
+  }, [primaryWork]);
 
   // Set primary work
   const setPrimaryWork = useCallback(async (workId: string) => {

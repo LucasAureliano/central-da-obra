@@ -12,7 +12,7 @@ import { collection, query, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
 // ─── Modal: Raio-X da Obra ────────────────────────────────────────────────────
-function RaioXModal({ isOpen, onClose, primaryWork, stagesInfo, budget, spent }: any) {
+function RaioXModal({ isOpen, onClose, _primaryWork, stagesInfo, budget, spent }: any) {
   if (!isOpen) return null;
 
   const balance = budget - spent;

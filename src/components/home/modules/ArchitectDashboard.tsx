@@ -54,9 +54,9 @@ function InteriorDesignWidget({ onNavigate }: { onNavigate: (tab: string) => voi
 }
 
 // --------------------------------------------------------------------------------------
-// Widget inline: Projeto Luminotécnico
+// Widget inline: Projetos Complementares
 // --------------------------------------------------------------------------------------
-function LightingDesignWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
+function EngineeringProjectsWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -65,169 +65,69 @@ function LightingDesignWidget({ onNavigate }: { onNavigate: (tab: string) => voi
       className="glass-panel"
       style={{ padding: 20, borderRadius: 24, marginBottom: 24 }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-          <Lightbulb size={18} color="#F59E0B" />
-          Projeto Luminotécnico
+          <Zap size={18} color="#0EA5E9" />
+          Projetos Complementares
         </h3>
-        <button
-          onClick={() => onNavigate('projeto-luminotecnico')}
-          style={{ background: 'none', border: 'none', color: '#F59E0B', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-        >
-          Calcular Lux <ChevronRight size={14} />
-        </button>
       </div>
 
-      <div style={{ padding: 14, backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Calculadora Luminotécnica</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Lux, Lumens, Watts e quantidade</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+        {/* Luminotécnico */}
+        <div style={{ padding: 14, backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', padding: 8, borderRadius: 10 }}>
+              <Lightbulb size={20} color="#F59E0B" />
+            </div>
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Luminotécnico</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cálculo de Lux e Lumens</span>
+            </div>
+          </div>
+          <button onClick={() => onNavigate('projeto-luminotecnico')} className="btn-primary" style={{ padding: '6px 12px', borderRadius: 10, fontSize: 12, backgroundColor: '#F59E0B' }}>Abrir</button>
         </div>
-        <button
-          onClick={() => onNavigate('projeto-luminotecnico')}
-          className="btn-primary"
-          style={{ padding: '8px 14px', borderRadius: 10, fontSize: 12, border: 'none', cursor: 'pointer', backgroundColor: '#F59E0B', color: '#FFF' }}
-        >
-          Iniciar
-        </button>
-      </div>
-    </motion.div>
-  );
-}
 
-// --------------------------------------------------------------------------------------
-// Widget inline: Projeto Elétrico
-// --------------------------------------------------------------------------------------
-function ElectricalDesignWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.22 }}
-      className="glass-panel"
-      style={{ padding: 20, borderRadius: 24, marginBottom: 24 }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-          <Zap size={18} color="#EAB308" />
-          Projeto Elétrico
-        </h3>
-        <button
-          onClick={() => onNavigate('projeto-eletrico')}
-          style={{ background: 'none', border: 'none', color: '#EAB308', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-        >
-          Dimensionar <ChevronRight size={14} />
-        </button>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <button
-          onClick={() => onNavigate('projeto-eletrico')}
-          style={{ padding: 12, borderRadius: 14, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', textAlign: 'left', cursor: 'pointer' }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Quadro de Cargas</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Circuitos e Disjuntores</span>
-        </button>
-
-        <button
-          onClick={() => onNavigate('projeto-eletrico')}
-          style={{ padding: 12, borderRadius: 14, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', textAlign: 'left', cursor: 'pointer' }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Levantamento</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Pontos TUG/TUE</span>
-        </button>
-      </div>
-    </motion.div>
-  );
-}
-
-// --------------------------------------------------------------------------------------
-// Widget inline: Projeto Hidráulico
-// --------------------------------------------------------------------------------------
-function PlumbingDesignWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.24 }}
-      className="glass-panel"
-      style={{ padding: 20, borderRadius: 24, marginBottom: 24 }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-          <Droplet size={18} color="#0EA5E9" />
-          Projeto Hidráulico
-        </h3>
-        <button
-          onClick={() => onNavigate('projeto-hidraulico')}
-          style={{ background: 'none', border: 'none', color: '#0EA5E9', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-        >
-          Planejar <ChevronRight size={14} />
-        </button>
-      </div>
-
-      <div style={{ padding: 14, backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Mapeamento de Pontos</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Água fria, quente, esgoto e pluvial</span>
+        {/* Elétrico */}
+        <div style={{ padding: 14, backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', padding: 8, borderRadius: 10 }}>
+              <Zap size={20} color="#EAB308" />
+            </div>
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Elétrico</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Quadro de Cargas, TUGs</span>
+            </div>
+          </div>
+          <button onClick={() => onNavigate('projeto-eletrico')} className="btn-primary" style={{ padding: '6px 12px', borderRadius: 10, fontSize: 12, backgroundColor: '#EAB308' }}>Abrir</button>
         </div>
-        <button
-          onClick={() => onNavigate('projeto-hidraulico')}
-          className="btn-primary"
-          style={{ padding: '8px 14px', borderRadius: 10, fontSize: 12, border: 'none', cursor: 'pointer', backgroundColor: '#0EA5E9', color: '#FFF' }}
-        >
-          Iniciar
-        </button>
-      </div>
-    </motion.div>
-  );
-}
 
-// --------------------------------------------------------------------------------------
-// Widget inline: Projeto de Automação
-// --------------------------------------------------------------------------------------
-function AutomationDesignWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.26 }}
-      className="glass-panel"
-      style={{ padding: 20, borderRadius: 24, marginBottom: 24, border: '1px solid rgba(16, 185, 129, 0.2)' }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-          <Cpu size={18} color="#10B981" />
-          Projeto de Automação
-        </h3>
-        <button
-          onClick={() => onNavigate('projeto-automacao')}
-          style={{ background: 'none', border: 'none', color: '#10B981', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-        >
-          Smart Home <ChevronRight size={14} />
-        </button>
-      </div>
+        {/* Hidráulico */}
+        <div style={{ padding: 14, backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ backgroundColor: 'rgba(14, 165, 233, 0.1)', padding: 8, borderRadius: 10 }}>
+              <Droplet size={20} color="#0EA5E9" />
+            </div>
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Hidráulico</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Mapeamento de Pontos</span>
+            </div>
+          </div>
+          <button onClick={() => onNavigate('projeto-hidraulico')} className="btn-primary" style={{ padding: '6px 12px', borderRadius: 10, fontSize: 12, backgroundColor: '#0EA5E9' }}>Abrir</button>
+        </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-        <button
-          onClick={() => onNavigate('projeto-automacao')}
-          style={{ padding: 12, borderRadius: 14, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', textAlign: 'left', cursor: 'pointer' }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Dispositivos</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Lista de equipamentos</span>
-        </button>
-
-        <button
-          onClick={() => onNavigate('projeto-automacao')}
-          style={{ padding: 12, borderRadius: 14, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', textAlign: 'left', cursor: 'pointer' }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Cenas (Smart)</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Rotinas e integrações</span>
-        </button>
-      </div>
-      
-      <div style={{ padding: 10, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: 12, border: '1px dashed #10B981', textAlign: 'center' }}>
-        <span style={{ fontSize: 11, color: '#10B981', fontWeight: 600 }}>Infraestrutura: Verificação de Cabos, Hubs e Redes</span>
+        {/* Automação */}
+        <div style={{ padding: 14, backgroundColor: 'rgba(16, 185, 129, 0.05)', borderRadius: 16, border: '1px solid rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: 8, borderRadius: 10 }}>
+              <Cpu size={20} color="#10B981" />
+            </div>
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Automação (Smart)</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Dispositivos e Cenas</span>
+            </div>
+          </div>
+          <button onClick={() => onNavigate('projeto-automacao')} className="btn-primary" style={{ padding: '6px 12px', borderRadius: 10, fontSize: 12, backgroundColor: '#10B981' }}>Abrir</button>
+        </div>
       </div>
     </motion.div>
   );
@@ -317,6 +217,7 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
     'projetos',
     'acompanhamento',
     'agenda',
+    'projetos-complementares'
   ];
 
   const WIDGET_NAMES = {
@@ -325,10 +226,7 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
     agenda:              'Agenda Técnica',
     vistorias:           'Vistorias Técnicas',
     'studio-interiores': 'Studio de Interiores',
-    luminotecnico:       'Projeto Luminotécnico',
-    eletrico:            'Projeto Elétrico',
-    hidraulico:          'Projeto Hidráulico',
-    automacao:           'Projeto de Automação',
+    'projetos-complementares': 'Projetos Complementares',
     biblioteca:          'Biblioteca Técnica',
     dicas:               'Dicas',
   };
@@ -340,10 +238,7 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
       case 'agenda':              return <AgendaWidget onNavigate={onNavigate} key="agenda" />;
       case 'vistorias':           return <InspectionsWidget onNavigate={onNavigate} key="vistorias" />;
       case 'studio-interiores':   return <InteriorDesignWidget onNavigate={onNavigate} key="studio-interiores" />;
-      case 'luminotecnico':       return <LightingDesignWidget onNavigate={onNavigate} key="luminotecnico" />;
-      case 'eletrico':            return <ElectricalDesignWidget onNavigate={onNavigate} key="eletrico" />;
-      case 'hidraulico':          return <PlumbingDesignWidget onNavigate={onNavigate} key="hidraulico" />;
-      case 'automacao':           return <AutomationDesignWidget onNavigate={onNavigate} key="automacao" />;
+      case 'projetos-complementares': return <EngineeringProjectsWidget onNavigate={onNavigate} key="projetos-complementares" />;
       case 'biblioteca':         return <LibraryWidget onNavigate={onNavigate} key="biblioteca" />;
       case 'dicas':              return <TipsWidget onNavigate={onNavigate} key="dicas" />;
       default:                    return null;
