@@ -3,6 +3,7 @@ import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { AlertCircle, Activity, Briefcase, FileText, Plus } from 'lucide-react';
+import { formatDate } from '../../utils/formatters';
 
 // Basic TiltCard mockup since we can't easily import the exact one from Dashboard without refactoring
 const TiltCard = ({ children, style, onClick }: any) => (
@@ -246,7 +247,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>{app.title}</p>
               <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                {app.date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                {formatDate(app.date)}
               </span>
             </div>
             {app.clientName && <p style={{ margin: '4px 0 0 0', fontSize: 13, color: 'var(--text-muted)' }}>Cliente: {app.clientName}</p>}

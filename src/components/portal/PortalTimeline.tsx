@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Camera, FileText, CheckCircle, Info } from 'lucide-react';
+import { formatDate } from '../../utils/formatters';
 
 export function PortalTimeline({ workId }: { workId: string }) {
   const [timeline, setTimeline] = useState<any[]>([]);
@@ -96,7 +97,7 @@ export function PortalTimeline({ workId }: { workId: string }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)' }}>{event.title}</h3>
                   <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
-                    {event.date ? new Date(event.date).toLocaleDateString('pt-BR') : ''}
+                    {event.date ? formatDate(event.date) : ''}
                   </span>
                 </div>
                 

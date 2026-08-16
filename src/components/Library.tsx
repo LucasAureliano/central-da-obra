@@ -3,6 +3,7 @@ import { BookOpen, Search, Download, ExternalLink, ShieldAlert, FileText, Bookma
 import { db } from '../lib/firebase';
 import { collection, query, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
+import { formatDate } from '../utils/formatters';
 
 interface LibraryItem {
   id: string;
@@ -188,7 +189,7 @@ export const Library: React.FC = () => {
                     <div>
                       <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{calc.calcType}</h3>
                       <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-                        {calc.savedAt ? new Date(calc.savedAt.seconds * 1000).toLocaleDateString('pt-BR') : 'Sem data'}
+                        {calc.savedAt ? formatDate(calc.savedAt.seconds * 1000) : 'Sem data'}
                       </p>
                     </div>
                   </div>

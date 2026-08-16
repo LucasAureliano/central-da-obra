@@ -114,6 +114,8 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ role, onComp
       } catch (err) {
         console.error('Error marking welcome or creating work:', err);
       }
+    } else {
+      localStorage.setItem('guestHasSeenWelcome', 'true');
     }
     onComplete();
   };

@@ -9,6 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import { motion } from 'framer-motion';
+import { formatDate } from '../utils/formatters';
+
 
 export function Financial({ onBack }: { onBack: () => void }) {
   const { user } = useAuth();
@@ -238,7 +240,7 @@ export function Financial({ onBack }: { onBack: () => void }) {
                         - R$ {tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                       <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                        {tx.date.toLocaleDateString('pt-BR')}
+                        {formatDate(tx.date)}
                       </span>
                     </div>
                   </div>

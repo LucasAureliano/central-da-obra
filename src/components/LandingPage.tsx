@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Logo } from './ui/Logo';
-import { Building2, Clock, ThumbsUp, PenTool, ShieldCheck, Zap } from 'lucide-react';
+
 
 import { HeroSection } from './landing/HeroSection';
 import { ProfilesSection } from './landing/ProfilesSection';

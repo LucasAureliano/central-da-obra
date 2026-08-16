@@ -54,14 +54,6 @@ import { ProviderDashboard } from './provider/ProviderDashboard';
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { isGuest, profile } = useAuth();
   
-  if (profile?.role === 'architect' || profile?.role === 'engineer') {
-    return <TechnicalDashboard onNavigate={onNavigate} />;
-  }
-
-  if (profile?.role === 'service') {
-    return <ProviderDashboard onNavigate={onNavigate} />;
-  }
-
   const { works, activeWork, isLoadingWorks } = useWorks();
   
   const [totalSpent, setTotalSpent] = useState<number>(0);
@@ -128,6 +120,14 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   useEffect(() => {
     localStorage.setItem('centralobra_dashboard_order', JSON.stringify(widgetOrder));
   }, [widgetOrder]);
+
+  if (profile?.role === 'architect' || profile?.role === 'engineer') {
+    return <TechnicalDashboard onNavigate={onNavigate} />;
+  }
+
+  if (profile?.role === 'service') {
+    return <ProviderDashboard onNavigate={onNavigate} />;
+  }
 
   // Loading state
   if (isLoadingWorks) {

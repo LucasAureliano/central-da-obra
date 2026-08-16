@@ -11,6 +11,7 @@ import { db } from '../lib/firebase';
 import { generateGeneralReport, generateFinancialReport, generateShoppingReport } from '../lib/pdfGenerator';
 import { exportShoppingToExcel, exportFinanceToExcel } from '../lib/excelGenerator';
 import { Camera, ClipboardCheck, FileSpreadsheet } from 'lucide-react';
+import { formatDate } from '../utils/formatters';
 
 export const Reports: React.FC = () => {
   const { activeWork } = useWorks();
@@ -257,7 +258,7 @@ export const Reports: React.FC = () => {
                           <h1>${successReport}</h1>
                           <div class="data-box">
                             <p><strong>Referência da Obra:</strong> ${activeWorkName}</p>
-                            <p><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+                            <p><strong>Data de Emissão:</strong> ${formatDate()}</p>
                           </div>
                           <h3>Resumo Consolidado</h3>
                           <ul>

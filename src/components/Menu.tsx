@@ -360,14 +360,12 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             { icon: <Sparkles size={20} />, label: 'Assistente Inteligente', color: '#10B981', action: () => onMenuSelect('Assistente') },
             { icon: <BookOpen size={20} />, label: 'Biblioteca & Normas NBR', color: '#8B5CF6', action: () => onMenuSelect('Biblioteca & Normas') },
             { icon: <Palette size={20} />, label: 'Tendências', color: '#D946EF', action: () => onMenuSelect('Tendências') },
-            { icon: <Lightbulb size={20} />, label: 'Projeto Luminotécnico', color: '#F59E0B', action: () => onMenuSelect('Projeto Luminotécnico') },
           ]
         },
         {
-          title: 'Ferramentas & Índices',
+          title: 'Ferramentas',
           items: [
             { icon: <Calculator size={20} />, label: 'Calculadoras Técnicas', color: '#3B82F6', action: () => onMenuSelect('Calculadoras') },
-            { icon: <TrendingUp size={20} />, label: 'Índices da Construção (BCB)', color: '#10B981', action: () => onMenuSelect('Índices da Construção') },
             { icon: <FileText size={20} />, label: 'Relatórios Técnicos PDF', color: '#F43F5E', action: () => onMenuSelect('Relatórios') },
           ]
         },
@@ -377,6 +375,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             { icon: <Palette size={20} />, label: 'Studio de Interiores', color: '#EC4899', action: () => onMenuSelect('Studio de Interiores') },
             { icon: <Lightbulb size={20} />, label: 'Projeto Elétrico', color: '#EAB308', action: () => onMenuSelect('Projeto Elétrico') },
             { icon: <Briefcase size={20} />, label: 'Projeto Hidráulico', color: '#0EA5E9', action: () => onMenuSelect('Projeto Hidráulico') },
+            { icon: <Lightbulb size={20} />, label: 'Projeto Luminotécnico', color: '#F59E0B', action: () => onMenuSelect('Projeto Luminotécnico') },
             { icon: <Wrench size={20} />, label: 'Automação (Smart)', color: '#10B981', action: () => onMenuSelect('Projeto Automação') },
           ]
         },

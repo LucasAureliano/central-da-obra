@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { DollarSign, Plus, CheckCircle2, Clock, ArrowLeft, Trash2, Edit3, X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { formatDate } from '../../utils/formatters';
 
 export interface ReceiptItem {
   id?: string;
@@ -308,7 +309,7 @@ export function ReceiptsManager({ onBack }: ReceiptsManagerProps) {
                     </p>
                     {rec.dueDate && (
                       <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginTop: 2 }}>
-                        Vencimento: {new Date(rec.dueDate).toLocaleDateString('pt-BR')}
+                        Vencimento: {formatDate(rec.dueDate)}
                       </span>
                     )}
                   </div>

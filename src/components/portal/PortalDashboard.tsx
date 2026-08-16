@@ -1,4 +1,5 @@
 import { MapPin, Calendar, Activity, ArrowUpRight } from 'lucide-react';
+import { formatDate } from '../../utils/formatters';
 
 export function PortalDashboard({ work }: { work: any }) {
   const progress = work.progress || 0;
@@ -100,7 +101,7 @@ export function PortalDashboard({ work }: { work: any }) {
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Previsão de Entrega</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>
-            {work.deadline ? new Date(work.deadline).toLocaleDateString('pt-BR') : 'Não definida'}
+            {work.deadline ? formatDate(work.deadline) : 'Não definida'}
           </div>
         </div>
         

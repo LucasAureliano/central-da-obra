@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Calendar, CheckCircle2, Clock, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { formatDate } from '../../utils/formatters';
 
 interface PortalScheduleProps {
   workId: string;
@@ -63,7 +64,7 @@ export default function PortalSchedule({ workId }: PortalScheduleProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    return formatDate(dateString);
   };
 
   if (loading) {

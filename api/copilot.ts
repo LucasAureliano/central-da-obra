@@ -16,14 +16,28 @@ const CopilotMessageSchema = z.object({
 });
 
 const CopilotPayloadSchema = z.object({
-  messages: z.array(CopilotMessageSchema).min(1).max(20) // max 20 messages per request
+  messages: z.array(CopilotMessageSchema).min(1).max(20), // max 20 messages per request
+  userRole: z.string().optional()
 });
 
 // System prompt tailored for Civil Engineering & Construction
-const COPILOT_SYSTEM_PROMPT = `Você é o Copilot da Obra, um assistente especializado em Engenharia Civil e Gestão de Obras para a plataforma CentralObra.
-Sua missão é ajudar engenheiros, arquitetos, mestres de obras e proprietários a resolver problemas do dia a dia da obra, esclarecer dúvidas técnicas e oferecer melhores práticas.
-Responda sempre de forma clara, técnica quando necessário, e acessível.
-Você não deve fornecer projetos estruturais para execução sem o carimbo de um engenheiro habilitado; ofereça orientações e aconselhe sempre a consulta de um RT (Responsável Técnico) para decisões críticas.`;
+const getSystemPrompt = (role?: string) => {
+  const base = `Você é o Copilot da Obra, um assistente especializado em Engenharia Civil e Gestão de Obras para a plataforma CentralObra.\nSua missão é ajudar engenheiros, arquitetos, mestres de obras e proprietários a resolver problemas do dia a dia da obra, esclarecer dúvidas técnicas e oferecer melhores práticas.\nResponda sempre de forma clara, técnica quando necessário, e acessível.\nVocê não deve fornecer projetos estruturais para execução sem o carimbo de um engenheiro habilitado; ofereça orientações e aconselhe sempre a consulta de um RT (Responsável Técnico) para decisões críticas.`;
+  
+  if (role === 'engineer' || role === 'architect') {
+    return `${base}\n\nATENÇÃO: O usuário atual é um Engenheiro ou Arquiteto. Atue como seu mentor de engenharia, ajudando a revisar normas, cálculos avançados, dimensionamentos e compatibilização de projetos.`;
+  }
+  if (role === 'builder') {
+    return `${base}\n\nATENÇÃO: O usuário atual é um Construtor/Empreiteiro. Atue como seu consultor de gestão de obras, auxiliando com cronogramas, equipes, logística de materiais e controle de custos no canteiro de obras.`;
+  }
+  if (role === 'owner') {
+    return `${base}\n\nATENÇÃO: O usuário atual é o Proprietário da Obra. Atue como seu consultor de obras residenciais e finanças, explicando termos técnicos de forma simples, ajudando a controlar o orçamento e garantindo transparência no progresso.`;
+  }
+  if (role === 'service') {
+    return `${base}\n\nATENÇÃO: O usuário atual é um Prestador de Serviços/Fornecedor. Atue como seu parceiro comercial e técnico, focando em elaboração de orçamentos precisos, fidelização de clientes e recomendações de materiais.`;
+  }
+  return base;
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -65,11 +79,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    const { messages } = validationResult.data;
+    const { messages, userRole } = validationResult.data;
 
     // 3. Prepare the conversation for OpenAI
     const conversation = [
-      { role: 'system', content: COPILOT_SYSTEM_PROMPT },
+      { role: 'system', content: getSystemPrompt(userRole) },
       ...messages
     ];
 

@@ -28,7 +28,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
 
   useEffect(() => {
     if (user && !isGuest) {
-      const docRef = doc(db, 'projects', projectId);
+      const docRef = doc(db, 'works', projectId);
       getDoc(docRef).then(snap => {
         if (snap.exists()) {
           setProject({ id: snap.id, ...snap.data() });

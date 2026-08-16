@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { applyGlobalWatermark } from './pdfGenerator';
 
 export interface TechnicalReportPDFData {
   title: string;
@@ -162,5 +163,6 @@ export function generateTechnicalReportPDF(data: TechnicalReportPDFData) {
     doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 20, { align: 'right' });
   }
 
+  applyGlobalWatermark(doc);
   doc.save(`Laudo_Tecnico_${data.projectName.replace(/\s+/g, '_')}_${data.reportNumber}.pdf`);
 }

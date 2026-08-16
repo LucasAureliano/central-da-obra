@@ -6,6 +6,8 @@ import { useWorks } from '../contexts/WorksContext';
 import { TiltCard } from './TiltCard';
 import { Check, Package, Search, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatCurrency } from '../utils/formatters';
+
 
 interface ShoppingItem {
   workId: string;
@@ -35,9 +37,9 @@ export function Shopping({ workId, embedded, parentCollection = 'works' }: { wor
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newQty, setNewQty] = useState(0);
+  const [newQty, setNewQty] = useState<number | ''>('');
   const [newUnit, setNewUnit] = useState('un');
-  const [newPrice, setNewPrice] = useState(0);
+  const [newPrice, setNewPrice] = useState<number | ''>('');
 
 
   // Fetch calculation‑derived items
@@ -163,21 +165,36 @@ export function Shopping({ workId, embedded, parentCollection = 'works' }: { wor
   };
 
   const handleAddManualItem = async () => {
-    if (!newName.trim() || newQty <= 0 || !currentWork) return;
+    if (!currentWork) {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error('Nenhuma obra ativa. Selecione ou crie uma obra primeiro.');
+      });
+      return;
+    }
+    const qty = Number(newQty);
+    if (!newName.trim() || isNaN(qty) || qty <= 0) {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error('Preencha o nome e uma quantidade válida.');
+      });
+      return;
+    }
     try {
       await addDoc(collection(db, `${parentCollection}`, currentWork.id, 'shopping'), {
         name: newName.trim(),
-        quantity: newQty,
+        quantity: qty,
         unit: newUnit,
         unitPrice: Number(newPrice) || 0,
         isPurchased: false,
         createdAt: serverTimestamp()
       });
       setNewName('');
-      setNewQty(0);
+      setNewQty('');
       setNewUnit('un');
-      setNewPrice(0);
+      setNewPrice('');
       setShowAddModal(false);
+      import('react-hot-toast').then(({ toast }) => {
+        toast.success('Material adicionado!');
+      });
     } catch (e) {
       console.error('Error adding manual item', e);
     }
@@ -233,7 +250,7 @@ export function Shopping({ workId, embedded, parentCollection = 'works' }: { wor
               ⚡ Cotação Automática de Preços
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: 8 }}>
-              Economia estimada: R$ {Math.round(totalPending * 0.12).toLocaleString('pt-BR')},00
+              Economia estimada: {formatCurrency(Math.round(totalPending * 0.12))},00
             </span>
           </div>
 
@@ -403,7 +420,7 @@ export function Shopping({ workId, embedded, parentCollection = 'works' }: { wor
                 type="number"
                 min="0"
                 value={newQty}
-                onChange={e => setNewQty(parseFloat(e.target.value) || 0)}
+                onChange={e => setNewQty(e.target.value === '' ? '' : parseFloat(e.target.value))}
                 className="input-premium"
                 style={{ width: '100%' }}
                 placeholder="0"
@@ -429,7 +446,7 @@ export function Shopping({ workId, embedded, parentCollection = 'works' }: { wor
                 min="0"
                 step="0.01"
                 value={newPrice}
-                onChange={e => setNewPrice(parseFloat(e.target.value) || 0)}
+                onChange={e => setNewPrice(e.target.value === '' ? '' : parseFloat(e.target.value))}
                 className="input-premium"
                 style={{ width: '100%' }}
                 placeholder="0,00"

@@ -5,6 +5,7 @@ import type { Client } from '../../types';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
+import { formatDate } from '../../utils/formatters';
 
 interface ClientDetailsProps {
   client: Client;
@@ -56,7 +57,7 @@ export function ClientDetails({ client, onBack, onEdit }: ClientDetailsProps) {
   const formatDate = (date: any) => {
     if (!date) return '—';
     const d = date.toDate ? date.toDate() : new Date(date);
-    return d.toLocaleDateString('pt-BR');
+    return formatDate(d);
   };
 
   const tabs = [

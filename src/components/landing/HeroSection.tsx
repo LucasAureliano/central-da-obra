@@ -22,8 +22,21 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
   };
 
   return (
-    <section className="landing-section" style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', paddingTop: '160px' }}>
-      <div className="landing-container" style={{ width: '100%' }}>
+    <section className="landing-section" style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '80px', paddingBottom: '40px', position: 'relative', overflow: 'hidden' }}>
+      {/* Ambient glow signature */}
+      <div style={{
+        position: 'absolute',
+        top: '20%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '600px',
+        height: '400px',
+        background: 'radial-gradient(ellipse at center, var(--color-primary-alpha) 0%, rgba(13,14,18,0) 70%)',
+        filter: 'blur(80px)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+      <div className="landing-container" style={{ width: '100%', position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           
           <motion.div
@@ -41,11 +54,14 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
               background: 'var(--bg-glass)',
               marginBottom: 32,
               backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)'
+              WebkitBackdropFilter: 'blur(10px)',
+              whiteSpace: 'nowrap',
+              maxWidth: '90vw',
+              overflow: 'hidden'
             }}>
-              <span className="text-gradient" style={{ fontWeight: 600, fontSize: 13 }}>NOVO</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
-                Aumente suas vendas com a Central de Marketing <ChevronRight size={14} />
+              <span className="text-gradient" style={{ fontWeight: 600, fontSize: 12 }}>NOVO</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                Aumente suas vendas com a Central de Marketing <ChevronRight size={14} style={{ flexShrink: 0 }} />
               </span>
             </div>
           </motion.div>
@@ -76,10 +92,10 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
             <button onClick={onRegister} className="btn-landing-primary" style={{ flex: '1 1 180px' }}>
-              Começar Grátis <ArrowRight size={18} />
+              Criar Minha Central <ArrowRight size={18} />
             </button>
             <button onClick={handleShowDemo} className="btn-landing-secondary" style={{ flex: '1 1 180px' }}>
-              Ver Demonstração <Play size={18} />
+              Explorar a Plataforma <Play size={18} />
             </button>
           </motion.div>
           

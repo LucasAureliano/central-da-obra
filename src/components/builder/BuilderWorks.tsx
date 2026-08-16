@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Plus, MapPin, Search, ChevronRight, Calendar, DollarSign, Activity } from 'lucide-react';
 import { useWorks } from '../../contexts/WorksContext';
+import { formatCurrency } from '../../utils/formatters';
 
 interface BuilderWorksProps {
   onWorkSelect: (id: string) => void;
@@ -150,7 +151,7 @@ export function BuilderWorks({ onWorkSelect }: BuilderWorksProps) {
                             <strong>Cliente:</strong> {work.client || 'Não informado'}
                           </span>
                           <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                            <strong>Orçamento:</strong> {work.budget ? `R$ ${work.budget.toLocaleString('pt-BR')}` : 'Não definido'}
+                            <strong>Orçamento:</strong> {work.budget ? `${formatCurrency(work.budget)}` : 'Não definido'}
                           </span>
                         </div>
                         

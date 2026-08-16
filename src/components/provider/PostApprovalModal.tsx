@@ -5,6 +5,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { formatDate } from '../../utils/formatters';
 
 interface PostApprovalModalProps {
   isOpen: boolean;
@@ -68,7 +69,7 @@ export function PostApprovalModal({ isOpen, onClose, quoteData, onNavigate }: Po
         address: quoteData.workAddress || '',
         totalValue: quoteData.grandTotal,
         totalServices: 1,
-        lastService: new Date().toLocaleDateString('pt-BR'),
+        lastService: formatDate(),
         createdAt: serverTimestamp(),
       });
       setCreatedClient(true);

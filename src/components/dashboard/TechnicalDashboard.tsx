@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -38,7 +38,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
 
   useEffect(() => {
     if (isArchitect && user) {
-      const q = query(collection(db, 'projects'), where('userId', '==', user.uid));
+      const q = query(collection(db, 'works'), where('userId', '==', user.uid));
       const unsub = onSnapshot(q, (snap) => {
         const loaded: any[] = [];
         snap.forEach(doc => loaded.push({ id: doc.id, ...doc.data() }));
@@ -136,7 +136,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
           if (event.date) {
             workAgenda.push({
               id: doc.id,
-              title: event.title || 'Visita Técnica',
+              title: event.title || 'Visita TÃ©cnica',
               workName: work.name,
               date: event.date,
               type: event.type || 'visita'
@@ -176,16 +176,16 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
       <motion.div variants={itemVariants} style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-            Olá, {profile?.name || 'Profissional'}
+            OlÃ¡, {profile?.name || 'Profissional'}
           </h1>
           <p style={{ fontSize: 16, color: 'var(--text-muted)', marginTop: 4 }}>
-            {profile?.role === 'architect' ? 'Painel de Arquitetura & Projetos' : 'Painel de Engenharia & Execução'}
+            {profile?.role === 'architect' ? 'Painel de Arquitetura & Projetos' : 'Painel de Engenharia & ExecuÃ§Ã£o'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button className="btn-secondary" style={{ padding: '10px 16px', borderRadius: 12 }} onClick={() => onNavigate('relatorios')}>
             <FileSignature size={18} />
-            Gerar Relatório
+            Gerar RelatÃ³rio
           </button>
           <button className="btn-primary" style={{ padding: '10px 16px', borderRadius: 12 }} onClick={() => onNavigate('obras')}>
             <Plus size={18} />
@@ -215,7 +215,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
             <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <AlertTriangle size={20} color="#F59E0B" />
             </div>
-            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Pendências</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>PendÃªncias</span>
           </div>
           <div style={{ fontSize: 32, fontWeight: 800, color: '#F59E0B' }}>{pendenciesCount}</div>
         </TiltCard>
@@ -254,7 +254,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
                 </div>
                 <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('diario-tecnico')}>
                   <FileCheck size={20} color="#3B82F6" />
-                  <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo Diário Técnico</span>
+                  <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo DiÃ¡rio TÃ©cnico</span>
                 </div>
               </>
             ) : (
@@ -265,13 +265,13 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
                 </div>
                 <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('obras')}>
                   <FileCheck size={20} color="#3B82F6" />
-                  <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo Diário de Obra</span>
+                  <span style={{ fontWeight: 600, color: '#3B82F6' }}>Novo DiÃ¡rio de Obra</span>
                 </div>
               </>
             )}
             <div className="btn-action" style={{ flex: '0 0 auto', padding: '12px 20px', borderRadius: 16, backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }} onClick={() => onNavigate('library')}>
               <Calculator size={20} color="#10B981" />
-              <span style={{ fontWeight: 600, color: '#10B981' }}>Memória de Cálculo</span>
+              <span style={{ fontWeight: 600, color: '#10B981' }}>MemÃ³ria de CÃ¡lculo</span>
             </div>
           </motion.div>
 
@@ -280,7 +280,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <LayoutDashboard size={24} color="var(--color-primary)" />
-                {isArchitect ? 'Meus Projetos (Portfólio)' : 'Minhas Obras (Portfólio)'}
+                {isArchitect ? 'Meus Projetos (PortfÃ³lio)' : 'Minhas Obras (PortfÃ³lio)'}
               </h2>
               <button onClick={() => onNavigate('obras')} style={{ color: 'var(--color-primary)', background: 'none', border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
                 Ver {isArchitect ? 'todos' : 'todas'} <ArrowRight size={16} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
@@ -294,7 +294,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: (item.progress || 0) >= 100 ? '#10B981' : '#3B82F6', boxShadow: `0 0 10px ${(item.progress || 0) >= 100 ? '#10B981' : '#3B82F6'}` }} />
                       <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                        {(item.progress || 0) >= 100 ? 'Concluído' : 'Em Andamento'}
+                        {(item.progress || 0) >= 100 ? 'ConcluÃ­do' : 'Em Andamento'}
                       </span>
                     </div>
                   </div>
@@ -317,7 +317,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
                         <Users size={12} /> Equipe: {item.teamCount || 0}
                       </div>
                       <div style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Clipboard size={12} /> Diários: {item.diariesCount || 0}
+                        <Clipboard size={12} /> DiÃ¡rios: {item.diariesCount || 0}
                       </div>
                     </div>
                   </div>
@@ -340,7 +340,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Activity size={18} color="var(--color-primary)" />
-              Insights Técnicos
+              Insights TÃ©cnicos
             </h3>
             {insights.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -360,7 +360,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
               <div style={{ padding: 24, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }}>
                 <CheckCircle size={32} color="#10B981" style={{ margin: '0 auto 12px', opacity: 0.8 }} />
                 <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>Tudo em dia!</p>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0 0' }}>Sem pendências ou atrasos críticos.</p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0 0' }}>Sem pendÃªncias ou atrasos crÃ­ticos.</p>
               </div>
             )}
           </motion.div>
@@ -369,7 +369,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Calendar size={18} color="#8B5CF6" />
-              Agenda Técnica
+              Agenda TÃ©cnica
             </h3>
             {agenda.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -387,7 +387,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
               </div>
             ) : (
               <div style={{ padding: 24, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16 }}>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Nenhum evento agendado para os próximos dias.</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Nenhum evento agendado para os prÃ³ximos dias.</p>
               </div>
             )}
             <button className="btn-secondary" style={{ width: '100%', marginTop: 16, justifyContent: 'center', borderRadius: 12 }} onClick={() => onNavigate('agenda')}>

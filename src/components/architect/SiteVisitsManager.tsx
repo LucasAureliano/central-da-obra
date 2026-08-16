@@ -6,6 +6,7 @@ import { ClipboardList, Plus, User, ArrowLeft, Trash2, X, Save, Download } from 
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { generateTechnicalReportPDF } from '../../utils/TechnicalReportPDF';
+import { formatDate } from '../../utils/formatters';
 
 export interface SiteVisit {
   id?: string;
@@ -173,7 +174,7 @@ export function SiteVisitsManager({ onBack }: SiteVisitsManagerProps) {
       generateTechnicalReportPDF({
         title: 'RELATÓRIO DE ACOMPANHAMENTO DE OBRA',
         reportNumber: `VT-${Math.floor(1000 + Math.random() * 9000)}`,
-        date: new Date(visit.date).toLocaleDateString('pt-BR'),
+        date: formatDate(visit.date),
         clientName: visit.clientName,
         projectName: visit.projectName,
         address: visit.address,
@@ -249,7 +250,7 @@ export function SiteVisitsManager({ onBack }: SiteVisitsManagerProps) {
                   </span>
                 </div>
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#8B5CF6', backgroundColor: 'rgba(139, 92, 246, 0.15)', padding: '4px 10px', borderRadius: 8 }}>
-                  {new Date(v.date).toLocaleDateString('pt-BR')} às {v.time}
+                  {formatDate(v.date)} às {v.time}
                 </span>
               </div>
 

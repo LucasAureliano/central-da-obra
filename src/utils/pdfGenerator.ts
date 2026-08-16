@@ -1,6 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import logoUrl from '/logo-centralobra.png?url';
+import { formatDate } from './formatters';
+
 
 interface PDFExportParams {
   work: any;
@@ -18,6 +20,8 @@ export function drawHeader(doc: jsPDF, userName: string, _userEmail: string, wor
   if (logoBase64) {
     const imgWidth = 140;
     const imgHeight = 50; 
+    doc.setFillColor(255, 255, 255);
+    doc.rect(centerX - (imgWidth/2), currentY, imgWidth, imgHeight, 'F');
     doc.addImage(logoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
     currentY += imgHeight + 20;
   } else {
@@ -41,9 +45,9 @@ export function drawHeader(doc: jsPDF, userName: string, _userEmail: string, wor
   doc.text(`Responsável: ${userName || 'Usuário'}`, centerX, currentY, { align: 'center' });
   currentY += 15;
   if (workName) {
-    doc.text(`Obra: ${workName}  |  Data: ${new Date().toLocaleDateString('pt-BR')}`, centerX, currentY, { align: 'center' });
+    doc.text(`Obra: ${workName}  |  Data: ${formatDate()}`, centerX, currentY, { align: 'center' });
   } else {
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, centerX, currentY, { align: 'center' });
+    doc.text(`Data: ${formatDate()}`, centerX, currentY, { align: 'center' });
   }
 
   return currentY + 20;
@@ -74,6 +78,43 @@ export function drawFooter(doc: jsPDF) {
   doc.setTextColor(180, 180, 180);
   doc.setFont('helvetica', 'normal');
   doc.text(`Página ${currentPage} de ${pageCount}`, pageWidth - 20, pageHeight - 26, { align: 'right' });
+}
+
+export function applyGlobalWatermark(doc: jsPDF) {
+  const pageCount = (doc as any).internal.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    // Watermark styling
+    doc.setFontSize(60);
+    doc.setTextColor(230, 230, 230);
+    doc.setFont('helvetica', 'bold');
+    
+    // Calculate center
+    const centerX = pageWidth / 2;
+    const centerY = pageHeight / 2;
+    
+    // Using GState for opacity if supported (works in newer jspdf)
+    try {
+      const gState = new (doc as any).GState({ opacity: 0.15 });
+      (doc as any).setGState(gState);
+    } catch (e) {
+      // Fallback if GState is not available
+    }
+
+    doc.text('CENTRALOBRA', centerX, centerY, {
+      align: 'center',
+      angle: 45
+    });
+
+    // Reset GState if supported
+    try {
+      const resetState = new (doc as any).GState({ opacity: 1.0 });
+      (doc as any).setGState(resetState);
+    } catch (e) {}
+  }
 }
 
 export async function generateBudgetPDF({ work, user, calculations, profile }: PDFExportParams) {
@@ -121,7 +162,7 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
   doc.text(`Endereço: ${work.address || 'Não informado'}`, 45, cardY + 50);
 
   const rightCol = pageWidth / 2 + 20;
-  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, rightCol, cardY + 34);
+  doc.text(`Data: ${formatDate()}`, rightCol, cardY + 34);
   if (work.budget) {
     const budgetFormatted = typeof work.budget === 'number' 
       ? work.budget.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
@@ -182,6 +223,7 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
 
     autoTable(doc, {
       startY: y,
+      margin: { left: 40, right: 40 },
       head: [['Material', 'Quantidade', 'Valor Unitário', 'Total']],
       body: tableData,
       theme: 'grid',
@@ -233,7 +275,8 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
     drawFooter(doc);
   }
 
-  doc.save(`Orcamento_${work.name?.replace(/\s+/g, '_') || 'Obra'}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+  applyGlobalWatermark(doc);
+  doc.save(`Orcamento_${work.name?.replace(/\s+/g, '_') || 'Obra'}_${formatDate().replace(/\//g, '-')}.pdf`);
 }
 
 // --------------------------------------------------------------------------------------
@@ -297,6 +340,8 @@ export async function generateCommercialQuotePDF({
     // Desenha a imagem centralizada (Ex: 120x120 proporção)
     const imgWidth = 140;
     const imgHeight = 50; 
+    doc.setFillColor(255, 255, 255);
+    doc.rect(centerX - (imgWidth/2), currentY, imgWidth, imgHeight, 'F');
     doc.addImage(logoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
     currentY += imgHeight + 20;
   } else {
@@ -328,7 +373,7 @@ export async function generateCommercialQuotePDF({
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(107, 114, 128); // Gray 500
-  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}  |  Validade: ${conditions.validade || '15 dias'}`, centerX, currentY + 13, { align: 'center' });
+  doc.text(`Data: ${formatDate()}  |  Validade: ${conditions.validade || '15 dias'}`, centerX, currentY + 13, { align: 'center' });
 
   currentY += 35;
 
@@ -556,5 +601,6 @@ export async function generateCommercialQuotePDF({
     doc.text(`Página ${i} de ${pageCount}`, pWidth - margin, pHeight - 20, { align: 'right' });
   }
 
+  applyGlobalWatermark(doc);
   doc.save(`Proposta_${client.name?.replace(/\s+/g, '_') || 'Cliente'}.pdf`);
 }

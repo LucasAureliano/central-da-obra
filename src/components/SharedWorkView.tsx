@@ -3,6 +3,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Briefcase, MapPin, Calendar, CheckCircle2, Circle, User, Phone, Mail } from 'lucide-react';
 import { CustomLogo } from './CustomLogo';
+import { formatDate } from '../utils/formatters';
 
 export function SharedWorkView({ token, theme }: { token: string; theme: 'light' | 'dark' }) {
   const [work, setWork] = useState<any>(null);
@@ -130,7 +131,7 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
                 <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Previsão de Entrega</span>
-                <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: 14 }}>{work.deadline ? new Date(work.deadline).toLocaleDateString('pt-BR') : 'Não definida'}</span>
+                <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: 14 }}>{work.deadline ? formatDate(work.deadline) : 'Não definida'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Cliente</span>

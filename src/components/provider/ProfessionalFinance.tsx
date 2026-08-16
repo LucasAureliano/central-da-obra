@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ArrowLeft, PieChart, Plus, X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { formatDate } from '../../utils/formatters';
 
 export interface FinancialEntry {
   id?: string;
@@ -171,7 +172,7 @@ export function ProfessionalFinance({ onBack }: ProfessionalFinanceProps) {
             <div key={entry.id || idx} className="glass-panel" style={{ padding: 14, borderRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{entry.description}</h4>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{entry.category} • {new Date(entry.date).toLocaleDateString('pt-BR')}</span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{entry.category} • {formatDate(entry.date)}</span>
               </div>
               <span style={{ fontSize: 15, fontWeight: 800, color: entry.type === 'receita' ? '#10B981' : '#EF4444' }}>
                 {entry.type === 'receita' ? `+ ${fmt(entry.amount)}` : `- ${fmt(entry.amount)}`}

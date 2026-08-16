@@ -71,7 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 
     const checkLocalGuest = () => {
-      const localGuestUid = sessionStorage.getItem("localGuestUid");
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+      // Disable auto-guest on standard web so visitors see the Landing Page.
+      if (!isPWA && window.location.pathname === '/') return false;
+      
+      const localGuestUid = localStorage.getItem("localGuestUid") || sessionStorage.getItem("localGuestUid");
       if (localGuestUid) {
         const fakeUser = {
           uid: localGuestUid,
@@ -90,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date(),
           plan: "free",
           hasSeenWelcome:
-            sessionStorage.getItem("guestHasSeenWelcome") === "true",
+            localStorage.getItem("guestHasSeenWelcome") === "true",
         });
         setLocalGuest(true);
         setLoading(false);
@@ -106,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (!firebaseUser.isAnonymous) {
             sessionStorage.removeItem("localGuestUid");
+            localStorage.removeItem("localGuestUid");
             sessionStorage.removeItem("guestHasSeenWelcome");
             setLocalGuest(false);
 
@@ -250,6 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      localStorage.removeItem("localGuestUid");
       sessionStorage.removeItem("localGuestUid");
       sessionStorage.removeItem("guestHasSeenWelcome");
       localStorage.removeItem("pendingRole");

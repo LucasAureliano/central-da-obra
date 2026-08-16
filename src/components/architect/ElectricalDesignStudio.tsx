@@ -79,8 +79,8 @@ export function ElectricalDesignStudio({ onBack }: { onBack?: () => void }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: 24, alignItems: 'start' }}>
-        <div style={{ backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'start' }}>
+        <div style={{ flex: '1 1 300px', backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Sparkles size={18} color="#EAB308" /> Novo Circuito
           </h2>
@@ -143,7 +143,8 @@ export function ElectricalDesignStudio({ onBack }: { onBack?: () => void }) {
           </div>
         </div>
 
-        <div style={{ backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
+        <div style={{ flex: '2 1 400px' }}>
+          <div style={{ backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Quadro Resumo</h2>
           
           <div style={{ overflowX: 'auto' }}>
@@ -189,6 +190,7 @@ export function ElectricalDesignStudio({ onBack }: { onBack?: () => void }) {
               </tbody>
             </table>
           </div>
+        </div>
         </div>
       </div>
     </div>

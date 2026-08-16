@@ -21,55 +21,32 @@ export interface ScheduleStage {
   order: number;
 }
 
-export const getTemplates = (specialty?: string): Record<string, { name: string; stages: string[] }> => {
-  const normSpecialty = (specialty || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-  if (normSpecialty.includes('eletricista') || normSpecialty.includes('eletrica')) {
-    return {
-      eletrica_basica: {
-        name: 'Instalação Elétrica Básica',
-        stages: ['Marcação de Pontos', 'Corte de Paredes e Chumbamento de Caixas', 'Passagem de Eletrodutos', 'Passagem de Fiação', 'Instalação de Tomadas e Interruptores', 'Montagem do Quadro de Distribuição', 'Teste de Isolamento e Tensão']
-      },
-      troca_fiacao: {
-        name: 'Troca de Fiação',
-        stages: ['Desligamento Geral e Retirada da Fiação Antiga', 'Inspeção de Eletrodutos', 'Passagem da Nova Fiação', 'Substituição de Disjuntores', 'Testes e Energização']
-      }
-    };
-  }
-
-  if (normSpecialty.includes('encanador') || normSpecialty.includes('hidraulica')) {
-    return {
-      hidraulica_basica: {
-        name: 'Instalação Hidráulica',
-        stages: ['Marcação de Pontos de Água e Esgoto', 'Cortes em Alvenaria', 'Instalação de Tubulação de Esgoto', 'Instalação de Tubulação de Água Fria/Quente', 'Teste de Estanqueidade (Pressurização)', 'Chumbamento da Tubulação', 'Instalação de Louças e Metais']
-      }
-    };
-  }
-
-  if (normSpecialty.includes('pedreiro') || normSpecialty.includes('alvenaria')) {
-    return {
-      alvenaria: {
-        name: 'Alvenaria e Reboco',
-        stages: ['Gabarito e Marcação', 'Elevação de Alvenaria', 'Cintas e Vergas', 'Chapisco', 'Emboço/Reboco', 'Cura']
-      },
-      piso: {
-        name: 'Contrapiso e Porcelanato',
-        stages: ['Limpeza e Nivelamento', 'Execução do Contrapiso', 'Impermeabilização', 'Assentamento de Porcelanato', 'Rejuntamento', 'Limpeza Final']
-      }
-    };
-  }
-
-  if (normSpecialty.includes('pintor') || normSpecialty.includes('pintura')) {
-    return {
-      pintura: {
-        name: 'Pintura Interna Completa',
-        stages: ['Proteção de Pisos e Móveis', 'Lixamento e Preparação de Superfície', 'Aplicação de Massa Corrida', 'Lixamento da Massa', 'Aplicação de Selador', 'Pintura (2 a 3 demãos)', 'Retoques Finos e Limpeza']
-      }
-    };
-  }
-
-  // Default models for General/Owner
+const getTemplates = (specialty?: string): Record<string, { name: string; stages: string[] }> => {
   return {
+    eletrica_basica: {
+      name: 'Instalação Elétrica Básica',
+      stages: ['Marcação de Pontos', 'Corte de Paredes e Chumbamento de Caixas', 'Passagem de Eletrodutos', 'Passagem de Fiação', 'Instalação de Tomadas e Interruptores', 'Montagem do Quadro de Distribuição', 'Teste de Isolamento e Tensão']
+    },
+    troca_fiacao: {
+      name: 'Troca de Fiação',
+      stages: ['Desligamento Geral e Retirada da Fiação Antiga', 'Inspeção de Eletrodutos', 'Passagem da Nova Fiação', 'Substituição de Disjuntores', 'Testes e Energização']
+    },
+    hidraulica_basica: {
+      name: 'Instalação Hidráulica',
+      stages: ['Marcação de Pontos de Água e Esgoto', 'Cortes em Alvenaria', 'Instalação de Tubulação de Esgoto', 'Instalação de Tubulação de Água Fria/Quente', 'Teste de Estanqueidade (Pressurização)', 'Chumbamento da Tubulação', 'Instalação de Louças e Metais']
+    },
+    alvenaria: {
+      name: 'Alvenaria e Reboco',
+      stages: ['Gabarito e Marcação', 'Elevação de Alvenaria', 'Cintas e Vergas', 'Chapisco', 'Emboço/Reboco', 'Cura']
+    },
+    piso: {
+      name: 'Contrapiso e Porcelanato',
+      stages: ['Limpeza e Nivelamento', 'Execução do Contrapiso', 'Impermeabilização', 'Assentamento de Porcelanato', 'Rejuntamento', 'Limpeza Final']
+    },
+    pintura_completa: {
+      name: 'Pintura Interna Completa',
+      stages: ['Proteção de Pisos e Móveis', 'Lixamento e Preparação de Superfície', 'Aplicação de Massa Corrida', 'Lixamento da Massa', 'Aplicação de Selador', 'Pintura (2 a 3 demãos)', 'Retoques Finos e Limpeza']
+    },
     casa_nova: {
     name: 'Casa Nova (Completa)',
     stages: [
@@ -320,7 +297,7 @@ export function InteractiveSchedule({ onBack, workId, projectId, embedded = fals
     });
 
     return () => unsubscribe();
-  }, [user, currentWorkId]);
+  }, [user, currentWorkId, collectionPath]);
 
   // Recalculate Work Progress % when stages change
   const updateWorkProgress = async (newStages: ScheduleStage[]) => {
@@ -366,7 +343,7 @@ export function InteractiveSchedule({ onBack, workId, projectId, embedded = fals
 
   const handleAddStage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stageTitle.trim() || !currentWork) return;
+    if (!stageTitle.trim() || !currentWorkId) return;
 
     try {
       const newStage: Omit<ScheduleStage, 'id'> = {
@@ -383,7 +360,7 @@ export function InteractiveSchedule({ onBack, workId, projectId, embedded = fals
       const updatedList = [...stages, { ...newStage, id: `temp-${Date.now()}` } as ScheduleStage];
       setStages(updatedList);
       
-      addDoc(collection(db, `works/${currentWork.id}/schedule_stages`), newStage).catch(err => console.error(err));
+      addDoc(collection(db, collectionPath), newStage).catch(err => console.error(err));
       updateWorkProgress(updatedList);
       
       toast.success('Etapa adicionada ao cronograma!');

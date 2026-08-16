@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Image, Filter, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatDate } from '../../utils/formatters';
 
 interface PortalGalleryProps {
   workId: string;
@@ -132,7 +133,7 @@ export default function PortalGallery({ workId }: PortalGalleryProps) {
                 {photo.date && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '13px' }}>
                     <Calendar size={14} />
-                    {new Date(photo.date).toLocaleDateString('pt-BR')}
+                    {formatDate(photo.date)}
                   </div>
                 )}
               </div>

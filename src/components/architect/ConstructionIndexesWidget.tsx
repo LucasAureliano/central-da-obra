@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, RefreshCw, BarChart3 } from 'lucide-react';
 import { constructionIndexesService, type ConstructionIndex } from '../../services/construction/ConstructionIndexesService';
+import { formatCurrency } from '../../utils/formatters';
 
 export function ConstructionIndexesWidget({ onNavigate: _onNavigate }: { onNavigate?: (tab: string) => void }) {
   const [indexes, setIndexes] = useState<ConstructionIndex[]>([]);
@@ -89,7 +90,7 @@ export function ConstructionIndexesWidget({ onNavigate: _onNavigate }: { onNavig
 
               <div>
                 <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-main)' }}>
-                  {idxItem.unit === 'R$/m²' ? `R$ ${idxItem.value.toLocaleString('pt-BR')}` : idxItem.name === 'SELIC' ? `${idxItem.value}%` : idxItem.value.toLocaleString('pt-BR')}
+                  {idxItem.unit === 'R$/m²' ? `${formatCurrency(idxItem.value)}` : idxItem.name === 'SELIC' ? `${idxItem.value}%` : idxItem.value.toLocaleString('pt-BR')}
                 </span>
                 <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginTop: 2 }}>
                   {idxItem.unit || 'pontos'}

@@ -4,6 +4,7 @@ import { useWorks } from '../../contexts/WorksContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { formatDate } from '../../utils/formatters';
 
 interface Inspection {
   id: string;
@@ -157,7 +158,7 @@ export function Inspections() {
                     {inspection.title}
                   </div>
                   <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-                    Data: {new Date(inspection.date).toLocaleDateString('pt-BR')} • {inspection.responsible}
+                    Data: {formatDate(inspection.date)} • {inspection.responsible}
                   </div>
                 </div>
                 <div style={{ 

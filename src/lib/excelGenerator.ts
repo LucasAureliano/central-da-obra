@@ -2,6 +2,7 @@ import { exportToExcel } from '../utils/excelExport';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 import type { Work, Expense } from '../types';
+import { formatDate } from '../utils/formatters';
 
 export const exportShoppingToExcel = async (activeWork: Work) => {
   const qShop = query(collection(db, `works/${activeWork.id}/shopping`));
@@ -66,7 +67,7 @@ export const exportFinanceToExcel = async (activeWork: Work) => {
   const expenses = snap.docs.map(d => d.data() as Expense);
 
   const data = expenses.map(e => ({
-    Data: e.date?.toDate ? e.date.toDate().toLocaleDateString('pt-BR') : new Date(e.date).toLocaleDateString('pt-BR'),
+    Data: e.date?.toDate ? formatDate(e.date.toDate()) : formatDate(e.date),
     Descricao: e.title,
     Categoria: e.category,
     Status: e.status,

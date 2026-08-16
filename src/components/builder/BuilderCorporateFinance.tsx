@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { DollarSign, TrendingUp, TrendingDown, ArrowLeft, Download, Search, Filter } from 'lucide-react';
 import { useWorks } from '../../contexts/WorksContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { formatCurrency } from '../../utils/formatters';
 
 export function BuilderCorporateFinance({ onBack }: { onBack: () => void }) {
   const { works, isLoadingWorks } = useWorks();
@@ -148,7 +149,7 @@ export function BuilderCorporateFinance({ onBack }: { onBack: () => void }) {
                     <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `R$${value/1000}k`} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-subtle)', borderRadius: 12, color: 'var(--text-main)' }}
-                      formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, undefined]}
+                      formatter={(value: any) => [`${formatCurrency(Number(value))}`, undefined]}
                     />
                     <Legend iconType="circle" />
                     <Area type="monotone" dataKey="Entradas" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorEntradas)" />
@@ -164,23 +165,23 @@ export function BuilderCorporateFinance({ onBack }: { onBack: () => void }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
                   <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Receita Operacional Bruta</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>R$ {totalBudget.toLocaleString('pt-BR')}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{formatCurrency(totalBudget)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
                   <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Impostos s/ Receita (Est.)</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>- R$ {(totalBudget * 0.06).toLocaleString('pt-BR')}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>- {formatCurrency((totalBudget * 0.06))}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Receita Líquida</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>R$ {(totalBudget * 0.94).toLocaleString('pt-BR')}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{formatCurrency((totalBudget * 0.94))}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
                   <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Custos Diretos (Obras)</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>- R$ {totalSpent.toLocaleString('pt-BR')}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#EF4444' }}>- {formatCurrency(totalSpent)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-elevated)', padding: 12, borderRadius: 8 }}>
                   <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)' }}>Lucro Bruto</span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: '#10B981' }}>R$ {((totalBudget * 0.94) - totalSpent).toLocaleString('pt-BR')}</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: '#10B981' }}>{formatCurrency(((totalBudget * 0.94) - totalSpent))}</span>
                 </div>
               </div>
             </motion.div>
@@ -198,7 +199,7 @@ export function BuilderCorporateFinance({ onBack }: { onBack: () => void }) {
                     <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `R$${value/1000}k`} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: 'var(--bg-glass)', borderColor: 'var(--border-subtle)', borderRadius: 12, color: 'var(--text-main)' }}
-                      formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, undefined]}
+                      formatter={(value: any) => [`${formatCurrency(Number(value))}`, undefined]}
                       itemStyle={{ fontWeight: 600 }}
                     />
                     <Legend />

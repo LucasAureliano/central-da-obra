@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { ClipboardList, Plus, Calendar, CheckCircle2, FileText, X, Check } from 'lucide-react';
 import { db } from '../../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -14,46 +14,46 @@ interface Inspection {
   title: string;
   date: string;
   inspector: string;
-  status: 'Pendente' | 'Concluída';
+  status: 'Pendente' | 'ConcluÃ­da';
   type: string;
   items: { id: string; text: string; checked: boolean }[];
   notes: string;
 }
 
 const PREDEFINED_CHECKLISTS: Record<string, string[]> = {
-  'Fundação': [
-    'Verificar locação dos eixos e pilares',
-    'Conferir dimensões das valas/sapatas',
-    'Checar bitola e armação das ferragens',
-    'Verificar prumo e esquadro das fôrmas',
+  'FundaÃ§Ã£o': [
+    'Verificar locaÃ§Ã£o dos eixos e pilares',
+    'Conferir dimensÃµes das valas/sapatas',
+    'Checar bitola e armaÃ§Ã£o das ferragens',
+    'Verificar prumo e esquadro das fÃ´rmas',
     'Inspecionar concretagem (slump test)',
-    'Verificar impermeabilização de baldrames'
+    'Verificar impermeabilizaÃ§Ã£o de baldrames'
   ],
   'Alvenaria e Estrutura': [
     'Conferir prumo das paredes',
-    'Verificar esquadro dos cômodos',
-    'Inspecionar nível das fiadas',
-    'Checar amarração dos tijolos/blocos',
+    'Verificar esquadro dos cÃ´modos',
+    'Inspecionar nÃ­vel das fiadas',
+    'Checar amarraÃ§Ã£o dos tijolos/blocos',
     'Verificar vergas e contravergas nas esquadrias',
-    'Conferir chapisco e emboço'
+    'Conferir chapisco e emboÃ§o'
   ],
-  'Instalações Hidráulicas': [
-    'Teste de estanqueidade das tubulações',
+  'InstalaÃ§Ãµes HidrÃ¡ulicas': [
+    'Teste de estanqueidade das tubulaÃ§Ãµes',
     'Conferir caimento (declividade) de esgoto',
     'Verificar posicionamento de ralos e caixas sifonadas',
-    'Checar prumo dos pontos de água',
-    'Inspecionar registros de gaveta e pressão'
+    'Checar prumo dos pontos de Ã¡gua',
+    'Inspecionar registros de gaveta e pressÃ£o'
   ],
-  'Instalações Elétricas': [
-    'Conferir locação de caixinhas (altura e prumo)',
-    'Verificar passagem de conduítes',
-    'Checar bitola da fiação conforme projeto',
-    'Inspecionar quadro de distribuição (QDC)',
+  'InstalaÃ§Ãµes ElÃ©tricas': [
+    'Conferir locaÃ§Ã£o de caixinhas (altura e prumo)',
+    'Verificar passagem de conduÃ­tes',
+    'Checar bitola da fiaÃ§Ã£o conforme projeto',
+    'Inspecionar quadro de distribuiÃ§Ã£o (QDC)',
     'Teste de isolamento'
   ],
   'Acabamentos e Revestimentos': [
     'Checar nivelamento do contrapiso',
-    'Verificar assentamento e juntas (espaçadores)',
+    'Verificar assentamento e juntas (espaÃ§adores)',
     'Conferir recortes nos cantos e ralos',
     'Inspecionar som oco no revestimento (batida)',
     'Verificar pintura (manchas, escorrimentos, cobertura)'
@@ -68,7 +68,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
-    type: 'Fundação',
+    type: 'FundaÃ§Ã£o',
     date: new Date().toISOString().split('T')[0],
     inspector: '',
     notes: '',
@@ -107,7 +107,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
   const loadInspections = async () => {
     try {
       setLoading(true);
-      const q = query(collection(db, 'projects', projectId, 'inspections'), orderBy('date', 'desc'));
+      const q = query(collection(db, 'works', projectId, 'inspections'), orderBy('date', 'desc'));
       const snapshot = await getDocs(q);
       const data: Inspection[] = [];
       snapshot.forEach(doc => {
@@ -124,7 +124,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
 
   const saveInspection = async () => {
     if (!formData.title) {
-      toast.error('Informe o título da vistoria.');
+      toast.error('Informe o tÃ­tulo da vistoria.');
       return;
     }
 
@@ -139,7 +139,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
       };
 
       if (user && !isGuest) {
-        await addDoc(collection(db, 'projects', projectId, 'inspections'), newEntry);
+        await addDoc(collection(db, 'works', projectId, 'inspections'), newEntry);
         loadInspections();
         toast.success('Vistoria agendada!');
       } else {
@@ -149,7 +149,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
         toast.success('Salvo localmente (Visitante).');
       }
       setIsModalOpen(false);
-      setFormData({ title: '', type: 'Fundação', date: new Date().toISOString().split('T')[0], inspector: '', notes: '' });
+      setFormData({ title: '', type: 'FundaÃ§Ã£o', date: new Date().toISOString().split('T')[0], inspector: '', notes: '' });
       setChecklistItems([]);
     } catch (error) {
       console.error(error);
@@ -161,7 +161,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>Vistorias Técnicas</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>Vistorias TÃ©cnicas</h3>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Checklists e laudos de vistoria de campo vinculados.</p>
         </div>
         <button className="btn-primary" onClick={() => setIsModalOpen(true)} style={{ padding: '8px 14px', borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -187,10 +187,10 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
                     <span style={{ backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: 12, fontWeight: 700 }}>{insp.type || 'Geral'}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-                    <Calendar size={12} /> {insp.date} • {insp.inspector}
+                    <Calendar size={12} /> {insp.date} â€¢ {insp.inspector}
                   </div>
                 </div>
-                <span className={`status-chip ${insp.status === 'Concluída' ? 'status-active' : ''}`}>{insp.status}</span>
+                <span className={`status-chip ${insp.status === 'ConcluÃ­da' ? 'status-active' : ''}`}>{insp.status}</span>
               </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
@@ -232,8 +232,8 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
                   </select>
                 </div>
                 <div className="input-group">
-                  <label>Título da Vistoria</label>
-                  <input type="text" className="input-field" style={{ padding: '0 16px', height: 44 }} placeholder="Ex: Conferência de armação" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                  <label>TÃ­tulo da Vistoria</label>
+                  <input type="text" className="input-field" style={{ padding: '0 16px', height: 44 }} placeholder="Ex: ConferÃªncia de armaÃ§Ã£o" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
                 </div>
               </div>
 
@@ -249,7 +249,7 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
               </div>
 
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>Checklist de Verificação</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>Checklist de VerificaÃ§Ã£o</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {checklistItems.map((item, idx) => (
                     <div key={item.id} style={{ display: 'flex', gap: 8 }}>
@@ -275,8 +275,8 @@ export function ProjectInspections({ projectId }: ProjectInspectionsProps) {
               </div>
 
               <div className="input-group">
-                <label>Observações Prévias</label>
-                <textarea className="input-field" style={{ padding: '12px 16px', minHeight: 60 }} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="Instruções para a vistoria..." />
+                <label>ObservaÃ§Ãµes PrÃ©vias</label>
+                <textarea className="input-field" style={{ padding: '12px 16px', minHeight: 60 }} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="InstruÃ§Ãµes para a vistoria..." />
               </div>
             </div>
 

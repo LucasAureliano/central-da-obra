@@ -4,6 +4,7 @@ import { useWorks } from '../../contexts/WorksContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { formatDate } from '../../utils/formatters';
 
 interface Stage {
   id: string;
@@ -191,7 +192,7 @@ export function Schedule() {
                     {stage.name}
                   </div>
                   <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-                    {new Date(stage.startDate).toLocaleDateString('pt-BR')} até {new Date(stage.endDate).toLocaleDateString('pt-BR')}
+                    {formatDate(stage.startDate)} até {formatDate(stage.endDate)}
                   </div>
                 </div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: getStatusColor(stage.status) }}>

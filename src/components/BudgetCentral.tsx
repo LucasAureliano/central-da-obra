@@ -4,6 +4,8 @@ import { collection, query, where, onSnapshot, getDocs, addDoc, serverTimestamp 
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { ImportBudgetModal } from './works/ImportBudgetModal';
+import { formatDate } from '../utils/formatters';
+
 
 interface BudgetCentralProps {
   onBack: () => void;
@@ -132,7 +134,7 @@ export function BudgetCentral({ onBack }: BudgetCentralProps) {
                 <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>Orçamento Profissional</h1>
               </div>
               <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Obra: {selectedWork.name}</h2>
-              <p style={{ color: 'var(--text-muted)' }}>{getClientLabel()}: {selectedWork.client || 'Não informado'} | Data: {new Date().toLocaleDateString('pt-BR')}</p>
+              <p style={{ color: 'var(--text-muted)' }}>{getClientLabel()}: {selectedWork.client || 'Não informado'} | Data: {formatDate()}</p>
             </div>
 
             {/* Calculations List */}

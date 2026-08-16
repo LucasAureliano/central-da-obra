@@ -4,6 +4,8 @@ import { collection, query, onSnapshot, addDoc, Timestamp, orderBy, updateDoc, d
 import { Plus, CheckCircle2, Clock, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../contexts/AuthContext';
+import { useAuthModal } from '../../contexts/AuthModalContext';
 
 interface ProviderWorkFinanceProps {
   workId: string;
@@ -23,6 +25,8 @@ interface WorkEntry {
 }
 
 export function ProviderWorkFinance({ workId }: ProviderWorkFinanceProps) {
+  const { user, isGuest } = useAuth();
+  const { triggerGuestAlert } = useAuthModal();
   const [entries, setEntries] = useState<WorkEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -35,19 +39,59 @@ export function ProviderWorkFinance({ workId }: ProviderWorkFinanceProps) {
 
   useEffect(() => {
     if (!workId) return;
+
+    if (isGuest || !user) {
+      try {
+        const stored = localStorage.getItem(`co_provider_finance_${workId}`);
+        if (stored) setEntries(JSON.parse(stored));
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+      return;
+    }
+
     const q = query(collection(db, 'works', workId, 'provider_finances'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snapshot) => {
       const docs: WorkEntry[] = [];
       snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() } as WorkEntry));
       setEntries(docs);
       setLoading(false);
+    }, (error) => {
+      console.error("Error loading provider finance:", error);
+      setLoading(false);
+      toast.error("Erro ao carregar o financeiro");
     });
     return () => unsub();
-  }, [workId]);
+  }, [workId, user, isGuest]);
+
+  const saveToLocal = (updated: WorkEntry[]) => {
+    localStorage.setItem(`co_provider_finance_${workId}`, JSON.stringify(updated));
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !amount) return;
+
+    if (isGuest || !user) {
+      const newItem: WorkEntry = {
+        id: crypto.randomUUID(),
+        description,
+        amount: parseFloat(amount),
+        type,
+        status,
+        date: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      };
+      const updated = [newItem, ...entries];
+      setEntries(updated);
+      saveToLocal(updated);
+      toast.success('Lançamento adicionado!');
+      setShowAddModal(false);
+      setDescription('');
+      setAmount('');
+      return;
+    }
 
     try {
       await addDoc(collection(db, 'works', workId, 'provider_finances'), {
@@ -69,6 +113,13 @@ export function ProviderWorkFinance({ workId }: ProviderWorkFinanceProps) {
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir?')) {
+      if (isGuest || !user) {
+        const updated = entries.filter(e => e.id !== id);
+        setEntries(updated);
+        saveToLocal(updated);
+        toast.success('Excluído com sucesso');
+        return;
+      }
       try {
         await deleteDoc(doc(db, 'works', workId, 'provider_finances', id));
         toast.success('Excluído com sucesso');
@@ -81,6 +132,14 @@ export function ProviderWorkFinance({ workId }: ProviderWorkFinanceProps) {
   const toggleStatus = async (entry: WorkEntry) => {
     if (!entry.id) return;
     const newStatus = entry.status === 'Pendente' ? (entry.type === 'Custo' ? 'Pago' : 'Recebido') : 'Pendente';
+    
+    if (isGuest || !user) {
+      const updated = entries.map(e => e.id === entry.id ? { ...e, status: newStatus as EntryStatus } : e);
+      setEntries(updated);
+      saveToLocal(updated);
+      return;
+    }
+
     try {
       await updateDoc(doc(db, 'works', workId, 'provider_finances', entry.id), { status: newStatus });
     } catch {

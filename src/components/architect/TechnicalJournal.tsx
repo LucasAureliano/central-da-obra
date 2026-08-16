@@ -4,6 +4,7 @@ import { useWorks } from '../../contexts/WorksContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { formatDate } from '../../utils/formatters';
 
 interface JournalEntry {
   id: string;
@@ -160,7 +161,7 @@ export function TechnicalJournal() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                 <div>
                   <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4 }}>
-                    {new Date(entry.date).toLocaleDateString('pt-BR')}
+                    {formatDate(entry.date)}
                   </div>
                   <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                     Responsável: {entry.responsible}

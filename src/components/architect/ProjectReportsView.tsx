@@ -1,7 +1,10 @@
-﻿import { FileSpreadsheet, Download } from 'lucide-react';
+import { FileSpreadsheet, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import jsPDF from 'jspdf';
 import { toast } from 'react-hot-toast';
+import { formatDate } from '../../utils/formatters';
+import { applyGlobalWatermark } from '../../utils/pdfGenerator';
+
 
 export function ProjectReportsView({ projectId }: { projectId: string }) {
   
@@ -18,6 +21,7 @@ export function ProjectReportsView({ projectId }: { projectId: string }) {
       doc.text('2. Compatibilização de Projetos - (Sem interferências críticas)', 20, 90);
       doc.text('3. Especificação de Materiais - (Tabela em anexo)', 20, 100);
 
+      applyGlobalWatermark(doc);
       doc.save(`Caderno_de_Obras_${projectId}.pdf`);
       toast.success('Caderno de Obras gerado com sucesso!');
     } catch (e) {
@@ -33,7 +37,7 @@ export function ProjectReportsView({ projectId }: { projectId: string }) {
       doc.text('Status Report Executivo', 20, 30);
       doc.setFontSize(12);
       doc.text(`ID do Projeto: ${projectId}`, 20, 45);
-      doc.text('Data de Geração: ' + new Date().toLocaleDateString('pt-BR'), 20, 60);
+      doc.text('Data de Geração: ' + formatDate(), 20, 60);
       
       doc.text('Resumo Financeiro:', 20, 80);
       doc.text('- Orçamento Total: (Calculado)', 20, 90);
@@ -43,6 +47,7 @@ export function ProjectReportsView({ projectId }: { projectId: string }) {
       doc.text('- Avanço Físico: (Calculado)%', 20, 130);
       doc.text('- Próxima Etapa: (Definir)', 20, 140);
 
+      applyGlobalWatermark(doc);
       doc.save(`Status_Report_${projectId}.pdf`);
       toast.success('Status Report gerado com sucesso!');
     } catch (e) {

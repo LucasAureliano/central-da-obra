@@ -3,6 +3,7 @@ import { Plus, Search, FileText, DollarSign, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { collection, getDocs, doc, updateDoc, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { formatDate } from '../../utils/formatters';
 
 type QuoteStatus = 'Rascunho' | 'Enviado' | 'Em Negociação' | 'Aprovado' | 'Execução' | 'Concluído' | 'Recusado';
 
@@ -179,7 +180,7 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
                           {quote.value?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                         <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
-                          {new Date(quote.date).toLocaleDateString('pt-BR')}
+                          {formatDate(quote.date)}
                         </span>
                       </div>
   

@@ -10,6 +10,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { PrimaryWorkSelector } from '../../ui/PrimaryWorkSelector';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { formatCurrency } from '../../../utils/formatters';
 
 // ─── Modal: Raio-X da Obra ────────────────────────────────────────────────────
 function RaioXModal({ isOpen, onClose, _primaryWork, stagesInfo, budget, spent }: any) {
@@ -48,8 +49,8 @@ function RaioXModal({ isOpen, onClose, _primaryWork, stagesInfo, budget, spent }
             </span>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
               {balance >= 0 
-                ? `Você tem um saldo positivo de R$ ${balance.toLocaleString('pt-BR')} para concluir a obra.` 
-                : `Você ultrapassou o orçamento em R$ ${Math.abs(balance).toLocaleString('pt-BR')}.`}
+                ? `Você tem um saldo positivo de ${formatCurrency(balance)} para concluir a obra.` 
+                : `Você ultrapassou o orçamento em ${formatCurrency(Math.abs(balance))}.`}
             </span>
           </div>
 

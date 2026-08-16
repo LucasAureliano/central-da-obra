@@ -29,16 +29,16 @@ export const ArchitectDemo: React.FC<DemoProps> = ({ step, onActionComplete }) =
           initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}
         >
-          {step === 0 && 'Gestão de Projetos'}
-          {step === 1 && 'Cronograma de Obras'}
+          {step === 0 && 'Design Studio & Marcas'}
+          {step === 1 && 'Compatibilização Inteligente'}
         </motion.h2>
         <motion.p 
           key={`desc-${step}`}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
           style={{ fontSize: 16, color: 'var(--text-muted)' }}
         >
-          {step === 0 && 'Organize plantas, contratos e documentos em um só lugar.'}
-          {step === 1 && 'Acompanhe prazos com visões de Gantt interativas.'}
+          {step === 0 && 'Especifique revestimentos e texturas reais (Portobello, Deca, etc) com preços atualizados.'}
+          {step === 1 && 'Integre projetos elétricos, luminotécnicos e hidráulicos com precisão.'}
         </motion.p>
       </div>
 

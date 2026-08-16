@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, Activity, Building, TrendingUp, Trash2 } from 'lucide-react';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
@@ -25,7 +25,7 @@ export const ExecutiveTimeline: React.FC = () => {
         workName: w.name,
         status: w.progress === 100 ? 'Em dia' : (w.progress > 50 ? 'Adiantado' : 'Atrasado'),
         progress: w.progress || 0,
-        deadline: w.deadline || 'N�o definido'
+        deadline: w.deadline || 'N?o definido'
       })));
     } catch (e) {
       console.error(e);
@@ -59,7 +59,7 @@ export const ExecutiveTimeline: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', marginBottom: 4 }}>Cronograma Geral</h1>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Vis�o macro de todas as suas obras</p>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Vis?o macro de todas as suas obras</p>
         </div>
       </div>
 

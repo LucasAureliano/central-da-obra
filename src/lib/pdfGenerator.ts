@@ -3,8 +3,9 @@ import 'jspdf-autotable';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 import type { Work, Expense } from '../types';
-import { drawHeader, drawFooter } from '../utils/pdfGenerator';
+import { drawHeader, drawFooter, applyGlobalWatermark } from '../utils/pdfGenerator';
 import { auth } from './firebase';
+import { formatDate } from '../utils/formatters';
 
 export const generateGeneralReport = async (activeWork: Work) => {
   const doc = new jsPDF('p', 'pt', 'a4');
@@ -38,6 +39,7 @@ export const generateGeneralReport = async (activeWork: Work) => {
   });
 
   drawFooter(doc);
+  applyGlobalWatermark(doc);
   doc.save(`relatorio_geral_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
 
@@ -61,7 +63,7 @@ export const generateFinancialReport = async (activeWork: Work) => {
     doc.text('Nenhuma despesa registrada nesta obra.', 40, 140);
   } else {
     const tableData = expenses.map(e => [
-      e.date?.toDate ? e.date.toDate().toLocaleDateString('pt-BR') : new Date(e.date).toLocaleDateString('pt-BR'),
+      e.date?.toDate ? formatDate(e.date.toDate()) : formatDate(e.date),
       e.title,
       e.category,
       e.status,
@@ -89,6 +91,7 @@ export const generateFinancialReport = async (activeWork: Work) => {
   }
 
   drawFooter(doc);
+  applyGlobalWatermark(doc);
   doc.save(`financeiro_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
 
@@ -159,5 +162,6 @@ export const generateShoppingReport = async (activeWork: Work) => {
   }
 
   drawFooter(doc);
+  applyGlobalWatermark(doc);
   doc.save(`compras_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
 };

@@ -3,6 +3,7 @@ import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { CloudRain, Sun, Cloud, Users, Send, MessageSquare } from 'lucide-react';
+import { formatDate } from '../../utils/formatters';
 
 interface WorkDiaryProps {
   workId: string;
@@ -174,7 +175,7 @@ export function WorkDiary({ workId }: WorkDiaryProps) {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <div>
                       <p style={{ fontSize: 12, color: 'var(--color-primary)', fontWeight: 600, marginBottom: 2 }}>
-                        {entry.createdAt?.toDate ? new Date(entry.createdAt.toDate()).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Hoje'}
+                        {entry.createdAt?.toDate ? formatDate(entry.createdAt.toDate()) : 'Hoje'}
                       </p>
                       <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                         por {entry.userName || 'Usuário'}

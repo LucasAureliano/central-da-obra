@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { applyGlobalWatermark } from './pdfGenerator';
 
 export interface CorporateReportPDFData {
   companyName: string;
@@ -148,5 +149,6 @@ export function generateCorporateReportPDF(data: CorporateReportPDFData) {
     doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 20, { align: 'right' });
   }
 
+  applyGlobalWatermark(doc);
   doc.save(`Relatorio_Corporativo_${data.companyName.replace(/\s+/g, '_')}_${data.reportNumber}.pdf`);
 }

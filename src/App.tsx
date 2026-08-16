@@ -111,6 +111,17 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (user && !isGuest && showAuthModal) {
+      closeAuthModal();
+    }
+  }, [user, isGuest, showAuthModal, closeAuthModal]);
+
   if (hash.startsWith('#/avaliar/')) {
     const providerId = hash.split('#/avaliar/')[1];
     if (providerId) {
@@ -125,17 +136,6 @@ function App() {
   if (isPreview === 'true') {
     return <DashboardRouter onNavigate={() => {}} />;
   }
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  useEffect(() => {
-    if (user && !isGuest && showAuthModal) {
-      closeAuthModal();
-    }
-  }, [user, isGuest, showAuthModal, closeAuthModal]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');

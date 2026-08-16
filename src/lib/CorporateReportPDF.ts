@@ -1,7 +1,9 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
+import { applyGlobalWatermark } from '../utils/pdfGenerator';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { formatCurrency } from '../utils/formatters';
 
 // This function assumes it receives the aggregated data
 export async function generateCorporateReportPDF(data: {
@@ -55,8 +57,8 @@ export async function generateCorporateReportPDF(data: {
   const kpis = [
     [`Obras Ativas / Totais`, `${data.activeWorks} / ${data.totalWorks}`],
     [`Obras em Atraso`, `${data.delayedWorks}`],
-    [`VGV (Orçamento Total)`, `R$ ${data.totalBudget.toLocaleString('pt-BR')}`],
-    [`Custo Realizado (Total)`, `R$ ${data.totalSpent.toLocaleString('pt-BR')}`],
+    [`VGV (Orçamento Total)`, `${formatCurrency(data.totalBudget)}`],
+    [`Custo Realizado (Total)`, `${formatCurrency(data.totalSpent)}`],
     [`Mão de Obra Alocada`, `${data.activeEmployees} colaboradores`],
     [`Equipamentos em Uso`, `${data.equipmentInUse} máquinas`],
   ];
@@ -82,8 +84,8 @@ export async function generateCorporateReportPDF(data: {
     w.name,
     w.status,
     `${w.progress || 0}%`,
-    `R$ ${(w.budget || 0).toLocaleString('pt-BR')}`,
-    `R$ ${(w.spent || 0).toLocaleString('pt-BR')}`
+    `${formatCurrency((w.budget || 0))}`,
+    `${formatCurrency((w.spent || 0))}`
   ]);
 
   (doc as any).autoTable({
@@ -114,5 +116,6 @@ export async function generateCorporateReportPDF(data: {
   addCenteredText('Relatório gerado automaticamente por CentralObra Connect', doc.internal.pageSize.getHeight() - 20, 8, '#999999');
 
   // Save the PDF
+  applyGlobalWatermark(doc);
   doc.save(`Relatorio_Corporativo_${format(new Date(), "yyyyMMdd")}.pdf`);
 }

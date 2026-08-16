@@ -16,6 +16,11 @@ export function exportToExcel({ filename, sheetName, columns, data, title, subti
   // Create rows
   const rows: any[][] = [];
 
+  // Add Branding Header / Watermark
+  rows.push(['CENTRALOBRA - PLATAFORMA DE GESTÃO DA CONSTRUÇÃO CIVIL']);
+  rows.push(['Documento Autenticado CentralObra | www.centralobra.com.br']);
+  rows.push([]);
+
   // Add Title and Subtitle
   if (title) {
     rows.push([title]);

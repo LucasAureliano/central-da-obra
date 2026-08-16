@@ -137,7 +137,7 @@ export function LightingDesignEngine({ onBack }: LightingDesignEngineProps) {
         <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 14px', textTransform: 'uppercase' }}>
           2. Dimensões do Ambiente
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10 }}>
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4 }}>Largura (m)</label>
             <input value={width} onChange={e => setWidth(e.target.value)} type="number" step="0.1" className="input-premium" />

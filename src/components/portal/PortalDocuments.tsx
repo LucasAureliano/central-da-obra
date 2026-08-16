@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { FileText, Download, Image as ImageIcon, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { formatDate } from '../../utils/formatters';
 
 interface PortalDocumentsProps {
   workId: string;
@@ -58,7 +59,7 @@ export default function PortalDocuments({ workId }: PortalDocumentsProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    return formatDate(dateString);
   };
 
   if (loading) {

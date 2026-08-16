@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, FolderPlus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../lib/firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 interface SelectWorkModalProps {
   isOpen: boolean;
@@ -21,9 +21,15 @@ export function SelectWorkModal({ isOpen, onClose, onSelect }: SelectWorkModalPr
     const fetchWorks = async () => {
       setLoading(true);
       try {
-        const q = query(collection(db, 'works'), where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'works'), where('userId', '==', user.uid));
         const snapshot = await getDocs(q);
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Sort descending locally to avoid requiring composite index on firestore
+        data.sort((a: any, b: any) => {
+          const tA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const tB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return tB - tA;
+        });
         setWorks(data);
       } catch (err) {
         console.error("Failed to fetch works", err);
@@ -38,7 +44,7 @@ export function SelectWorkModal({ isOpen, onClose, onSelect }: SelectWorkModalPr
   if (!isOpen) return null;
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       {/* Backdrop */}
       <div 
         style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} 
@@ -46,7 +52,7 @@ export function SelectWorkModal({ isOpen, onClose, onSelect }: SelectWorkModalPr
       />
       
       {/* Modal */}
-      <div className="glass-panel animate-slide-up" style={{ position: 'relative', width: '100%', maxWidth: 500, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: 24, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="glass-panel animate-scale-up" style={{ position: 'relative', width: '100%', maxWidth: 500, borderRadius: 24, padding: 24, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
         <button 
           onClick={onClose}
           style={{ position: 'absolute', top: 20, right: 20, background: 'var(--bg-elevated)', border: 'none', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}

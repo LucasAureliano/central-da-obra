@@ -48,6 +48,7 @@ interface CalculatorLibraryProps {
 }
 
 export function CalculatorLibrary({ onNavigate }: CalculatorLibraryProps) {
+  const { profile } = useAuth();
   const [activeCalc, setActiveCalc] = useState<CalcId>(null);
   const [search, setSearch] = useState('');
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -118,7 +119,6 @@ export function CalculatorLibrary({ onNavigate }: CalculatorLibraryProps) {
   // Temporarily block new calculators
   const isNew = (id: string) => ['project-wizard'].includes(id);
 
-  const { profile } = useAuth();
   const filtered = db.filter(c => c.title.toLowerCase().includes(search.toLowerCase()) || c.cat.toLowerCase().includes(search.toLowerCase()));
 
   let categories: string[] = Array.from(new Set(db.map(c => c.cat)));

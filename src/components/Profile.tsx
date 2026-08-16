@@ -6,6 +6,8 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 
 import { BusinessProfileModal } from './provider/BusinessProfileModal';
+import { formatDate } from '../utils/formatters';
+
 
 export function Profile() {
   const { user, profile, signOut, isGuest } = useAuth();
@@ -219,7 +221,7 @@ export function Profile() {
           <div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Membro desde</p>
             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>
-              {profile?.createdAt?.toDate ? profile.createdAt.toDate().toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')}
+              {profile?.createdAt?.toDate ? formatDate(profile.createdAt.toDate()) : formatDate()}
             </p>
           </div>
         </div>

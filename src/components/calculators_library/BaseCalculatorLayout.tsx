@@ -10,8 +10,10 @@ import { db } from '../../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { SelectWorkModal } from './SelectWorkModal';
 import { useWorks } from '../../contexts/WorksContext';
-import { drawHeader, drawFooter } from '../../utils/pdfGenerator';
+import { drawHeader, drawFooter, applyGlobalWatermark } from '../../utils/pdfGenerator';
 import { materialPriceService } from '../../services/materials/MaterialPriceService';
+import { formatDate } from '../../utils/formatters';
+
 export type CalcResultItem = {
   label: string;
   value: string | number;
@@ -81,14 +83,15 @@ export function BaseCalculatorLayout({
   React.useEffect(() => {
     if (results?.materials && results.materials.length > 0) {
       setIsFetchingPrices(true);
-      const materialNames = results.materials.map(m => m.name);
+      const cleanName = (name: string) => name.replace(/\([^)]*\)/g, '').trim();
+        const materialNames = results.materials.map(m => cleanName(m.name));
       
       materialPriceService.searchMultiple(materialNames).then(pricesData => {
         const newPrices: Record<string, { price: number, supplier: string, link?: string }> = {};
         
         results.materials.forEach(mat => {
            // We use the first (lowest) valid price
-           const matches = pricesData[mat.name] || [];
+           const matches = pricesData[cleanName(mat.name)] || [];
            if (matches.length > 0) {
              const bestPrice = matches[0];
              newPrices[mat.name] = {
@@ -298,6 +301,7 @@ export function BaseCalculatorLayout({
         }
 
         drawFooter(doc);
+        applyGlobalWatermark(doc);
         doc.save(`Calculo_${title.replace(/\s+/g, '_')}.pdf`);
         
         setPdfSuccess(true);
@@ -397,7 +401,7 @@ export function BaseCalculatorLayout({
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>{title}</p>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{new Date().toLocaleDateString('pt-BR')}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{formatDate()}</p>
                 </div>
               </div>
 

@@ -5,6 +5,7 @@ import { Share2, QrCode, Power, Plus, Copy, MessageCircle, Check } from 'lucide-
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { formatDate } from '../../utils/formatters';
 
 interface ShareWorkViewProps {
   workId: string;
@@ -210,7 +211,7 @@ export function ShareWorkView({ workId }: ShareWorkViewProps) {
                       </span>
                     </div>
                     <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-                      Criado em: {link.createdAt?.toDate ? link.createdAt.toDate().toLocaleDateString('pt-BR') : new Date(link.createdAt).toLocaleDateString('pt-BR')}
+                      Criado em: {link.createdAt?.toDate ? formatDate(link.createdAt.toDate()) : formatDate(link.createdAt)}
                     </p>
                   </div>
                 </div>

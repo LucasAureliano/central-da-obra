@@ -3,6 +3,8 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Check, Circle, DollarSign, Package, Download } from 'lucide-react';
 import { generateBudgetPDF } from '../../utils/pdfGenerator';
+import { formatDate } from '../../utils/formatters';
+
 
 export interface BudgetListProps {
   workId: string;
@@ -116,7 +118,7 @@ export function BudgetList({ workId, work, user, calculations, profile }: Budget
                 <div>
                   <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{calc.calcType}</h4>
                   <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-                    Adicionado em {new Date(calc.savedAt?.toDate?.() || Date.now()).toLocaleDateString('pt-BR')}
+                    Adicionado em {formatDate(calc.savedAt?.toDate?.() || Date.now())}
                   </p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
