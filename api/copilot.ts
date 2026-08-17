@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import OpenAI from 'openai';
-import { adminAuth, adminDb } from './_lib/firebase-admin';
+import { adminAuth, adminDb } from './_lib/firebase-admin.js';
 
 import { z } from 'zod';
 
@@ -75,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!validationResult.success) {
       return res.status(400).json({ 
         error: 'Bad Request: Invalid payload structure or size limit exceeded', 
-        details: validationResult.error.errors 
+        details: validationResult.error.format() 
       });
     }
 
@@ -97,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: conversation,
+      messages: conversation as any,
       temperature: 0.7,
       max_tokens: 1000,
     });

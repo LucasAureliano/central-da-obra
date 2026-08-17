@@ -188,7 +188,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
 
       {/* Content */}
       {activeTab === 'resumo' && (
-        <div style={{ padding: 20 }}>
+        <div style={{ padding: '20px 20px 100px 20px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
             {profile?.role !== 'owner' && (
               <div className="glass-panel" style={{ padding: 16, borderRadius: 16 }}>
@@ -202,7 +202,17 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
                 </p>
               </div>
             )}
-            <div className="glass-panel" style={{ padding: 16, borderRadius: 16, gridColumn: profile?.role === 'owner' ? 'span 2' : 'auto' }}>
+            
+            <div className="glass-panel" style={{ padding: 16, borderRadius: 16, gridColumn: profile?.role === 'owner' ? 'span 1' : 'auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-danger)', marginBottom: 8 }}>
+                <Wallet size={16} /> <span style={{ fontSize: 12, fontWeight: 600 }}>Custo Atual</span>
+              </div>
+              <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(work.actualCost || 0)}
+              </p>
+            </div>
+
+            <div className="glass-panel" style={{ padding: 16, borderRadius: 16, gridColumn: profile?.role === 'owner' ? 'span 1' : 'span 2' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', marginBottom: 8 }}>
                 <Calendar size={16} /> <span style={{ fontSize: 12, fontWeight: 600 }}>Prazo</span>
               </div>
@@ -251,15 +261,15 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       )}
 
       {activeTab === 'documentos' && (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in" style={{ padding: '0 0 100px 0' }}>
           <DocumentsView workId={work.id} />
         </div>
       )}
 
       {activeTab === 'projetos' && (
-        <div className="animate-fade-in" style={{ padding: 20 }}>
+        <div className="animate-fade-in" style={{ padding: 20, overflowX: 'hidden' }}>
           {!activeProject ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
               <button onClick={() => setActiveProject('eletrico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
                   <Lightbulb size={24} color="#EAB308" />
@@ -300,7 +310,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       )}
 
       {activeTab === 'compartilhamento' && (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in" style={{ padding: '0 0 100px 0' }}>
           <ShareWorkView workId={work.id} />
         </div>
       )}

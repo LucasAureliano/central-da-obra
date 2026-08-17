@@ -43,7 +43,7 @@ export const exportShoppingToExcel = async (activeWork: Work) => {
     }
   });
 
-  exportToExcel({
+  await exportToExcel({
     filename: `Lista_de_Compras_${(activeWork.name || 'obra').replace(/\s+/g, '_')}`,
     sheetName: 'Compras',
     title: 'Lista de Compras & Materiais',
@@ -74,7 +74,7 @@ export const exportFinanceToExcel = async (activeWork: Work) => {
     Valor: Number(e.amount)
   }));
 
-  exportToExcel({
+  await exportToExcel({
     filename: `Financeiro_${(activeWork.name || 'obra').replace(/\s+/g, '_')}`,
     sheetName: 'Financeiro',
     title: 'Relatório Financeiro',

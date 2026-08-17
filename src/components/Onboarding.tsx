@@ -349,18 +349,20 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onFinishOnboarding }) =>
         ))}
       </div>
 
-      <button 
-        onClick={() => {
-          if (selectedProfile) {
-            onFinishOnboarding(selectedProfile);
-          }
-        }} 
-        disabled={!selectedProfile}
-        className="btn-primary" 
-        style={{ marginTop: 'auto', opacity: selectedProfile ? 1 : 0.6 }}
-      >
-        Acessar Painel <ArrowRight size={18} />
-      </button>
+      <div style={{ marginTop: 'auto', paddingTop: 16, paddingBottom: 16, position: 'sticky', bottom: 0, backgroundColor: 'var(--bg-main)' }}>
+        <button 
+          onClick={() => {
+            if (selectedProfile) {
+              onFinishOnboarding(selectedProfile);
+            }
+          }} 
+          disabled={!selectedProfile}
+          className="btn-primary" 
+          style={{ width: '100%', opacity: selectedProfile ? 1 : 0.6 }}
+        >
+          Acessar Painel <ArrowRight size={18} />
+        </button>
+      </div>
     </div>
   );
 };

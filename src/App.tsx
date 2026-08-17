@@ -3,27 +3,29 @@
  * PROPRIETARY AND CONFIDENTIAL
  * This software and its documentation are proprietary to CentralObra.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardRouter } from './components/DashboardRouter';
 import { Works } from './components/Works';
 import { WorkDetails } from './components/WorkDetails';
-import { CalculatorLibrary } from './components/calculators_library/CalculatorLibrary';
-import { TechnicalCentral } from './components/library/TechnicalCentral';
-import { InsightsCentral } from './components/insights/InsightsCentral';
-import { Menu as MenuIcon, Home, Briefcase, LogIn, X, Sparkles, Calendar, Calculator } from 'lucide-react';
+import { Menu as MenuIcon, Home, Briefcase, LogIn, X, Sparkles, Calendar, Calculator, Loader2 } from 'lucide-react';
 import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
-import { ProviderWorkDashboard } from './components/provider/ProviderWorkDashboard';
 import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
-import { Shopping } from './components/Shopping';
-import { Finance } from './components/Finance';
 import { Menu } from './components/Menu';
 import { CustomLogo } from './components/CustomLogo';
-import { CalculatorsWizard } from './components/calculators_library/CalculatorsWizard';
 import { Profile } from './components/Profile';
-import { Reports } from './components/Reports';
 import { Login } from './components/Login';
+
+// Lazy loaded heavy components
+const CalculatorLibrary = lazy(() => import('./components/calculators_library/CalculatorLibrary').then(m => ({ default: m.CalculatorLibrary })));
+const TechnicalCentral = lazy(() => import('./components/library/TechnicalCentral').then(m => ({ default: m.TechnicalCentral })));
+const InsightsCentral = lazy(() => import('./components/insights/InsightsCentral').then(m => ({ default: m.InsightsCentral })));
+const ProviderWorkDashboard = lazy(() => import('./components/provider/ProviderWorkDashboard').then(m => ({ default: m.ProviderWorkDashboard })));
+const Shopping = lazy(() => import('./components/Shopping').then(m => ({ default: m.Shopping })));
+const Finance = lazy(() => import('./components/Finance').then(m => ({ default: m.Finance })));
+const CalculatorsWizard = lazy(() => import('./components/calculators_library/CalculatorsWizard').then(m => ({ default: m.CalculatorsWizard })));
+const Reports = lazy(() => import('./components/Reports').then(m => ({ default: m.Reports })));
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
 import { useAuth } from './contexts/AuthContext';
@@ -44,6 +46,8 @@ import { ServicesCatalog } from './components/provider/ServicesCatalog';
 import { ServicesManager } from './components/provider/ServicesManager';
 import { ReceiptsManager } from './components/provider/ReceiptsManager';
 import { ProfessionalFinance } from './components/provider/ProfessionalFinance';
+import { GuestRestrictionModal } from './components/GuestRestrictionModal';
+import { TipsWidget } from './components/home/modules/TipsWidget';
 import { AppSettings } from './components/AppSettings';
 import { InteriorDesignStudio } from './components/architect/InteriorDesignStudio';
 import { InteractiveSchedule } from './components/owner/InteractiveSchedule';
@@ -70,6 +74,7 @@ import { BuilderSuppliers } from './components/builder/BuilderSuppliers';
 import { BuilderEquipment } from './components/builder/BuilderEquipment';
 import { BuilderProcurement } from './components/builder/BuilderProcurement';
 import { BuilderCorporateFinance } from './components/builder/BuilderCorporateFinance';
+import { CorporateBI } from './components/builder/CorporateBI';
 import { QuoteWizard } from './components/provider/QuoteWizard';
 import { SmartAssistant } from './components/assistant/SmartAssistant';
 import { OwnerWorkDetails } from './components/owner/OwnerWorkDetails';
@@ -389,6 +394,26 @@ function App() {
       setActiveTab('ajustes');
       return;
     }
+    if (title === 'Dicas') {
+      setActiveTab('dicas');
+      return;
+    }
+    if (title === 'Funil de Negócios' || title === 'Funil de Negócios (CRM)' || title === 'crm' || title === 'CRM' || title === 'Clientes & CRM' || title === 'CRM de Vendas') {
+      setActiveTab('clientes');
+      return;
+    }
+    if (title === 'Propostas' || title === 'Propostas Comerciais') {
+      setActiveTab('orcamentos');
+      return;
+    }
+    if (title === 'Portal do Cliente') {
+      setActiveTab('portal-cliente');
+      return;
+    }
+    if (title === 'Imóveis' || title === 'Portfólio de Imóveis') {
+      setActiveTab('imoveis');
+      return;
+    }
     setMenuTitle(title);
     setActiveTab('placeholder');
   };
@@ -444,8 +469,13 @@ function App() {
           return <BuilderProcurement key="centro-compras" onBack={() => handleNavigate('inicio')} />;
         }
         return <Shopping key="centro-compras" />;
-      case 'orcamentos': return activeRole === 'service' ? <CommercialQuotes key="orcamentos" onNavigate={handleNavigate} /> : <PlaceholderScreen key="orcamentos" title="Orçamentos" onBack={() => handleNavigate('inicio')} />;
+      case 'orcamentos': return <CommercialQuotes key="orcamentos" onNavigate={handleNavigate} />;
       case 'clientes': return <ClientsManager key="clientes" />;
+      case 'crm': return <ClientsManager key="crm" />;
+      case 'medicao': return <Schedule key="medicao" />;
+      case 'portfolio': return <Works key="portfolio" onWorkSelect={(id) => setSelectedWorkId(id)} />;
+      case 'recebimentos': return <Finance key="recebimentos" />;
+      case 'financas': return <Finance key="financas" />;
       case 'agenda-completa': return <Agenda key="agenda" />;
       case 'controle-projetos': return <ProjectControl key="projetos" />;
       case 'studio-interiores': return <InteriorDesignStudio key="studio-interiores" onBack={() => handleNavigate('inicio')} />;
@@ -475,7 +505,6 @@ function App() {
       case 'novo-orcamento': return <QuoteWizard key="novo-orcamento" onFinish={() => setActiveTab('orcamentos')} />;
       case 'catalogo-servicos': return <ServicesCatalog key="catalogo" onBack={() => handleNavigate('inicio')} />;
       case 'meus-servicos': return <ServicesManager key="meus-servicos" onBack={() => handleNavigate('inicio')} />;
-      case 'recebimentos': return <ReceiptsManager key="recebimentos" onBack={() => handleNavigate('inicio')} />;
       case 'nova-despesa': return <Finance key="nova-despesa" initialShowAddModal={true} onBack={() => handleNavigate('inicio')} />;
       case 'marketing': return <MarketingCenter key="marketing" onBack={() => handleNavigate('inicio')} />;
       case 'financeiro-profissional': return <ProfessionalFinance key="fin-pro" onBack={() => handleNavigate('inicio')} />;
@@ -490,6 +519,8 @@ function App() {
         if (activeRole === 'builder') return <BuilderTeams key="equipe" onBack={() => handleNavigate('menu')} />;
         return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;
       case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} />;
+      case 'dicas': return <div key="dicas" className="screen-content" style={{ padding: '24px 20px' }}><TipsWidget onNavigate={handleNavigate} /></div>;
+      case 'indicadores-bi': return <CorporateBI key="indicadores-bi" onBack={() => handleNavigate('inicio')} />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
       case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => handleNavigate('menu')} />;
       default: return <DashboardRouter key="default" onNavigate={handleNavigate} />;
@@ -512,13 +543,14 @@ function App() {
                   user={user} 
                   activeRole={activeRole as string}
                 >
-                  {renderContent()}
+                  <Suspense fallback={<div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}><Loader2 className="animate-spin text-blue-500" size={32} /></div>}>{renderContent()}</Suspense>
                 </AppLayout>
                 <AuthModals 
                   theme={theme} 
                   authView={authView} 
                   setAuthView={setAuthView} 
                 />
+                <GuestRestrictionModal />
               </div>
             </PortalProvider>
           </AssistantProvider>

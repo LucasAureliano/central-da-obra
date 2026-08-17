@@ -101,9 +101,8 @@ export function DocumentsView({ workId, parentCollection = 'works' }: DocumentsV
   return (
     <div style={{ padding: 16 }}>
       
-      {/* Upload Panel */}
-      {!isOwner && (
-        <div className="glass-panel" style={{ padding: 20, borderRadius: 16, marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Upload Panel — visible to all authenticated users */}
+      <div className="glass-panel" style={{ padding: 20, borderRadius: 16, marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
         <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Novo Documento</h3>
         
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -119,11 +118,17 @@ export function DocumentsView({ workId, parentCollection = 'works' }: DocumentsV
           <label className="btn-primary" style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: uploading ? 'wait' : 'pointer', opacity: uploading ? 0.7 : 1 }}>
             <FileUp size={20} />
             {uploading ? `Enviando... ${Math.round(progress)}%` : 'Selecionar Arquivo'}
-            <input type="file" onChange={handleFileUpload} disabled={uploading} style={{ display: 'none' }} />
+            <input type="file" accept="*/*" onChange={handleFileUpload} disabled={uploading} style={{ display: 'none' }} />
           </label>
         </div>
+
+        {/* Progress bar */}
+        {uploading && (
+          <div style={{ width: '100%', height: 6, borderRadius: 3, backgroundColor: 'var(--bg-elevated)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', borderRadius: 3, backgroundColor: 'var(--color-primary)', width: `${progress}%`, transition: 'width 0.3s ease' }} />
+          </div>
+        )}
       </div>
-      )}
 
       {/* Document Folders */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -140,6 +145,42 @@ export function DocumentsView({ workId, parentCollection = 'works' }: DocumentsV
                 </h4>
               </div>
               
+              {/* Photo grid for 'Fotos' category */}
+              {category === 'Fotos' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+                  {catDocs.map(docItem => (
+                    <div key={docItem.id} style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', aspectRatio: '1', backgroundColor: 'var(--bg-elevated)' }}>
+                      {docItem.type?.startsWith('image/') ? (
+                        <img
+                          src={docItem.url}
+                          alt={docItem.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {getIcon(docItem.type)}
+                        </div>
+                      )}
+                      {/* Hover overlay with actions */}
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: 0, transition: 'opacity 0.2s' }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+                      >
+                        <a href={docItem.url} target="_blank" rel="noopener noreferrer" style={{ padding: 8, borderRadius: 8, color: '#fff', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex' }}>
+                          <Download size={16} />
+                        </a>
+                        <button onClick={() => handleDelete(docItem)} style={{ padding: 8, borderRadius: 8, color: '#fff', backgroundColor: 'rgba(239,68,68,0.7)', border: 'none', cursor: 'pointer', display: 'flex' }}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '4px 8px', background: 'linear-gradient(transparent, rgba(0,0,0,0.6))', fontSize: 11, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {docItem.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {catDocs.map(doc => (
                   <div key={doc.id} className="card-premium-interactive" style={{ padding: 16, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'var(--bg-surface)' }}>
@@ -159,15 +200,14 @@ export function DocumentsView({ workId, parentCollection = 'works' }: DocumentsV
                       <a href={doc.url} target="_blank" rel="noopener noreferrer" style={{ padding: 8, borderRadius: 8, color: 'var(--text-main)', backgroundColor: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Download size={18} />
                       </a>
-                      {!isOwner && (
-                        <button onClick={() => handleDelete(doc)} style={{ padding: 8, borderRadius: 8, color: 'var(--color-danger)', backgroundColor: 'var(--bg-main)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Trash2 size={18} />
-                        </button>
-                      )}
+                      <button onClick={() => handleDelete(doc)} style={{ padding: 8, borderRadius: 8, color: 'var(--color-danger)', backgroundColor: 'var(--bg-main)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
+              )}
             </div>
           );
         })}

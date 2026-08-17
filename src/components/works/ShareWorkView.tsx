@@ -65,6 +65,16 @@ export function ShareWorkView({ workId }: ShareWorkViewProps) {
     setIsCreating(true);
     try {
       const token = crypto.randomUUID();
+      
+      const { getDoc } = await import('firebase/firestore');
+      const workSnap = await getDoc(doc(db, 'works', workId));
+      let workData = null;
+      
+      if (workSnap.exists()) {
+        const d = workSnap.data();
+        workData = { name: d.name, address: d.address, progress: d.progress || 0, status: d.status || '', image: d.image || '' };
+      }
+
       await addDoc(collection(db, 'shared_links'), {
         token,
         workId,
@@ -72,9 +82,11 @@ export function ShareWorkView({ workId }: ShareWorkViewProps) {
         permissions: selectedPermissions,
         active: true,
         createdAt: serverTimestamp(),
+        workData: workData
       });
       toast.success('Link de acesso gerado com sucesso!');
     } catch (err) {
+      console.error(err);
       toast.error('Erro ao gerar link.');
     } finally {
       setIsCreating(false);

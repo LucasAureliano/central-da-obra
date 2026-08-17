@@ -54,8 +54,14 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!requireAuth('criar uma nova obra')) return;
-    if (!user || !name) return;
+    if (!user) {
+      toast.error('Faça login para criar uma obra');
+      return;
+    }
+    if (!name) {
+      toast.error('Preencha o nome da obra');
+      return;
+    }
 
     setIsSubmitting(true);
     try {

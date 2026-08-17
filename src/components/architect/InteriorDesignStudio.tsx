@@ -92,7 +92,7 @@ export function InteriorDesignStudio({ onBack }: { onBack: () => void }) {
     <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 24px 20px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={onBack} className="btn-secondary" style={{ width: 40, height: 40, borderRadius: 20, padding: 0 }}>
             <ArrowLeft size={20} />

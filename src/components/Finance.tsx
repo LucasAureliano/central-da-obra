@@ -219,7 +219,7 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded,
     return <div className="screen-content" style={{ padding: 20 }}>Carregando financeiro...</div>;
   }
 
-  if (works.length === 0) {
+  if (isGlobal && works.length === 0) {
     return (
       <div className="screen-content animate-fade-in" style={{ padding: 20 }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>Financeiro</h1>

@@ -145,7 +145,7 @@ export function AutomationDesignStudio({ onBack }: { onBack?: () => void }) {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'start' }}>
-          <form onSubmit={addDevice} style={{ flex: '1 1 300px', backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
+          <form onSubmit={addDevice} style={{ flex: '1 1 280px', backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Novo Dispositivo</h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -226,14 +226,15 @@ export function AutomationDesignStudio({ onBack }: { onBack?: () => void }) {
             </div>
           </form>
 
-          <div style={{ flex: '2 1 400px' }}>
+          <div style={{ flex: '2 1 280px', minWidth: 0 }}>
             <div style={{ backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Dispositivos Mapeados</h2>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Arraste para reordenar</span>
-            </div>
-                        <div style={{ overflowX: 'auto', paddingBottom: 10 }}>
-                <div style={{ minWidth: 600 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Dispositivos Mapeados</h2>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Arraste para reordenar</span>
+              </div>
+              
+              <div style={{ overflowX: 'hidden', paddingBottom: 10 }}>
+                <div style={{ width: '100%' }}>
                   <Reorder.Group 
                     axis="y" 
                     values={devices} 

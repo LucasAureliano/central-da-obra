@@ -141,7 +141,9 @@ h1, h2, h3, h4, h5, h6 {
     flex-direction: row;
   }
   .screen-content {
-    padding-bottom: 32px;
+    padding: 32px 40px 64px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
   }
 }
 
@@ -217,6 +219,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (min-width: 769px) {
   .mobile-hidden {
+    display: block;
+  }
+  span.mobile-hidden, br.mobile-hidden {
+    display: initial;
+  }
+  div.mobile-hidden {
     display: flex;
   }
   .desktop-hidden {
@@ -510,12 +518,12 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--color-primary);
   color: var(--text-inverse);
   position: absolute;
-  top: -24px;
+  top: -16px;
   left: 50%;
   transform: translateX(-50%);
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
   box-shadow: 0 8px 16px var(--color-primary-alpha);
   border: 4px solid var(--bg-surface);
   margin: 0;
@@ -531,7 +539,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--text-main);
   margin-top: auto;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 /* Inputs */
@@ -570,7 +578,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .input-field, .textarea-field, .select-field {
   width: 100%;
-  height: 56px;
+  height: 48px;
   background-color: rgba(10, 10, 10, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -653,7 +661,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .input-premium {
   width: 100%;
-  height: 56px;
+  height: 48px;
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -705,12 +713,12 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--color-primary);
   color: var(--text-inverse);
   position: absolute;
-  top: -24px;
+  top: -16px;
   left: 50%;
   transform: translateX(-50%);
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
   box-shadow: 0 8px 16px var(--color-primary-alpha);
   border: 4px solid var(--bg-surface);
   margin: 0;
@@ -726,7 +734,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--text-main);
   margin-top: auto;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 /* Inputs */
@@ -765,7 +773,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .input-field, .textarea-field, .select-field {
   width: 100%;
-  height: 56px;
+  height: 48px;
   background-color: rgba(10, 10, 10, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -848,7 +856,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .input-premium {
   width: 100%;
-  height: 56px;
+  height: 48px;
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -876,12 +884,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Utilities */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+@media (max-width: 768px) {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 .animate-fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.2, 0, 0, 1) both;

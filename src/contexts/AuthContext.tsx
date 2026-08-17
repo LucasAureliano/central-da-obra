@@ -55,6 +55,10 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   loginAsGuest: () => Promise<void>;
   signOut: () => Promise<void>;
+  showGuestModal: boolean;
+  setShowGuestModal: (show: boolean) => void;
+  guestActionName: string;
+  setGuestActionName: (action: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,6 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [localGuest, setLocalGuest] = useState(false);
+  
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [guestActionName, setGuestActionName] = useState('realizar esta ação');
 
   useEffect(() => {
     let unsubscribeProfile: () => void;
@@ -276,11 +283,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         profile,
         loading,
-        isGuest,
+        isGuest: isGuest || localGuest,
         localGuest,
         signInWithGoogle,
         loginAsGuest,
         signOut,
+        showGuestModal,
+        setShowGuestModal,
+        guestActionName,
+        setGuestActionName
       }}
     >
       {children}

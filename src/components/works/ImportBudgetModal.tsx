@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { UploadCloud, X, AlertTriangle, CheckCircle2, ArrowRight } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Configure PDF.js worker
@@ -52,48 +52,52 @@ export function ImportBudgetModal({ isOpen, onClose, onImport }: ImportBudgetMod
     }
   };
 
-  const parseExcelAndShowMapping = (file: File): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-          const json: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const parseExcelAndShowMapping = async (file: File): Promise<void> => {
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(buffer);
+      
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet) {
+        throw new Error('A planilha parece estar vazia.');
+      }
 
-          if (json.length < 2) {
-            throw new Error('A planilha parece estar vazia ou não tem dados suficientes.');
-          }
+      const json: any[][] = [];
+      worksheet.eachRow((row, rowNumber) => {
+        const rowData: any[] = [];
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          rowData[colNumber - 1] = cell.value;
+        });
+        json.push(rowData);
+      });
 
-          const fileHeaders = (json[0] || []).map(h => String(h || '').trim());
-          setHeaders(fileHeaders);
-          setRawExcelData(json.slice(1)); // Store rows without header
+      if (json.length < 2) {
+        throw new Error('A planilha parece estar vazia ou não tem dados suficientes.');
+      }
 
-          // Auto-detect columns
-          let detectName = -1, detectQty = -1, detectPrice = -1;
-          fileHeaders.forEach((h, index) => {
-            const lowerH = h.toLowerCase();
-            if (detectName === -1 && (lowerH.includes('nome') || lowerH.includes('descrição') || lowerH.includes('produto') || lowerH.includes('material'))) detectName = index;
-            if (detectQty === -1 && (lowerH.includes('qtd') || lowerH.includes('quant'))) detectQty = index;
-            if (detectPrice === -1 && (lowerH.includes('preço') || lowerH.includes('valor') || lowerH.includes('unit'))) detectPrice = index;
-          });
+      const fileHeaders = (json[0] || []).map(h => String(h || '').trim());
+      setHeaders(fileHeaders);
+      setRawExcelData(json.slice(1)); // Store rows without header
 
-          // Fallback if not detected, use 0, 1, 2
-          setColName(detectName !== -1 ? detectName : (fileHeaders.length > 0 ? 0 : -1));
-          setColQuantity(detectQty !== -1 ? detectQty : (fileHeaders.length > 1 ? 1 : -1));
-          setColPrice(detectPrice !== -1 ? detectPrice : (fileHeaders.length > 2 ? 2 : -1));
+      // Auto-detect columns
+      let detectName = -1, detectQty = -1, detectPrice = -1;
+      fileHeaders.forEach((h, index) => {
+        const lowerH = h.toLowerCase();
+        if (detectName === -1 && (lowerH.includes('nome') || lowerH.includes('descrição') || lowerH.includes('produto') || lowerH.includes('material'))) detectName = index;
+        if (detectQty === -1 && (lowerH.includes('qtd') || lowerH.includes('quant'))) detectQty = index;
+        if (detectPrice === -1 && (lowerH.includes('preço') || lowerH.includes('valor') || lowerH.includes('unit'))) detectPrice = index;
+      });
 
-          setStep(2); // Go to mapping step
-          resolve();
-        } catch (error: any) {
-          reject(new Error(error.message || 'Falha ao ler o Excel. Certifique-se de que não está corrompido.'));
-        }
-      };
-      reader.onerror = () => reject(new Error('Erro de leitura de arquivo.'));
-      reader.readAsArrayBuffer(file);
-    });
+      // Fallback if not detected, use 0, 1, 2
+      setColName(detectName !== -1 ? detectName : (fileHeaders.length > 0 ? 0 : -1));
+      setColQuantity(detectQty !== -1 ? detectQty : (fileHeaders.length > 1 ? 1 : -1));
+      setColPrice(detectPrice !== -1 ? detectPrice : (fileHeaders.length > 2 ? 2 : -1));
+
+      setStep(2); // Go to mapping step
+    } catch (error: any) {
+      throw new Error(error.message || 'Falha ao ler o Excel. Certifique-se de que não está corrompido.');
+    }
   };
 
   const handleApplyMapping = () => {

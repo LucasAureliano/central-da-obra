@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Check, Eye, Lock, Globe, X, ShieldCheck, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { portalService } from '../../services/portal/PortalService';
+
 
 interface ClientPortalConnectModalProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ export function ClientPortalConnectModal({ isOpen, onClose, project, providerPro
     
     setIsGenerating(true);
     try {
-      const linkData = await portalService.generateClientPortalLink(project, providerProfile);
+      const { portalService } = await import('../../services/portal/PortalService'); const linkData = await portalService.generateClientPortalLink(project, providerProfile);
       setGeneratedLink(linkData.shareableUrl);
       navigator.clipboard.writeText(linkData.shareableUrl);
       setCopied(true);
@@ -103,7 +103,7 @@ export function ClientPortalConnectModal({ isOpen, onClose, project, providerPro
           </div>
 
           {/* Checkbox list */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10, marginBottom: 24 }}>
             {[
               { key: 'photos', label: '📷 Fotos da Obra' },
               { key: 'videos', label: '🎥 Vídeos de Evolução' },

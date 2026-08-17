@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FolderKanban, Calendar, CheckCircle, Plus, FileText } from 'lucide-react';
+import { FolderKanban, Calendar, CheckCircle, Plus, FileText, Sparkles, Calculator } from 'lucide-react';
 
 interface DemoProps {
   step: number;
@@ -31,6 +31,8 @@ export const ArchitectDemo: React.FC<DemoProps> = ({ step, onActionComplete }) =
         >
           {step === 0 && 'Design Studio & Marcas'}
           {step === 1 && 'Compatibilização Inteligente'}
+          {step === 2 && 'Assistente com IA'}
+          {step === 3 && 'Calculadoras Avançadas'}
         </motion.h2>
         <motion.p 
           key={`desc-${step}`}
@@ -39,6 +41,8 @@ export const ArchitectDemo: React.FC<DemoProps> = ({ step, onActionComplete }) =
         >
           {step === 0 && 'Especifique revestimentos e texturas reais (Portobello, Deca, etc) com preços atualizados.'}
           {step === 1 && 'Integre projetos elétricos, luminotécnicos e hidráulicos com precisão.'}
+          {step === 2 && 'Tire dúvidas técnicas, pesquise normas e peça dicas em linguagem natural.'}
+          {step === 3 && 'Dezenas de calculadoras para pisos, gesso, iluminação e quantitativos.'}
         </motion.p>
       </div>
 
@@ -96,8 +100,56 @@ export const ArchitectDemo: React.FC<DemoProps> = ({ step, onActionComplete }) =
           </motion.div>
         )}
 
+        {step === 2 && (
+          <motion.div layout initial={{ scale: 0.95, y: 10, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="glass-panel" style={{ padding: 24, borderRadius: 24, width: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+              <div style={{ padding: 12, borderRadius: 12, background: 'var(--bg-elevated)', alignSelf: 'flex-start', maxWidth: '80%' }}>
+                <p style={{ fontSize: 14 }}>Qual é o recuo mínimo para esse projeto?</p>
+              </div>
+              <AnimatePresence>
+                {interacted && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ padding: 12, borderRadius: 12, background: 'var(--color-primary-light)', alignSelf: 'flex-end', maxWidth: '80%' }}>
+                    <p style={{ fontSize: 14, color: 'var(--color-primary-dark)' }}>De acordo com as normas municipais, o recuo é de 5 metros.</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <button 
+              onClick={handleInteract}
+              className={interacted ? "btn-secondary" : "btn-primary glow-effect"}
+              style={{ width: '100%', height: 48, borderRadius: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              {interacted ? <><CheckCircle size={20} /> Respondido</> : <><Sparkles size={20} /> Perguntar à IA</>}
+            </button>
+          </motion.div>
+        )}
+
+        {step === 3 && (
+          <motion.div layout initial={{ scale: 0.95, y: 10, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="glass-panel" style={{ padding: 24, borderRadius: 24, width: '100%' }}>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+              <div style={{ flex: 1, height: 80, background: 'var(--bg-elevated)', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                <Calculator size={24} style={{ marginBottom: 4 }} />
+                <span style={{ fontSize: 11 }}>Pisos</span>
+              </div>
+              <div style={{ flex: 1, height: 80, background: 'var(--bg-elevated)', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                <Calculator size={24} style={{ marginBottom: 4 }} />
+                <span style={{ fontSize: 11 }}>Gesso</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleInteract}
+              className={interacted ? "btn-success" : "btn-primary glow-effect"}
+              style={{ width: '100%', height: 48, borderRadius: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              {interacted ? <><CheckCircle size={20} /> Cálculo Salvo</> : <><Calculator size={20} /> Gerar Quantitativo</>}
+            </button>
+          </motion.div>
+        )}
 
       </div>
     </div>
   );
 };
+

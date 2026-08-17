@@ -233,7 +233,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Próximos Atendimentos</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>{nextAppointments.length} agendados</div>
               </div>
-              <button onClick={() => onNavigate('Agenda')} style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: 'var(--color-primary)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Ver Agenda</button>
+              <button onClick={() => onNavigate('agenda-completa')} style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: 'var(--color-primary)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Ver Agenda</button>
             </div>
           </div>
         </div>
@@ -243,7 +243,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
       <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Agenda</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
         {nextAppointments.length > 0 ? nextAppointments.map((app, idx) => (
-          <div key={idx} style={{ padding: 16, borderRadius: 16, backgroundColor: 'var(--bg-base)', borderLeft: '4px solid #F59E0B' }} onClick={() => onNavigate('Agenda')}>
+          <div key={idx} style={{ padding: 16, borderRadius: 16, backgroundColor: 'var(--bg-base)', borderLeft: '4px solid #F59E0B' }} onClick={() => onNavigate('agenda-completa')}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>{app.title}</p>
               <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
@@ -253,7 +253,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
             {app.clientName && <p style={{ margin: '4px 0 0 0', fontSize: 13, color: 'var(--text-muted)' }}>Cliente: {app.clientName}</p>}
           </div>
         )) : (
-          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('Agenda')}>
+          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('agenda-completa')}>
              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>Sem agendamentos próximos.</p>
           </div>
         )}
@@ -262,7 +262,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
       {/* ORÇAMENTOS */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Orçamentos Recentes</h2>
-        <button onClick={() => onNavigate('Orcamentos')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver Todos</button>
+        <button onClick={() => onNavigate('orcamentos')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver Todos</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
         {latestQuotes.length > 0 ? latestQuotes.map(q => (
@@ -274,7 +274,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
             <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{fmt(q.totalValue || q.value || 0)}</div>
           </div>
         )) : (
-          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('Orcamentos')}>
+          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('orcamentos')}>
              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>Nenhum orçamento recente.</p>
           </div>
         )}
@@ -283,7 +283,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
       {/* RECEBIMENTOS */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Recebimentos</h2>
-        <button onClick={() => onNavigate('Recebimentos')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver Todos</button>
+        <button onClick={() => onNavigate('recebimentos')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver Todos</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
         {latestReceipts.length > 0 ? latestReceipts.map(r => (
@@ -295,7 +295,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
             <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{fmt(r.amount || 0)}</div>
           </div>
         )) : (
-          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('Recebimentos')}>
+          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('recebimentos')}>
              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>Nenhum recebimento registrado.</p>
           </div>
         )}
@@ -304,7 +304,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
       {/* MEUS CLIENTES */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Meus Clientes</h2>
-        <button onClick={() => onNavigate('Clientes')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver Todos</button>
+        <button onClick={() => onNavigate('clientes')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver Todos</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
         {latestClients.length > 0 ? latestClients.map(c => (
@@ -318,7 +318,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
             </div>
           </div>
         )) : (
-          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('Clientes')}>
+          <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-base)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }} onClick={() => onNavigate('clientes')}>
              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>Nenhum cliente cadastrado.</p>
           </div>
         )}
@@ -326,7 +326,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
 
       {/* CENTRAL DE CÁLCULOS */}
       <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Central de Cálculos</h2>
-      <div style={{ marginBottom: 32 }} onClick={() => onNavigate('Calculadoras')}>
+      <div style={{ marginBottom: 32 }} onClick={() => onNavigate('calculos')}>
         <TiltCard style={{ padding: 20, borderRadius: 16, background: 'linear-gradient(135deg, var(--color-primary), #60A5FA)', color: '#FFF', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Activity size={24} color="#FFF" />

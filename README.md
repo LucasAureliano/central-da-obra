@@ -1,68 +1,77 @@
-# CentralObra
+<p align="center">
+  <img src="public/favicon.svg" alt="Central da Obra Logo" width="120" />
+</p>
 
-> Plataforma SaaS para gestão inteligente da construção civil.
+<h1 align="center">Central da Obra</h1>
 
-*A CentralObra é um produto proprietário. Este repositório apresenta a arquitetura, funcionalidades e documentação do projeto para fins de portfólio. O código-fonte proprietário não está disponibilizado publicamente.*
+<p align="center">
+  <strong>Plataforma SaaS Inteligente para Gestão 360º da Construção Civil</strong>
+</p>
+
+<p align="center">
+  <a href="#sobre-o-projeto">Sobre</a> •
+  <a href="#solução">Solução</a> •
+  <a href="#tecnologias">Tecnologias</a> •
+  <a href="#funcionalidades-principais">Funcionalidades</a> •
+  <a href="#segurança-e-privacidade">Segurança</a>
+</p>
 
 ---
 
-## Sobre o projeto
+## 🏗️ Sobre o projeto
 
-A construção civil sofre com descentralização de informações, orçamentos estourados, comunicação fragmentada entre proprietários e prestadores, além da ausência de inteligência de dados nas tomadas de decisão de campo.
+A indústria da construção civil sofre historicamente com a descentralização de informações, orçamentos imprecisos, comunicação fragmentada e falta de previsibilidade financeira em tempo real.
 
-**CentralObra** é um Software as a Service (SaaS) criado para unificar e resolver esses problemas através de uma gestão 360º.
+A **Central da Obra** é uma plataforma inovadora criada para resolver esses desafios, unificando proprietários, arquitetos, engenheiros, construtoras e prestadores de serviço em um único ecossistema inteligente e seguro.
 
-## Solução
+## 🚀 Solução
 
-A plataforma centraliza a jornada da construção:
-- **Gestão de Obras**: Controle de múltiplas obras, status, prazos e equipes.
-- **Financeiro & Custos**: DRE automatizado, controle de verbas, custos diretos e notas.
-- **Suprimentos e Compras**: Fluxo de aprovação de orçamentos, cotação e lista de materiais.
-- **Inteligência e BI**: Dashboards executivos, indicadores de saúde financeira e alertas em tempo real.
-- **Copilot Inteligente**: Assistência embarcada que entende do negócio para sugerir ações (orçamentos, vistoria, mitigação de riscos).
+O aplicativo atua como o sistema nervoso central de qualquer projeto de construção ou reforma, entregando:
 
-## Perfis Atendidos
+- **Gestão Integrada:** Cronogramas detalhados, controle de progresso e alinhamento de equipes em tempo real.
+- **Saúde Financeira:** Visão clara de orçamentos, custos reais (DRE), contas a pagar e despesas.
+- **Suprimentos Simplificados:** Automação na cotação de materiais, aprovação de orçamentos e listas inteligentes.
+- **Copilot IA:** Um assistente inteligente embarcado que entende do contexto da sua obra e oferece suporte para estimativas, mitigação de riscos e dicas construtivas.
 
-A aplicação possui um **RBAC (Role-Based Access Control)** flexível que adapta as permissões de acordo com o Tenant:
+## 👥 Perfis Atendidos (Multi-Tenant RBAC)
 
-- 🏠 **Proprietário**: Acesso total às suas próprias obras, finanças e convites a profissionais.
-- 👷 **Prestador de Serviços**: Ferramentas focadas na entrega (diário de obras, fotos, faturamento aprovado).
-- 📐 **Arquiteto/Engenheiro**: Gestão técnica e delegada do cronograma.
-- 🏢 **Construtora**: Acesso de nível corporativo (Enterprise) com BI consolidado.
+A plataforma se adapta instantaneamente às necessidades de cada usuário através de um robusto controle de acesso baseado em perfis (Role-Based Access Control):
 
-## Tecnologias
+- 🏠 **Proprietário:** Controle total financeiro, visão executiva do andamento e gestão de acessos.
+- 📐 **Arquiteto / Engenheiro:** Ferramentas técnicas de projetos, gerenciamento de equipe e controle de qualidade.
+- 👷 **Prestador de Serviço:** Diário de obra prático, envio de fotos de progresso e gestão de recebíveis.
+- 🏢 **Construtora (Corporate):** Painel Enterprise (BI) com visão consolidada de todos os projetos simultâneos.
 
-A arquitetura foi selecionada para garantir escalabilidade, segurança e rápida iteração de produto:
-- **Frontend**: React, TypeScript, Tailwind CSS, Vite.
-- **Arquitetura**: Progressive Web App (PWA) Mobile-first.
-- **Autenticação**: Firebase Authentication + App Check (ReCaptcha Enterprise).
-- **Banco de Dados**: Firestore (NoSQL Real-Time) com Tenancy-Isolation.
-- **Backend / APIs**: Vercel Serverless Functions + Firebase Admin SDK.
-- **Infra/DevOps**: GitHub Actions (CI/CD) integrado.
+## 💻 Tecnologias
 
-## Funcionalidades e Telas (Demonstração)
+Arquitetura moderna, mobile-first e preparada para escalabilidade:
 
-*(Screenshots de demonstração serão inseridos nas sub-pastas do repositório público)*
-1. **Painel do Proprietário**: Visão de Orçamento Consumido vs Planejado.
-2. **Copilot**: Interface de Inteligência Artificial assistindo uma tomada de decisão sobre compras.
-3. **Módulo de Compras**: Aprovação de orçamentos de fornecedores.
-4. **Corporate BI (Construtora)**: Visão consolidada de todas as obras da empresa.
+- **Frontend:** React 19, TypeScript, Tailwind CSS, Vite
+- **Experiência:** PWA (Progressive Web App) para uso nativo off-line em dispositivos móveis.
+- **Backend & APIs:** Vercel Serverless Functions para processamento isolado (IA, pagamentos, cálculos).
+- **Banco de Dados:** Firebase Firestore (NoSQL Real-Time) com Tenancy-Isolation.
+- **Autenticação:** Firebase Auth + App Check (Google ReCaptcha Enterprise).
+- **Armazenamento:** Firebase Storage com regras rígidas de acesso a arquivos e plantas.
 
-## Segurança
+## ✨ Funcionalidades Principais
 
-O projeto não expõe regras de negócio críticas ou segredos aos clientes:
-- **Zero Trust**: Regras de Segurança (Firestore/Storage Rules) impedem que um usuário leia dados fora do seu escopo de permissão (Roles).
-- **APIs Isoladas**: Processamento de IA, cruzamento de custos e chaves externas residem no backend (Vercel Functions).
-- **Pre-commit Hooks**: Mecanismos rígidos de CI para coibir o envio acidental de chaves de API (`.env`).
+- **Painel Financeiro Avançado:** Acompanhe o saldo planejado vs. realizado de forma visual e intuitiva.
+- **Central de Projetos:** Compartilhe, edite e valide projetos em tempo real (PDFs, DWGs e Imagens).
+- **Diário de Obra:** Feed estilo rede-social com atualizações diárias, clima automatizado e fotos do andamento.
+- **Bibliotecas Técnicas:** Calculadoras embutidas (Blondel, Tijolos, Tintas) e indexadores atualizados da construção civil.
+- **Sistema de Convites:** Adicione profissionais à sua obra com apenas um link e defina o nível de acesso (Visualizador, Editor, Gerente).
 
-## Roadmap
+## 🔒 Segurança e Privacidade
 
-- [x] Arquitetura base e Autenticação Segura
-- [x] Isolamento Multi-Tenant (Perfis e Regras)
-- [x] Gestão Financeira e Compras
-- [x] Inteligência Artificial Integrada (Copilot)
-- [ ] Lançamento em Lojas Oficiais (App Store e Google Play)
-- [ ] Integrações B2B Externas (APIs de Fornecedores)
+Seguimos as melhores práticas de mercado para garantir a proteção dos dados dos nossos usuários:
 
-## Status
-> **Status atual:** Produto em fase final de homologação / preparação para lançamento fechado.
+- **Zero Trust Architecture:** Todas as leituras e escritas são validadas por regras de segurança nativas (`firestore.rules` e `storage.rules`), garantindo que usuários leiam apenas dados onde têm permissão direta.
+- **Nenhum Segredo Exposto:** Chaves de API, segredos de serviço e integrações sensíveis são mantidas estritamente do lado do servidor (Vercel Functions). O repositório não rastreia arquivos `.env`.
+- **Prevenção contra Bots:** Acesso às APIs protegido por Firebase App Check.
+- Para relatar vulnerabilidades, leia nosso [SECURITY.md](./SECURITY.md).
+
+---
+
+<p align="center">
+  <i>Desenvolvido com foco na excelência e na modernização da construção civil.</i>
+</p>

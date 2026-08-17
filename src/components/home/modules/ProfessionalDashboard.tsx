@@ -7,10 +7,44 @@ import { CalculatorsCentralWidget } from './CalculatorsCentralWidget';
 import { TipsWidget } from './TipsWidget';
 import { ReorderableDashboardLayout } from './ReorderableDashboardLayout';
 
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { collection, query, getDocs } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+
 // --------------------------------------------------------------------------------------
 // Widget inline: CRM e Negócios (Funil de Vendas)
 // --------------------------------------------------------------------------------------
 function CRMBusinessWidget({ onNavigate }: { onNavigate: (tab: string) => void }) {
+  const { user } = useAuth();
+  const [stats, setStats] = useState({ leads: 0, orcamentos: 0, ativas: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+      try {
+        const q = query(collection(db, 'users', user.uid, 'quotes'));
+        const snap = await getDocs(q);
+        
+        let leads = 0;
+        let orcamentos = 0;
+        let ativas = 0;
+
+        snap.docs.forEach(doc => {
+          const status = doc.data().status;
+          if (status === 'Rascunho' || status === 'Em Negociação') leads++;
+          if (status === 'Enviado') orcamentos++;
+          if (status === 'Execução') ativas++;
+        });
+
+        setStats({ leads, orcamentos, ativas });
+      } catch (err) {
+        console.error('Erro ao buscar stats do funil', err);
+      }
+    };
+    fetchStats();
+  }, [user]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -41,10 +75,10 @@ function CRMBusinessWidget({ onNavigate }: { onNavigate: (tab: string) => void }
             </div>
             <div>
               <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Novos Leads</span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Clientes buscando orçamento</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Rascunho e Negociação</span>
             </div>
           </div>
-          <span style={{ fontSize: 14, fontWeight: 900, color: '#F59E0B' }}>3</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: '#F59E0B' }}>{stats.leads}</span>
         </div>
 
         {/* Orçamentos */}
@@ -58,7 +92,7 @@ function CRMBusinessWidget({ onNavigate }: { onNavigate: (tab: string) => void }
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Enviados / Aguardando</span>
             </div>
           </div>
-          <span style={{ fontSize: 14, fontWeight: 900, color: '#3B82F6' }}>5</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: '#3B82F6' }}>{stats.orcamentos}</span>
         </div>
 
         {/* Obras Ativas */}
@@ -72,7 +106,7 @@ function CRMBusinessWidget({ onNavigate }: { onNavigate: (tab: string) => void }
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Execução em andamento</span>
             </div>
           </div>
-          <span style={{ fontSize: 14, fontWeight: 900, color: '#10B981' }}>2</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: '#10B981' }}>{stats.ativas}</span>
         </div>
       </div>
     </motion.div>

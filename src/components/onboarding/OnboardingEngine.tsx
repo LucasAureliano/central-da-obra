@@ -27,13 +27,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ role, onComp
 
   // Define max steps per role
   const getDemoLength = (r: UserRole) => {
-    switch (r) {
-      case 'owner': return 4;
-      case 'service': return 4;
-      case 'architect': return 2;
-      case 'builder': return 3;
-      default: return 3;
-    }
+    return 4; // Todos os perfis agora tem 4 passos detalhados
   };
 
   const demoLength = getDemoLength(role);

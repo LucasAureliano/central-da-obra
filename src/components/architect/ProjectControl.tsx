@@ -159,7 +159,7 @@ export const ProjectControl: React.FC = () => {
     <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', marginBottom: 4 }}>Projetos de Arquitetura</h1>
           <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Gestão técnica, pranchas e compatibilização</p>

@@ -46,7 +46,7 @@ class MaterialPriceService {
       }
 
       // Usamos a URL absoluta para funcionar no localhost sem proxy do Vite e evitar Vercel Protection em previews
-      const response = await fetch(`https://centralobra-black.vercel.app/api/prices?q=${encodeURIComponent(query)}`, {
+      const response = await fetch(`/api/prices?q=${encodeURIComponent(query)}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -130,7 +130,7 @@ class MaterialPriceService {
         }
       } catch (e) {}
 
-      const response = await fetch(`https://centralobra-black.vercel.app/api/prices?materials=${encodeURIComponent(missingQueries.join(','))}`, {
+      const response = await fetch(`/api/prices?materials=${encodeURIComponent(missingQueries.join(','))}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

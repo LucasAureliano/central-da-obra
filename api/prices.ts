@@ -6,24 +6,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { searchLeroyMerlin, PriceResult } from './_adapters/leroyMerlin.js';
 import { searchObramax } from './_adapters/obramax.js';
-import * as admin from 'firebase-admin';
+import { adminAuth } from './_lib/firebase-admin.js';
 import { z } from 'zod';
-
-// Initialize Firebase Admin (Only once)
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        // Replace escaped newlines if passed in ENV
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
-  }
-}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Configuração de CORS para permitir que o app chame esta API
@@ -45,8 +29,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const idToken = authHeader.split('Bearer ')[1];
     try {
-      if (admin.apps.length) {
-        await admin.auth().verifyIdToken(idToken);
+      if (adminAuth) {
+        await adminAuth.verifyIdToken(idToken);
       } else {
         // Fallback for local development if admin is not configured
         console.warn('Firebase Admin not initialized, skipping token verification');

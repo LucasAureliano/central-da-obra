@@ -276,7 +276,16 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
   }
 
   applyGlobalWatermark(doc);
-  doc.save(`Orcamento_${work.name?.replace(/\s+/g, '_') || 'Obra'}_${formatDate().replace(/\//g, '-')}.pdf`);
+  // Use blob URL approach for Capacitor/Android WebView compatibility
+  const blob = doc.output('blob');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Orcamento_${work.name?.replace(/\s+/g, '_') || 'Obra'}_${formatDate().replace(/\//g, '-')}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // --------------------------------------------------------------------------------------
@@ -602,5 +611,14 @@ export async function generateCommercialQuotePDF({
   }
 
   applyGlobalWatermark(doc);
-  doc.save(`Proposta_${client.name?.replace(/\s+/g, '_') || 'Cliente'}.pdf`);
+  // Use blob URL approach for Capacitor/Android WebView compatibility
+  const pdfBlob = doc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const pdfLink = document.createElement('a');
+  pdfLink.href = pdfUrl;
+  pdfLink.download = `Proposta_${client.name?.replace(/\s+/g, '_') || 'Cliente'}.pdf`;
+  document.body.appendChild(pdfLink);
+  pdfLink.click();
+  document.body.removeChild(pdfLink);
+  URL.revokeObjectURL(pdfUrl);
 }

@@ -92,7 +92,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
     <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px 20px' }}>
       
       {/* Header Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}>
           <ArrowLeft size={18} /> Projetos
         </button>
@@ -100,9 +100,9 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
         <button
           onClick={() => setShowConnectModal(true)}
           className="btn-primary"
-          style={{ padding: '8px 14px', borderRadius: 12, fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ padding: '8px 14px', borderRadius: 12, fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
         >
-          <Share2 size={15} /> CentralObra Connect (Portal)
+          <Share2 size={15} /> CentralObra Connect
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
           padding: 24,
           borderRadius: 24,
           marginBottom: 20,
-          backgroundImage: project.coverUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${project.coverUrl})` : 'linear-gradient(135deg, var(--bg-elevated) 0%, rgba(139, 92, 246, 0.15) 100%)',
+          backgroundImage: project.coverUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${project.coverUrl})` : 'linear-gradient(135deg, #1E1B4B 0%, #4C1D95 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#FFF'

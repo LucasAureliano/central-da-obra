@@ -124,7 +124,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
               exit={{ opacity: 0, y: -15, scale: 0.98, filter: 'blur(4px)' }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ minHeight: '100%', height: '100%' }}
+              style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}
             >
               {children}
             </motion.div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { useWorks } from '../contexts/WorksContext';
@@ -203,7 +204,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
               {photoUrl ? <img src={photoUrl} alt="Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Building2 size={24} />}
             </div>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{(profile as any)?.companyName || 'Construtora Alpha'}</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{(profile as any)?.companyName || user?.displayName || user?.email?.split('@')[0] || 'Minha Empresa'}</h3>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6' }}>Enterprise ERP</span>
             </div>
           </div>
@@ -509,66 +510,69 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
       </div>
 
       {/* Role Change Modal */}
-      <AnimatePresence>
-        {showRoleModal && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
-            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 20
-          }}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-panel"
-              style={{ width: '100%', maxWidth: 400, padding: 24, borderRadius: 24, position: 'relative' }}
-            >
-              <button 
-                onClick={() => setShowRoleModal(false)}
-                style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {showRoleModal && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+              zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 20
+            }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="glass-panel"
+                style={{ width: '100%', maxWidth: 400, padding: 24, borderRadius: 24, position: 'relative' }}
               >
-                <X size={24} />
-              </button>
-
-              <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(59,130,246,0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                <RefreshCw size={24} />
-              </div>
-
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
-                Alterar Perfil de Uso
-              </h2>
-              
-              <div style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
-                <p style={{ marginBottom: 12 }}>
-                  Ao alterar o seu perfil, a interface do aplicativo será adaptada para mostrar apenas as ferramentas relevantes para a nova função.
-                </p>
-                <p style={{ color: 'var(--color-primary)', fontWeight: 600, padding: '12px', backgroundColor: 'var(--color-primary-alpha)', borderRadius: 8 }}>
-                  Nenhum dado será perdido! Suas obras, cálculos e documentos salvos no perfil atual continuarão seguros, e você pode retornar a este perfil sempre que quiser.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', gap: 12 }}>
                 <button 
                   onClick={() => setShowRoleModal(false)}
-                  className="btn-secondary"
-                  style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600 }}
+                  style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
                 >
-                  Cancelar
+                  <X size={24} />
                 </button>
-                <button 
-                  onClick={handleChangeRole}
-                  disabled={changingRole}
-                  className="btn-primary"
-                  style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600, display: 'flex', justifyContent: 'center' }}
-                >
-                  {changingRole ? 'Aguarde...' : 'Alterar Perfil'}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+
+                <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(59,130,246,0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  <RefreshCw size={24} />
+                </div>
+
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
+                  Alterar Perfil de Uso
+                </h2>
+                
+                <div style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+                  <p style={{ marginBottom: 12 }}>
+                    Ao alterar o seu perfil, a interface do aplicativo será adaptada para mostrar apenas as ferramentas relevantes para a nova função.
+                  </p>
+                  <p style={{ color: 'var(--color-primary)', fontWeight: 600, padding: '12px', backgroundColor: 'var(--color-primary-alpha)', borderRadius: 8 }}>
+                    Nenhum dado será perdido! Suas obras, cálculos e documentos salvos no perfil atual continuarão seguros, e você pode retornar a este perfil sempre que quiser.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button 
+                    onClick={() => setShowRoleModal(false)}
+                    className="btn-secondary"
+                    style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600 }}
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={handleChangeRole}
+                    disabled={changingRole}
+                    className="btn-primary"
+                    style={{ flex: 1, padding: 12, borderRadius: 12, fontSize: 14, fontWeight: 600, display: 'flex', justifyContent: 'center' }}
+                  >
+                    {changingRole ? 'Aguarde...' : 'Alterar Perfil'}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
     </div>
   );

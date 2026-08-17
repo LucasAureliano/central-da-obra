@@ -23,8 +23,29 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
         
         const linkData = snap.docs[0].data();
         
-        if (linkData.workData) {
-          setWork({ id: linkData.workId, ...linkData.workData });
+        if (linkData.workId) {
+          const { getDoc, doc } = await import('firebase/firestore');
+          try {
+            const workSnap = await getDoc(doc(db, 'works', linkData.workId));
+            if (workSnap.exists()) {
+              setWork({ id: workSnap.id, ...workSnap.data() });
+            } else {
+              // Try fetching from projects if not found in works
+              const projSnap = await getDoc(doc(db, 'projects', linkData.workId));
+              if (projSnap.exists()) {
+                 setWork({ id: projSnap.id, ...projSnap.data() });
+              } else {
+                 setErrorMsg('Dados da obra indisponíveis.');
+              }
+            }
+          } catch (e) {
+            console.error('Permission denied or error fetching work', e);
+            if (linkData.workData) {
+              setWork({ id: linkData.workId, ...linkData.workData });
+            } else {
+              setErrorMsg('Dados da obra protegidos e não cacheados no link.');
+            }
+          }
         } else {
           setErrorMsg('Dados da obra indisponíveis.');
         }

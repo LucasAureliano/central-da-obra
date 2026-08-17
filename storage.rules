@@ -52,9 +52,9 @@ service firebase.storage {
     // ==========================================
     // PUBLIC ASSETS (Ex: Portfólios públicos gerados pelo app)
     // ==========================================
-    match /public/{allPaths=**} {
+    match /public/{userId}/{allPaths=**} {
       allow read: if true; // Qualquer um pode ver imagens públicas
-      allow write: if isAuthenticated(); // Somente usuários autenticados podem publicar algo público
+      allow write: if isAuthenticated() && request.auth.uid == userId; // Isolamento seguro do bucket público
     }
 
     // Bloqueia todo o resto por padrão

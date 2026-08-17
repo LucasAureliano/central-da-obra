@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, BarChart3, Users2, CheckCircle, RefreshCw, Plus } from 'lucide-react';
+import { Building2, BarChart3, Users2, CheckCircle, RefreshCw, Plus, PieChart } from 'lucide-react';
 
 interface DemoProps {
   step: number;
@@ -32,6 +32,7 @@ export const BuilderDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
           {step === 0 && 'Timeline Executiva'}
           {step === 1 && 'Relatórios Corporativos'}
           {step === 2 && 'Maquinário & Equipes'}
+          {step === 3 && 'Dashboard Financeiro (BI)'}
         </motion.h2>
         <motion.p 
           key={`desc-${step}`}
@@ -41,6 +42,7 @@ export const BuilderDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
           {step === 0 && 'Controle o cronograma de múltiplas obras e fornecedores.'}
           {step === 1 && 'Gere KPIs e exporte PDFs corporativos com a sua marca.'}
           {step === 2 && 'Faça a gestão do pátio, locações de máquinas e folha de ponto.'}
+          {step === 3 && 'Visualize receitas, despesas e fluxo de caixa de todas as obras.'}
         </motion.p>
       </div>
 
@@ -107,6 +109,25 @@ export const BuilderDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => 
               style={{ width: '100%', height: 48, borderRadius: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               {interacted ? <><CheckCircle size={20} /> Tarefa Atribuída</> : <><Plus size={20} /> Atribuir Tarefa</>}
+            </button>
+          </motion.div>
+        )}
+
+        {step === 3 && (
+          <motion.div layout initial={{ scale: 0.95, y: 10, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="glass-panel" style={{ padding: 24, borderRadius: 24, width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 24 }}>
+              <div style={{ position: 'relative', width: 120, height: 120, borderRadius: '50%', background: 'conic-gradient(var(--color-primary) 0% 70%, var(--bg-elevated) 70% 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'var(--bg-surface)' }} />
+                <span style={{ position: 'absolute', fontSize: 20, fontWeight: 800 }}>70%</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleInteract}
+              className={interacted ? "btn-secondary" : "btn-primary glow-effect"}
+              style={{ width: '100%', height: 48, borderRadius: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              {interacted ? <><CheckCircle size={20} /> Dashboard Atualizado</> : <><PieChart size={20} /> Analisar Receitas</>}
             </button>
           </motion.div>
         )}

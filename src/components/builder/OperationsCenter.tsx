@@ -67,7 +67,7 @@ export const OperationsCenter: React.FC<{ onNavigate?: (tab: string) => void }> 
 
       {/* Grid de KPIs Estratégicos */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 24 }}>
-        <div className="glass-panel" style={{ padding: 14, borderRadius: 16, borderLeft: '4px solid #3B82F6' }}>
+        <div className="glass-panel" style={{ padding: 14, borderRadius: 16, borderLeft: '4px solid var(--color-primary)' }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 2 }}>Obras Ativas</span>
           <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-main)' }}>{activeWorks}</span>
         </div>
@@ -165,7 +165,7 @@ export const OperationsCenter: React.FC<{ onNavigate?: (tab: string) => void }> 
       {/* Lista de Obras e Status */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Andamento das Obras</h3>
-        <button onClick={() => onNavigate && onNavigate('obras')} style={{ background: 'none', border: 'none', color: '#3B82F6', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Ver Todas</button>
+        <button onClick={() => onNavigate && onNavigate('obras')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Ver Todas</button>
       </div>
 
       {works.length === 0 ? (
@@ -177,7 +177,7 @@ export const OperationsCenter: React.FC<{ onNavigate?: (tab: string) => void }> 
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 20 }}>
           {works.map(w => (
-            <div key={w.id} className="glass-panel" style={{ padding: 16, borderRadius: 18, borderLeft: '4px solid #3B82F6' }}>
+            <div key={w.id} className="glass-panel" style={{ padding: 16, borderRadius: 18, borderLeft: '4px solid var(--color-primary)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                 <div>
                   <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 2px 0' }}>{w.name}</h4>
@@ -185,7 +185,7 @@ export const OperationsCenter: React.FC<{ onNavigate?: (tab: string) => void }> 
                     <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={12} /> Previsão: Nov/2026</span>
                   </div>
                 </div>
-                <span className="status-chip" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6', fontWeight: 800 }}>
+                <span className="status-chip" style={{ backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', fontWeight: 800 }}>
                   {w.progress || 0}%
                 </span>
               </div>
@@ -202,7 +202,7 @@ export const OperationsCenter: React.FC<{ onNavigate?: (tab: string) => void }> 
               </div>
 
               <div style={{ height: 6, backgroundColor: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ width: `${w.progress || 0}%`, height: '100%', backgroundColor: '#3B82F6', borderRadius: 3 }} />
+                <div style={{ width: `${w.progress || 0}%`, height: '100%', backgroundColor: 'var(--color-primary)', borderRadius: 3 }} />
               </div>
             </div>
           ))}

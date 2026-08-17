@@ -5,6 +5,7 @@ import { ProjectsWidget } from './ProjectsWidget';
 import { LibraryWidget } from './LibraryWidget';
 import { TipsWidget } from './TipsWidget';
 import { AgendaWidget } from './AgendaWidget';
+import { CalculatorsCentralWidget } from './CalculatorsCentralWidget';
 import { ReorderableDashboardLayout } from './ReorderableDashboardLayout';
 
 // --------------------------------------------------------------------------------------
@@ -217,7 +218,8 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
     'projetos',
     'acompanhamento',
     'agenda',
-    'projetos-complementares'
+    'projetos-complementares',
+    'calculadoras'
   ];
 
   const WIDGET_NAMES = {
@@ -229,6 +231,7 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
     'projetos-complementares': 'Projetos Complementares',
     biblioteca:          'Biblioteca Técnica',
     dicas:               'Dicas',
+    calculadoras:        'Calculadoras',
   };
 
   const renderWidget = (id: string) => {
@@ -241,6 +244,7 @@ export function ArchitectDashboard({ onNavigate }: { onNavigate: (tab: string) =
       case 'projetos-complementares': return <EngineeringProjectsWidget onNavigate={onNavigate} key="projetos-complementares" />;
       case 'biblioteca':         return <LibraryWidget onNavigate={onNavigate} key="biblioteca" />;
       case 'dicas':              return <TipsWidget onNavigate={onNavigate} key="dicas" />;
+      case 'calculadoras':       return <CalculatorsCentralWidget onNavigate={onNavigate} key="calculadoras" />;
       default:                    return null;
     }
   };

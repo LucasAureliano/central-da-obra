@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronRight, Play } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronDown, Play } from 'lucide-react';
 
 interface HeroSectionProps {
   onLogin: () => void;
@@ -15,14 +15,13 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
     setTimeout(() => {
       const element = document.getElementById('demo-view');
       if (element) {
-        const top = element.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top, behavior: 'smooth' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 100);
   };
 
   return (
-    <section className="landing-section" style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '80px', paddingBottom: '40px', position: 'relative', overflow: 'hidden' }}>
+    <section className="landing-section" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '80px', paddingBottom: '80px', position: 'relative', overflow: 'hidden' }}>
       {/* Ambient glow signature */}
       <div style={{
         position: 'absolute',
@@ -37,7 +36,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
         pointerEvents: 'none'
       }} />
       <div className="landing-container" style={{ width: '100%', position: 'relative', zIndex: 1 }}>
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: 720, margin: '0 auto', padding: '0 16px' }}>
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -68,16 +67,18 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
 
           <motion.h1 
             className="hero-title"
+            style={{ textAlign: 'center', width: '100%' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            A plataforma completa para <br className="mobile-hidden" />
+            A plataforma completa para{' '}
             <span className="text-gradient">profissionais da obra</span>
           </motion.h1>
           
           <motion.p 
             className="hero-subtitle"
+            style={{ textAlign: 'center', width: '100%' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
@@ -121,6 +122,36 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
 
         </div>
       </div>
+      
+      {!showDemo && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          style={{
+            position: 'absolute',
+            bottom: 40,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 8,
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            zIndex: 10
+          }}
+          onClick={() => {
+            const container = document.querySelector('.landing-body');
+            if (container) {
+              container.scrollTo({ top: window.innerHeight - 80, behavior: 'smooth' });
+            }
+          }}
+        >
+          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.7 }}>Role para explorar</span>
+          <ChevronDown size={24} style={{ opacity: 0.7 }} />
+        </motion.div>
+      )}
     </section>
   );
 }

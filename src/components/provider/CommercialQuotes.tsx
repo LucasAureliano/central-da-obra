@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, FileText, DollarSign, Loader2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { collection, getDocs, doc, updateDoc, query } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -87,7 +88,7 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
             notes: `Origem: Orçamento comercial ${targetQuote.id}`
           });
 
-          const { toast } = await import('react-hot-toast');
+          
           toast.success('Cotação aprovada! Sincronizada com o Financeiro e Lista de Compras.');
         }
       } catch (err) {

@@ -47,7 +47,8 @@ service cloud.firestore {
     // REGRAS DE USUÁRIOS E PERFIL
     // ==========================================
     match /users/{userId} {
-      allow read: if isOwner(userId) || (isAuthenticated() && request.query.limit <= 10); // Permitir buscar perfil público
+      allow get: if isOwner(userId) || isAuthenticated();
+      allow list: if false; // Prevent scraping of the users collection
       allow write: if isOwner(userId);
       
       match /shopping/{itemId} {
@@ -62,8 +63,10 @@ service cloud.firestore {
       // Para criar a obra, a pessoa deve ser a dona (request.resource.data.userId == request.auth.uid)
       allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
       
-      // Para ler a obra, deve ser o dono primário ou ter uma role designada.
-      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || resource.data.get('roles', {}).keys().hasAny([request.auth.uid]));
+      // Para ler a obra, deve ser o dono primário
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      // Ou ter uma role designada
+      allow read: if isAuthenticated() && resource.data.get('roles', {}).keys().hasAny([request.auth.uid]);
       
       // Para atualizar a obra, deve ser dono, manager ou editor.
       allow update: if isAuthenticated() && (request.auth.uid == resource.data.userId || resource.data.get('roles', {}).get(request.auth.uid, '') in ['owner', 'manager', 'editor']);

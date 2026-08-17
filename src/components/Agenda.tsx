@@ -105,15 +105,13 @@ export function Agenda() {
                 <div className="input-group">
                   <label className="input-label">Data</label>
                   <div style={{ position: 'relative' }}>
-                    <CalendarIcon size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
-                    <input type="date" className="input-premium" style={{ width: '100%', paddingLeft: 44 }} value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
+                    <input type="date" className="input-premium" style={{ width: '100%' }} value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
                   </div>
                 </div>
                 <div className="input-group">
                   <label className="input-label">Horário</label>
                   <div style={{ position: 'relative' }}>
-                    <Clock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
-                    <input type="time" className="input-premium" style={{ width: '100%', paddingLeft: 44 }} value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} />
+                    <input type="time" className="input-premium" style={{ width: '100%' }} value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} />
                   </div>
                 </div>
               </div>
