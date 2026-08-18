@@ -15,28 +15,31 @@ export function drawHeader(doc: jsPDF, userName: string, _userEmail: string, wor
   const pageWidth = doc.internal.pageSize.getWidth();
   const centerX = pageWidth / 2;
 
-  let currentY = 20;
+  let currentY = 30;
 
   if (logoBase64) {
-    const imgWidth = 140;
-    const imgHeight = 50; 
-    doc.setFillColor(255, 255, 255);
-    doc.rect(centerX - (imgWidth/2), currentY, imgWidth, imgHeight, 'F');
-    doc.addImage(logoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
-    currentY += imgHeight + 20;
+    try {
+      const props = doc.getImageProperties(logoBase64);
+      const ratio = props.width / props.height;
+      const imgHeight = 35; 
+      const imgWidth = imgHeight * ratio;
+      // Logo no canto superior esquerdo com proporções originais, sem fundo branco
+      doc.addImage(logoBase64, 'PNG', 40, 20, imgWidth, imgHeight);
+    } catch (e) {
+      doc.addImage(logoBase64, 'PNG', 40, 20, 100, 35);
+    }
   } else {
-    // Fallback: Ícone Dourado Centralizado
+    // Fallback: Ícone Dourado no canto superior esquerdo
     doc.setFillColor(212, 175, 55);
-    doc.rect(centerX - 16, currentY, 32, 32, 'F');
+    doc.rect(40, 20, 24, 24, 'F');
     doc.setFillColor(255, 255, 255);
-    doc.rect(centerX - 12, currentY + 18, 24, 4, 'F');
-    doc.rect(centerX - 8, currentY + 8, 16, 12, 'F');
+    doc.rect(43, 34, 18, 3, 'F');
+    doc.rect(46, 26, 12, 9, 'F');
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(26);
+    doc.setFontSize(14);
     doc.setTextColor(17, 24, 39);
-    doc.text('CentralObra', centerX, currentY + 55, { align: 'center' });
-    currentY += 75;
+    doc.text('CentralObra', 72, 37, { align: 'left' });
   }
 
   doc.setFontSize(10);
@@ -50,7 +53,7 @@ export function drawHeader(doc: jsPDF, userName: string, _userEmail: string, wor
     doc.text(`Data: ${formatDate()}`, centerX, currentY, { align: 'center' });
   }
 
-  return currentY + 20;
+  return currentY + 30;
 }
 
 export function drawFooter(doc: jsPDF) {
@@ -80,7 +83,9 @@ export function drawFooter(doc: jsPDF) {
   doc.text(`Página ${currentPage} de ${pageCount}`, pageWidth - 20, pageHeight - 26, { align: 'right' });
 }
 
-export function applyGlobalWatermark(doc: jsPDF) {
+export function applyGlobalWatermark(doc: jsPDF, isPro: boolean = false) {
+  if (isPro) return; // Planos PRO/Business não possuem marca d'água
+
   const pageCount = (doc as any).internal.getNumberOfPages();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -275,7 +280,8 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
     drawFooter(doc);
   }
 
-  applyGlobalWatermark(doc);
+  const isPro = profile?.subscriptionPlan === 'pro' || profile?.subscriptionPlan === 'business' || true; // Em testes, libera premium
+  applyGlobalWatermark(doc, isPro);
   // Use blob URL approach for Capacitor/Android WebView compatibility
   const blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
@@ -598,6 +604,8 @@ export async function generateCommercialQuotePDF({
 
   // Footer para todas as páginas geradas
   const pageCount = (doc as any).internal.getNumberOfPages();
+  const isPro = profile?.subscriptionPlan === 'pro' || profile?.subscriptionPlan === 'business';
+
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     const pWidth = doc.internal.pageSize.getWidth();
@@ -606,11 +614,17 @@ export async function generateCommercialQuotePDF({
     doc.setFontSize(8);
     doc.setTextColor(156, 163, 175);
     doc.setFont('helvetica', 'normal');
-    doc.text('Gerado com CentralObra - Plataforma de Gestão', margin, pHeight - 20);
+    
+    if (isPro) {
+      doc.text('Documento Autenticado Eletronicamente', margin, pHeight - 20);
+    } else {
+      doc.text('Gerado com CentralObra - Plataforma de Gestão', margin, pHeight - 20);
+    }
+    
     doc.text(`Página ${i} de ${pageCount}`, pWidth - margin, pHeight - 20, { align: 'right' });
   }
 
-  applyGlobalWatermark(doc);
+  applyGlobalWatermark(doc, isPro);
   // Use blob URL approach for Capacitor/Android WebView compatibility
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);

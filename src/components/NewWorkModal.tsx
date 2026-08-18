@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useWorks } from '../contexts/WorksContext';
 import { useGuestGuard } from '../hooks/useGuestGuard';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 interface NewWorkModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ const themeColors = [
 export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
   const { user, profile } = useAuth();
   const { works, setPrimaryWork } = useWorks();
+  const { canCreateWork } = useSubscription();
   
   const [name, setName] = useState('');
   const [client, setClient] = useState('');
@@ -56,6 +58,10 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
     e.preventDefault();
     if (!user) {
       toast.error('Faça login para criar uma obra');
+      return;
+    }
+    if (!canCreateWork()) {
+      onClose();
       return;
     }
     if (!name) {

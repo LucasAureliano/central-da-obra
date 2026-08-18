@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@capacitor/core": "^8.5.0",
+    "@mercadopago/sdk-react": "^1.0.7",
     "cheerio": "^1.2.0",
     "date-fns": "^4.4.0",
     "exceljs": "^4.4.0",
@@ -22,6 +23,7 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.23.0",
+    "mercadopago": "^3.4.0",
     "openai": "^7.4.0",
     "pdfjs-dist": "^6.1.200",
     "qrcode.react": "^4.2.0",

@@ -19,6 +19,32 @@ export interface DashboardPrefs {
   hidden?: string[];
 }
 
+export type SubscriptionStatus = 'ACTIVE' | 'TRIAL' | 'FREE' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED' | 'REVOKED' | 'COMP' | 'TESTER';
+export type SubscriptionSource = 'subscription' | 'admin_grant' | 'trial' | 'promo' | null;
+
+export interface SubscriptionData {
+  planId: string;
+  status: SubscriptionStatus;
+  source: SubscriptionSource;
+  provider?: string;
+  providerSubscriptionId?: string;
+  startedAt?: any;
+  expiresAt?: any;
+  trialStartedAt?: any;
+  trialEndsAt?: any;
+  autoRenew: boolean;
+  grantedBy?: string;
+}
+
+export interface Entitlements {
+  unlimitedQuotes?: boolean;
+  multipleWorks?: boolean;
+  advancedReports?: boolean;
+  AI?: boolean;
+  clientPortal?: boolean;
+  [key: string]: boolean | undefined;
+}
+
 export interface UserProfile {
   uid: string;
   email: string | null;
@@ -28,6 +54,9 @@ export interface UserProfile {
   specialty?: string;
   createdAt: any;
   plan: string;
+  subscription?: SubscriptionData;
+  entitlements?: Entitlements;
+  isAdmin?: boolean;
   hasSeenWelcome?: boolean;
   dashboardPrefs?: DashboardPrefs;
   
@@ -100,6 +129,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: (localStorage.getItem("pendingRole") as UserRole) || null,
           createdAt: new Date(),
           plan: "free",
+          subscription: {
+            planId: "free",
+            status: "FREE",
+            source: null,
+            autoRenew: false
+          },
+          entitlements: {},
           hasSeenWelcome:
             localStorage.getItem("guestHasSeenWelcome") === "true",
         });
@@ -137,6 +173,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   role: pendingRole || null, // Role starts with pending or null
                   createdAt: new Date(),
                   plan: "free",
+                  subscription: {
+                    planId: "free",
+                    status: "FREE",
+                    source: null,
+                    autoRenew: false
+                  },
+                  entitlements: {},
                   hasSeenWelcome: false,
                   dashboardPrefs: {
                     widgets: [
@@ -178,6 +221,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               role: (localStorage.getItem("pendingRole") as UserRole) || null,
               createdAt: new Date(),
               plan: "free",
+              subscription: {
+                planId: "free",
+                status: "FREE",
+                source: null,
+                autoRenew: false
+              },
+              entitlements: {},
               hasSeenWelcome:
                 sessionStorage.getItem("guestHasSeenWelcome") === "true",
               dashboardPrefs: {
@@ -248,6 +298,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: (localStorage.getItem("pendingRole") as UserRole) || null,
         createdAt: new Date(),
         plan: "free",
+        subscription: {
+          planId: "free",
+          status: "FREE",
+          source: null,
+          autoRenew: false
+        },
+        entitlements: {},
         hasSeenWelcome: false,
         dashboardPrefs: {
           widgets: ["resumo", "calculadoras", "insights", "financeiro"],

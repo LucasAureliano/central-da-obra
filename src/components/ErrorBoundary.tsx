@@ -1,9 +1,9 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
@@ -27,36 +27,21 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
       return (
-        <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: 'var(--bg-base)' }}>
-          <div className="card-premium" style={{ maxWidth: 400, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <AlertTriangle size={32} />
-            </div>
-            <div>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Ops! Algo deu errado.</h2>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Encontramos um erro inesperado. Nossa equipe já foi notificada. Tente recarregar a página.
-              </p>
-            </div>
-            
-            {this.state.error && (
-              <div style={{ padding: 12, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 8, width: '100%', overflow: 'auto', textAlign: 'left' }}>
-                <code style={{ fontSize: 11, color: 'var(--color-danger)', whiteSpace: 'pre-wrap' }}>
-                  {this.state.error.message}
-                </code>
-              </div>
-            )}
-
-            <button 
-              className="btn-primary" 
-              onClick={() => window.location.reload()}
-              style={{ width: '100%', marginTop: 8 }}
-            >
-              <RefreshCw size={18} />
-              Recarregar Página
-            </button>
-          </div>
+        <div style={{ padding: 20, backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: 8, margin: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>Algo deu errado nesta seção.</h2>
+          <pre style={{ fontSize: 12, overflowX: 'auto', whiteSpace: 'pre-wrap' }}>
+            {this.state.error?.toString()}
+          </pre>
+          <button 
+            onClick={() => this.setState({ hasError: false, error: null })}
+            style={{ marginTop: 12, padding: '8px 16px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+          >
+            Tentar novamente
+          </button>
         </div>
       );
     }

@@ -7,14 +7,25 @@ interface QuoteStepTypeProps {
   setServiceType: (type: string) => void;
   setServices: (services: any[]) => void;
   setStep: (step: number) => void;
+  activeRole?: string;
 }
 
-export function QuoteStepType({ TEMPLATES, serviceType, applyTemplate, setServiceType, setServices, setStep }: QuoteStepTypeProps) {
+export function QuoteStepType({ TEMPLATES, serviceType, applyTemplate, setServiceType, setServices, setStep, activeRole }: QuoteStepTypeProps) {
+  const architectTemplates = ['Projeto Arquitetônico', 'Projeto Estrutural', 'Compatibilização BIM', 'Emissão de ART/RRT'];
+  
+  const filteredTemplates = Object.keys(TEMPLATES).filter(key => {
+    if (activeRole === 'architect' || activeRole === 'engineer') {
+      return architectTemplates.includes(key);
+    } else {
+      return !architectTemplates.includes(key);
+    }
+  });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Selecione um modelo pré-configurado. Você poderá editar os itens livremente nas próximas etapas.</p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-        {Object.keys(TEMPLATES).map(key => (
+        {filteredTemplates.map(key => (
           <motion.div 
             key={key} 
             whileHover={{ scale: 1.02 }}

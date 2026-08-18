@@ -8,12 +8,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardRouter } from './components/DashboardRouter';
 import { Works } from './components/Works';
 import { WorkDetails } from './components/WorkDetails';
-import { Menu as MenuIcon, Home, Briefcase, LogIn, X, Sparkles, Calendar, Calculator, Loader2 } from 'lucide-react';
+import { Menu as MenuIcon, Home, Briefcase, LogIn, X, Loader2 } from 'lucide-react';
 import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
+import { SubscriptionPlans } from './components/SubscriptionPlans';
 import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
 import { Menu } from './components/Menu';
-import { CustomLogo } from './components/CustomLogo';
+
 import { Profile } from './components/Profile';
 import { Login } from './components/Login';
 
@@ -22,10 +23,10 @@ const CalculatorLibrary = lazy(() => import('./components/calculators_library/Ca
 const TechnicalCentral = lazy(() => import('./components/library/TechnicalCentral').then(m => ({ default: m.TechnicalCentral })));
 const InsightsCentral = lazy(() => import('./components/insights/InsightsCentral').then(m => ({ default: m.InsightsCentral })));
 const ProviderWorkDashboard = lazy(() => import('./components/provider/ProviderWorkDashboard').then(m => ({ default: m.ProviderWorkDashboard })));
-const Shopping = lazy(() => import('./components/Shopping').then(m => ({ default: m.Shopping })));
-const Finance = lazy(() => import('./components/Finance').then(m => ({ default: m.Finance })));
 const CalculatorsWizard = lazy(() => import('./components/calculators_library/CalculatorsWizard').then(m => ({ default: m.CalculatorsWizard })));
 const Reports = lazy(() => import('./components/Reports').then(m => ({ default: m.Reports })));
+import { Finance } from './components/Finance';
+import { Shopping } from './components/Shopping';
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
 import { useAuth } from './contexts/AuthContext';
@@ -39,12 +40,11 @@ import { PortalProvider } from './contexts/PortalContext';
 import { PlaceholderScreen } from './components/PlaceholderScreen';
 import { SharedWorkView } from './components/SharedWorkView';
 import { CustomToaster } from './components/ui/Toast';
-import { GlobalHeader } from './components/ui/GlobalHeader';
 import { CommercialQuotes } from './components/provider/CommercialQuotes';
 import { ClientsManager } from './components/provider/ClientsManager';
 import { ServicesCatalog } from './components/provider/ServicesCatalog';
 import { ServicesManager } from './components/provider/ServicesManager';
-import { ReceiptsManager } from './components/provider/ReceiptsManager';
+
 import { ProfessionalFinance } from './components/provider/ProfessionalFinance';
 import { GuestRestrictionModal } from './components/GuestRestrictionModal';
 import { TipsWidget } from './components/home/modules/TipsWidget';
@@ -80,11 +80,14 @@ import { SmartAssistant } from './components/assistant/SmartAssistant';
 import { OwnerWorkDetails } from './components/owner/OwnerWorkDetails';
 import { MarketingCenter } from './components/provider/MarketingCenter';
 import { ReviewPublicPage } from './components/provider/ReviewPublicPage';
+import { UpgradeModal } from './components/shared/UpgradeModal';
+import { QuotaBanner } from './components/shared/QuotaBanner';
 import { AppLayout, AuthModals } from './components/layout';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 function App() {
   const { user, profile, loading, isGuest } = useAuth();
-  const { showAuthModal, closeAuthModal, openAuthModal, showGuestAlert, closeGuestAlert } = useAuthModal();
+  const { showAuthModal, closeAuthModal, openAuthModal } = useAuthModal();
   const { works, activeWork } = useWorks(); // Now we have access!
   const [activeTab, setActiveTab] = useState('inicio');
   const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
@@ -230,6 +233,10 @@ function App() {
   }
 
   const handleMenuSelect = (title: string) => {
+    if (title === 'planos' || title === 'Meu Plano' || title === 'Planos' || title === 'Assinatura' || title === 'Meu Plano & Assinatura') {
+      setActiveTab('planos');
+      return;
+    }
     if (title === 'Minhas Obras' || title === 'Obras') {
       setActiveTab('obras');
       return;
@@ -398,6 +405,10 @@ function App() {
       setActiveTab('dicas');
       return;
     }
+    if (title === 'Administração') {
+      setActiveTab('admin');
+      return;
+    }
     if (title === 'Funil de Negócios' || title === 'Funil de Negócios (CRM)' || title === 'crm' || title === 'CRM' || title === 'Clientes & CRM' || title === 'CRM de Vendas') {
       setActiveTab('clientes');
       return;
@@ -519,8 +530,10 @@ function App() {
         if (activeRole === 'builder') return <BuilderTeams key="equipe" onBack={() => handleNavigate('menu')} />;
         return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;
       case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} />;
+      case 'planos': return <SubscriptionPlans key="planos" onBack={() => handleNavigate('menu')} />;
       case 'dicas': return <div key="dicas" className="screen-content" style={{ padding: '24px 20px' }}><TipsWidget onNavigate={handleNavigate} /></div>;
       case 'indicadores-bi': return <CorporateBI key="indicadores-bi" onBack={() => handleNavigate('inicio')} />;
+      case 'admin': return <AdminDashboard key="admin" onNavigate={handleNavigate} />;
       case 'menu': return <Menu key="menu" theme={theme} onToggleTheme={toggleTheme} onMenuSelect={handleMenuSelect} onReplayOnboarding={() => setForceOnboarding(true)} />;
       case 'placeholder': return <PlaceholderScreen key="placeholder" title={menuTitle} onBack={() => handleNavigate('menu')} />;
       default: return <DashboardRouter key="default" onNavigate={handleNavigate} />;
@@ -543,6 +556,7 @@ function App() {
                   user={user} 
                   activeRole={activeRole as string}
                 >
+                  {!isGuest && <QuotaBanner onNavigate={setActiveTab} />}
                   <Suspense fallback={<div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}><Loader2 className="animate-spin text-blue-500" size={32} /></div>}>{renderContent()}</Suspense>
                 </AppLayout>
                 <AuthModals 
@@ -551,6 +565,7 @@ function App() {
                   setAuthView={setAuthView} 
                 />
                 <GuestRestrictionModal />
+                <UpgradeModal onNavigate={handleNavigate} />
               </div>
             </PortalProvider>
           </AssistantProvider>

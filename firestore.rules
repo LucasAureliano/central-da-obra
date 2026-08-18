@@ -48,8 +48,8 @@ service cloud.firestore {
     // ==========================================
     match /users/{userId} {
       allow get: if isOwner(userId) || isAuthenticated();
-      allow list: if false; // Prevent scraping of the users collection
-      allow write: if isOwner(userId);
+      allow list: if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if isOwner(userId) || (isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
       
       match /shopping/{itemId} {
         allow read, write: if isOwner(userId);
@@ -141,6 +141,16 @@ service cloud.firestore {
         allow read: if hasWorkAccess(workId);
         allow write: if hasWorkWriteAccess(workId);
       }
+      
+      match /shopping/{itemId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
+
+      match /calculations/{calcId} {
+        allow read: if hasWorkAccess(workId);
+        allow write: if hasWorkWriteAccess(workId);
+      }
     }
 
     // ==========================================
@@ -155,6 +165,14 @@ service cloud.firestore {
       }
 
       match /journal/{journalId} {
+        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+      }
+
+      match /shopping/{itemId} {
+        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+      }
+
+      match /calculations/{calcId} {
         allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
       }
     }

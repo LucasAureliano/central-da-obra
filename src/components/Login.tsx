@@ -21,14 +21,37 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    const emailKey = email.toLowerCase().trim();
+    const attemptsKey = `login_attempts_${emailKey}`;
+    const lockoutKey = `login_lockout_${emailKey}`;
+    
+    const lockoutUntil = localStorage.getItem(lockoutKey);
+    if (lockoutUntil && Date.now() < parseInt(lockoutUntil)) {
+      const remainingSecs = Math.ceil((parseInt(lockoutUntil) - Date.now()) / 1000);
+      setError(`Muitas tentativas de login por segurança. Por favor aguarde ${remainingSecs}s para tentar novamente.`);
+      setLoading(false);
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      localStorage.removeItem(attemptsKey);
+      localStorage.removeItem(lockoutKey);
     } catch (err: any) {
       console.error(err);
-      if (err.code === 'auth/invalid-credential') {
-        setError('E-mail ou senha incorretos. Se ainda não possui conta, clique em "Criar conta" no fim da página.');
+      const currentAttempts = parseInt(localStorage.getItem(attemptsKey) || '0') + 1;
+      localStorage.setItem(attemptsKey, currentAttempts.toString());
+      if (currentAttempts >= 5) {
+        const lockoutTime = Date.now() + 5 * 60 * 1000; // 5 minutes lockout
+        localStorage.setItem(lockoutKey, lockoutTime.toString());
+        setError('Bloqueio de segurança ativado! Muitas tentativas incorretas (5/5). Aguarde 5 minutos.');
       } else {
-        setError(err.message || 'Erro ao fazer login.');
+        if (err.code === 'auth/invalid-credential') {
+          setError(`E-mail ou senha incorretos. Tentativa ${currentAttempts} de 5.`);
+        } else {
+          setError(err.message || 'Erro ao fazer login.');
+        }
       }
     } finally {
       setLoading(false);
@@ -36,8 +59,9 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', overflowY: 'auto', alignItems: 'center', justifyContent: 'center', padding: '24px 24px 60px 24px', position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', alignItems: 'center', justifyContent: 'flex-start', padding: '24px 24px 60px 24px', position: 'relative' }}>
       <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '50%', background: 'radial-gradient(ellipse at top, rgba(255,107,0,0.15), transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ margin: 'auto 0', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
       <div className="animate-stagger-1" style={{ marginBottom: 48, transform: 'scale(1.2)' }}>
         <Logo variant="horizontal" theme={theme} />
@@ -173,6 +197,7 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
             </span>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

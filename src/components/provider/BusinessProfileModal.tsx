@@ -92,6 +92,7 @@ export function BusinessProfileModal({ isOpen, onClose }: BusinessProfileModalPr
         console.error(e);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, user, isGuest]);
 
   const loadBusinessProfile = async () => {

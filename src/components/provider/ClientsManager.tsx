@@ -6,12 +6,14 @@ import { db } from '../../lib/firebase';
 import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { toast } from 'react-hot-toast';
 import type { Client } from '../../types';
 
 export const ClientsManager: React.FC = () => {
   const { user, isGuest } = useAuth();
   const { triggerGuestAlert } = useAuthModal();
+  const { canCreateClient } = useSubscription();
   
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +43,7 @@ export const ClientsManager: React.FC = () => {
       setClients([]);
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isGuest]);
 
   const loadClients = async () => {
@@ -72,7 +75,7 @@ export const ClientsManager: React.FC = () => {
           userId: user.uid
         });
       });
-      loadedClients.sort((a, b) => a.name.localeCompare(b.name));
+      loadedClients.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
       setClients(loadedClients);
     } catch (error) {
       console.error("Error loading clients:", error);
@@ -89,6 +92,8 @@ export const ClientsManager: React.FC = () => {
       triggerGuestAlert();
       return;
     }
+    if (!canCreateClient()) return;
+    
     setEditingClient(null);
     setFormData({ name: '', email: '', phone: '', whatsapp: '', address: '', documentNumber: '', notes: '', photoUrl: '', nextVisit: '' });
     setIsModalOpen(true);

@@ -1,5 +1,4 @@
 import { useAuth } from '../contexts/AuthContext';
-import toast from 'react-hot-toast';
 
 export function useGuestGuard() {
   const { isGuest, setShowGuestModal, setGuestActionName } = useAuth();

@@ -250,7 +250,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const quickChips = getQuickChips();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--bg-base)' }}>
+    <div className="screen-content" style={{ display: 'flex', flexDirection: 'column', height: '100%', maxWidth: 800, margin: '0 auto', width: '100%' }}>
       {/* Header */}
       <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10, borderBottom: '1px solid var(--border-subtle)' }}>
         <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -365,7 +365,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
       </div>
 
       {/* Input Area */}
-      <div className="glass-panel" style={{ position: 'fixed', bottom: 70, left: 0, right: 0, padding: '16px 20px', paddingBottom: '16px', borderTop: '1px solid var(--border-subtle)', zIndex: 10 }}>
+      <div className="glass-panel" style={{ position: 'sticky', bottom: 70, padding: '16px 20px', borderTop: '1px solid var(--border-subtle)', zIndex: 10, borderRadius: '24px 24px 0 0' }}>
         
         {/* Quick Chips */}
         {messages.length === 1 && (

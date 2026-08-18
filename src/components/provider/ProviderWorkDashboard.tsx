@@ -40,28 +40,47 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
   return (
     <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 24px 20px', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 24 }}>
-        <button 
-          onClick={onBack}
-          style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', cursor: 'pointer', flexShrink: 0 }}
-        >
-          <ArrowLeft size={20} />
+      {/* Header Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}>
+          <ArrowLeft size={18} /> Voltar
         </button>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px 0', lineHeight: 1.2 }}>
-            {work.name}
-          </h1>
-          {work.client && (
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-              <HardHat size={14} /> Cliente: {work.client}
-            </p>
-          )}
-          {work.address && (
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <MapPin size={13} /> {work.address}
-            </p>
-          )}
+      </div>
+
+      {/* Project Cover & Card Banner */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: 24,
+          borderRadius: 24,
+          marginBottom: 20,
+          backgroundImage: work.coverUrl || work.photoUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${work.coverUrl || work.photoUrl})` : 'linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: '#FFF'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: '#60A5FA', backgroundColor: 'rgba(96, 165, 250, 0.2)', padding: '4px 10px', borderRadius: 8 }}>
+              {work.providerServiceType || 'Obra'}
+            </span>
+            <h1 style={{ fontSize: 22, fontWeight: 900, margin: '8px 0 4px', color: '#FFF' }}>{work.name}</h1>
+            {work.client && (
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                <Users size={13} color="#FFF" /> Cliente: {work.client}
+              </span>
+            )}
+            {work.address && (
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <MapPin size={13} color="#FFF" /> {work.address}
+              </span>
+            )}
+          </div>
+
+          <span className="status-chip" style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: '#FFF', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 12px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>
+            {work.status || 'Em Andamento'}
+          </span>
         </div>
       </div>
 

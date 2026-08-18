@@ -5,6 +5,7 @@ import { Logo } from './ui/Logo';
 import { HeroSection } from './landing/HeroSection';
 import { ProfilesSection } from './landing/ProfilesSection';
 import { FeaturesGridSection } from './landing/FeaturesGridSection';
+import { PricingSection } from './landing/PricingSection';
 import { FaqSection } from './landing/FaqSection';
 import { InstitutionalFooter } from './landing/InstitutionalFooter';
 import { GenericInfoPage } from './landing/GenericInfoPage';
@@ -109,6 +110,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
           <div className="nav-center mobile-hidden">
             <a href="#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
             <a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
+            <a href="#planos" onClick={(e) => handleScrollTo(e, 'planos')} className="landing-nav-link animated-link">Planos</a>
             <a href="#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
           </div>
 
@@ -132,6 +134,10 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       
       <div id="recursos">
         <FeaturesGridSection />
+      </div>
+
+      <div id="planos">
+        <PricingSection onSubscribe={onRegister} />
       </div>
 
       <div id="como-funciona">

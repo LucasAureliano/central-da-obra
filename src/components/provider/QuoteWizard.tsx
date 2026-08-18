@@ -98,6 +98,9 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
   const { profile } = useAuth();
   const { openAuthModal } = useAuthModal();
   
+  const rawRole = (profile as any)?.role || localStorage.getItem('pendingRole');
+  const activeRole = ['service', 'architect', 'engineer', 'builder'].includes(rawRole as string) ? rawRole : 'owner';
+  
   const [step, setStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showGuestWarning, setShowGuestWarning] = useState(isGuest);
@@ -383,7 +386,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
 
               {/* STEP 3: TYPE */}
               {step === 3 && (
-                <QuoteStepType TEMPLATES={TEMPLATES} serviceType={serviceType} applyTemplate={applyTemplate} setServiceType={setServiceType} setServices={setServices} setStep={setStep} />
+                <QuoteStepType TEMPLATES={TEMPLATES} serviceType={serviceType} applyTemplate={applyTemplate} setServiceType={setServiceType} setServices={setServices} setStep={setStep} activeRole={activeRole as string} />
               )}
 
               {/* STEP 4: SERVICES */}

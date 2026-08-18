@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import { toast } from 'react-hot-toast';
 import { ArchitectProjectDetails } from './ArchitectProjectDetails';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 interface ProjectPhase {
   id: string;
@@ -152,11 +153,20 @@ export const ProjectControl: React.FC = () => {
   );
 
   if (selectedProjectId) {
-    return <ArchitectProjectDetails projectId={selectedProjectId} onBack={() => setSelectedProjectId(null)} />;
+    return (
+      <ErrorBoundary fallback={
+        <div style={{ padding: 20 }}>
+          <h2>Erro ao carregar o projeto.</h2>
+          <button className="btn-primary" onClick={() => setSelectedProjectId(null)}>Voltar aos projetos</button>
+        </div>
+      }>
+        <ArchitectProjectDetails projectId={selectedProjectId} onBack={() => setSelectedProjectId(null)} />
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden' }}>
+    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden', maxWidth: 800, margin: '0 auto', width: '100%' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>

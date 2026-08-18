@@ -43,7 +43,7 @@ class PortalService {
     return {
       workId: workData.id,
       token: mockToken,
-      shareableUrl: `https://centralobra.app/?shared=${mockToken}`,
+      shareableUrl: `${window.location.origin}/?shared=${mockToken}`,
       expiresAt: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
     };
   }

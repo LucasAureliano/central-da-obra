@@ -91,7 +91,7 @@ export function SearchableSelect({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Sticky Search Bar */}
-      <div style={{ position: 'sticky', top: 80, zIndex: 5, backgroundColor: 'var(--bg-main)', paddingBottom: 8 }}>
+      <div style={{ paddingBottom: 8 }}>
         <div style={{ position: 'relative' }}>
           <Search size={20} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
           <input

@@ -41,7 +41,8 @@ import {
   ShieldCheck,
   ShieldAlert,
   Calculator,
-  HelpCircle
+  HelpCircle,
+  Crown
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -308,6 +309,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           title: 'Configurações',
           items: [
             { icon: <User size={20} />, label: 'Meu Perfil', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
+            { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
             { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },
@@ -335,6 +337,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           title: 'Configurações',
           items: [
             { icon: <User size={20} />, label: 'Perfil Profissional', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
+            { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
             { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },
@@ -384,6 +387,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           title: 'Configurações',
           items: [
             { icon: <User size={20} />, label: 'Perfil Profissional (CREA/CAU)', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
+            { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
             { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },
@@ -425,6 +429,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           title: 'Configurações',
           items: [
             { icon: <Building2 size={20} />, label: 'Dados da Empresa', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
+            { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
             { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },
@@ -437,6 +442,31 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
   };
 
   const menuSections = getAdaptiveMenuSections();
+
+  if (profile?.isAdmin) {
+    const configSection = menuSections.find(s => s.title === 'Configurações');
+    if (configSection) {
+      configSection.items.push({ icon: <ShieldCheck size={20} />, label: 'Administração', color: '#EF4444', action: () => onMenuSelect('Administração') });
+    }
+  } else if (user?.email === 'lucassantosfuturo@gmail.com') {
+    const configSection = menuSections.find(s => s.title === 'Configurações');
+    if (configSection) {
+      configSection.items.push({ 
+        icon: <ShieldAlert size={20} />, 
+        label: 'Forçar Admin (Dev)', 
+        color: '#F59E0B', 
+        action: async () => {
+          try {
+            await updateDoc(doc(db, 'users', user.uid), { isAdmin: true });
+            toast.success('Admin ativado! Recarregando...');
+            setTimeout(() => window.location.reload(), 1000);
+          } catch(e) {
+            toast.error('Erro ao ativar admin.');
+          }
+        } 
+      });
+    }
+  }
 
   return (
     <div className="screen-content animate-fade-in" style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, paddingBottom: 100 }}>

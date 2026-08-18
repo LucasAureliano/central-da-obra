@@ -6,6 +6,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 interface Contact {
   id: string;
@@ -18,6 +19,7 @@ interface Contact {
 
 export function TeamManagement({ onBack }: { onBack: () => void }) {
   const { user } = useAuth();
+  const { canAddTeamMember } = useSubscription();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [filter, setFilter] = useState<'all' | 'team' | 'client'>('all');
   const [search, setSearch] = useState('');
@@ -94,7 +96,11 @@ export function TeamManagement({ onBack }: { onBack: () => void }) {
         <button 
           className="btn-primary" 
           style={{ width: 44, height: 44, borderRadius: 22, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            if (canAddTeamMember()) {
+              setIsModalOpen(true);
+            }
+          }}
         >
           <UserPlus size={20} />
         </button>

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, FileText, DollarSign, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, getDocs, doc, updateDoc, query } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, query, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { formatDate } from '../../utils/formatters';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 
 type QuoteStatus = 'Rascunho' | 'Enviado' | 'Em Negociação' | 'Aprovado' | 'Execução' | 'Concluído' | 'Recusado';
 
@@ -27,6 +28,7 @@ interface CommercialQuotesProps {
 
 export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }) => {
   const { user } = useAuth();
+  const { canCreateQuote } = useSubscription();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,6 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
 
         // Sync with Finance & Shopping when Approved
         if (newStatus === 'Aprovado') {
-          const { addDoc, collection, serverTimestamp } = await import('firebase/firestore');
           // Add to Shopping
           await addDoc(collection(db, 'users', user.uid, 'shopping'), {
             name: `[Cotação] ${targetQuote.service} (${targetQuote.client})`,
@@ -98,6 +99,12 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
     }
   };
 
+  const handleNewQuote = () => {
+    if (canCreateQuote() && onNavigate) {
+      onNavigate('novo-orcamento');
+    }
+  };
+
   return (
     <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div style={{ width: '100%', maxWidth: 1000 }}>
@@ -106,7 +113,7 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
             Orçamentos
           </h1>
           <button 
-            onClick={() => onNavigate && onNavigate('novo-orcamento')}
+            onClick={handleNewQuote}
             className="btn-primary btn-3d"
             style={{ borderRadius: 12, padding: '10px 16px', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)' }}
           >
@@ -144,51 +151,60 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
           <button 
             className="btn-primary" 
             style={{ borderRadius: 100, padding: '16px 32px', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 24px rgba(37, 99, 235, 0.2)' }}
+            onClick={handleNewQuote}
           >
             <Plus size={20} /> Criar Meu Primeiro Orçamento
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 16, margin: '0 -20px', paddingLeft: 20, paddingRight: 20, width: '100%', maxWidth: 1040 }} className="hide-scrollbar">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32, width: '100%', maxWidth: 1000, paddingBottom: 32 }}>
           {STATUSES.map(status => {
             const columnQuotes = quotes.filter(q => q.status === status && (q.client.toLowerCase().includes(filter.toLowerCase()) || q.service.toLowerCase().includes(filter.toLowerCase())));
             
+            if (columnQuotes.length === 0) return null;
+
             return (
-              <div key={status} style={{ minWidth: 280, maxWidth: 280, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{status}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', backgroundColor: 'var(--bg-elevated)', padding: '4px 10px', borderRadius: 12 }}>
+              <div key={status} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{status}</h3>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)', backgroundColor: 'var(--bg-elevated)', padding: '4px 12px', borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
                     {columnQuotes.length}
                   </span>
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 100 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
                   {columnQuotes.map(quote => (
-                    <div key={quote.id} className="glass-panel" style={{ padding: 16, borderRadius: 16, border: '1px solid var(--border-subtle)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <div key={quote.id} className="glass-panel" style={{ padding: 20, borderRadius: 24, border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>{quote.client}</h4>
-                          <span style={{ fontSize: 13, color: 'var(--text-muted)', display: 'block', lineHeight: 1.4 }}>{quote.service}</span>
+                          <h4 style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{quote.client}</h4>
+                          <span style={{ fontSize: 14, color: 'var(--text-muted)', display: 'block', lineHeight: 1.4, fontWeight: 500 }}>{quote.service}</span>
                         </div>
-                        <div style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(37, 99, 235, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <FileText size={16} />
+                        <div style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(37, 99, 235, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <FileText size={20} />
                         </div>
                       </div>
                       
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: 12 }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <DollarSign size={14} color="#10B981" />
-                          {quote.value?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-                        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
-                          {formatDate(quote.date)}
-                        </span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-elevated)', padding: '14px 16px', borderRadius: 16 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Valor Total</span>
+                          <span style={{ fontSize: 18, fontWeight: 800, color: '#10B981', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {quote.value?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Data</span>
+                          <span style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 700 }}>
+                            {formatDate(quote.date)}
+                          </span>
+                        </div>
                       </div>
   
-                      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto', paddingTop: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>Status:</span>
                         <select 
-                          className="input-field" 
-                          style={{ padding: '8px 12px', fontSize: 13, height: 'auto', backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', fontWeight: 600 }}
+                          className="input-premium" 
+                          style={{ padding: '0 16px', fontSize: 14, height: 44, flex: 1, fontWeight: 600 }}
                           value={quote.status}
                           onChange={(e) => moveQuote(quote.id, e.target.value as QuoteStatus)}
                         >
@@ -199,16 +215,16 @@ export const CommercialQuotes: React.FC<CommercialQuotesProps> = ({ onNavigate }
                       </div>
                     </div>
                   ))}
-                  
-                  {columnQuotes.length === 0 && (
-                    <div style={{ padding: 20, textAlign: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px dashed var(--border-subtle)' }}>
-                      <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Nenhum orçamento</span>
-                    </div>
-                  )}
                 </div>
               </div>
             );
           })}
+          
+          {quotes.filter(q => q.client.toLowerCase().includes(filter.toLowerCase()) || q.service.toLowerCase().includes(filter.toLowerCase())).length === 0 && (
+            <div style={{ padding: 40, textAlign: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 24, border: '1px dashed var(--border-subtle)' }}>
+              <span style={{ fontSize: 15, color: 'var(--text-muted)', fontWeight: 600 }}>Nenhum orçamento encontrado para "{filter}"</span>
+            </div>
+          )}
         </div>
       )}
     </div>

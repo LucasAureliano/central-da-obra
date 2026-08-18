@@ -39,8 +39,9 @@ export function Register({ onGoToLogin, theme = 'dark' }: RegisterProps) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', alignItems: 'center', justifyContent: 'flex-start', padding: 24, position: 'relative' }}>
       <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '50%', background: 'radial-gradient(ellipse at top, rgba(255,107,0,0.15), transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ margin: 'auto 0', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
       <div className="animate-stagger-1" style={{ marginBottom: 48, transform: 'scale(1.2)' }}>
         <Logo variant="horizontal" theme={theme} />
@@ -183,6 +184,7 @@ export function Register({ onGoToLogin, theme = 'dark' }: RegisterProps) {
             </span>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );
