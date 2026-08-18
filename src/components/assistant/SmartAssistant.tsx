@@ -365,7 +365,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
       </div>
 
       {/* Input Area */}
-      <div className="glass-panel" style={{ position: 'sticky', bottom: 70, padding: '16px 20px', borderTop: '1px solid var(--border-subtle)', zIndex: 10, borderRadius: '24px 24px 0 0' }}>
+      <div className="glass-panel" style={{ padding: '16px 20px', borderTop: '1px solid var(--border-subtle)', zIndex: 10, borderRadius: '24px 24px 0 0', marginTop: 'auto' }}>
         
         {/* Quick Chips */}
         {messages.length === 1 && (
