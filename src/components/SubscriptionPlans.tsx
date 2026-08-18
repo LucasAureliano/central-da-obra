@@ -85,7 +85,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   }
 
   return (
-    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', backgroundColor: 'var(--bg-base)' }}>
+    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -114,7 +114,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
       </div>
 
       {/* Uso Atual - Meu Plano */}
-      <div className="glass-panel mb-12 p-6 max-w-[800px] mx-auto rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] relative overflow-hidden">
+      <div className="glass-panel mb-12 p-6 max-w-[800px] mx-auto rounded-2xl border border-[var(--border-subtle)] bg-transparent relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl" />
         
         <div className="flex items-center justify-between mb-6 relative z-10">
@@ -267,7 +267,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
         <motion.div 
           whileHover={{ y: -8, boxShadow: '0 20px 40px -10px rgba(37,99,235,0.2)' }}
           className="glass-panel" 
-          style={{ padding: 32, borderRadius: 24, border: '2px solid var(--color-primary)', position: 'relative', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-surface)' }}
+          style={{ padding: 32, borderRadius: 24, border: '2px solid var(--color-primary)', position: 'relative', display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}
         >
           <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', backgroundColor: 'var(--color-primary)', color: '#FFF', padding: '4px 16px', borderRadius: 20, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}>
             <Sparkles size={14} /> Mais Popular
@@ -362,7 +362,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
 
       </div>
 
-      <div style={{ maxWidth: 400, margin: '40px auto 0', padding: '24px', backgroundColor: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border-subtle)' }}>
+      <div className="glass-panel" style={{ maxWidth: 400, margin: '40px auto 0', padding: '24px', backgroundColor: 'transparent', borderRadius: 16, border: '1px solid var(--border-subtle)' }}>
         <h4 className="text-sm font-bold text-[var(--text-main)] mb-2">Possui um Cupom Promocional?</h4>
         <div className="flex gap-2">
           <input 
