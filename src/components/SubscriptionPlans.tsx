@@ -85,7 +85,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   }
 
   return (
-    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px' }}>
+    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden', width: '100%', boxSizing: 'border-box' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>

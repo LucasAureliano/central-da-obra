@@ -269,7 +269,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
       {activeTab === 'projetos' && (
         <div className="animate-fade-in" style={{ padding: 20, overflowX: 'hidden' }}>
           {!activeProject ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16 }}>
               <button onClick={() => setActiveProject('eletrico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
                   <Lightbulb size={24} color="#EAB308" />

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Search, Users, Crown, AlertTriangle, ArrowLeft, RefreshCw, Filter } from 'lucide-react';
 import { collection, query, getDocs, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -130,7 +130,7 @@ export const AdminDashboard: React.FC<{ onNavigate: (tab: string) => void }> = (
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, padding: '0 20px', marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, padding: '0 20px', marginBottom: 20 }}>
         {[
           { label: 'Usuários', value: totalUsers, icon: <Users size={16} />, color: '#3B82F6' },
           { label: 'Premium', value: premiumUsers, icon: <Crown size={16} />, color: '#F59E0B' },

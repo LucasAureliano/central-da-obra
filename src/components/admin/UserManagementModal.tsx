@@ -101,7 +101,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden border border-[var(--border-subtle)] flex flex-col max-h-[90vh] text-[var(--text-main)]"
+          className="relative w-[90vw] max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden border border-[var(--border-subtle)] flex flex-col max-h-[90vh] text-[var(--text-main)]"
         >
           {/* Header */}
           <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-transparent">
