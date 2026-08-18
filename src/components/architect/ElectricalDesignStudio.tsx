@@ -143,7 +143,7 @@ export function ElectricalDesignStudio({ onBack }: { onBack?: () => void }) {
           </div>
         </div>
 
-        <div style={{ flex: '2 1 400px' }}>
+        <div style={{ flex: '2 1 400px', minWidth: 0 }}>
           <div style={{ backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Quadro Resumo</h2>
           

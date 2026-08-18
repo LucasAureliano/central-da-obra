@@ -168,7 +168,7 @@ export function PlumbingDesignStudio({ onBack }: { onBack?: () => void }) {
             </div>
           </form>
 
-          <div style={{ flex: '2 1 400px' }}>
+          <div style={{ flex: '2 1 400px', minWidth: 0 }}>
             <div style={{ backgroundColor: 'var(--bg-panel)', padding: 24, borderRadius: 24, border: '1px solid var(--border-subtle)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Lista de Pontos</h2>
