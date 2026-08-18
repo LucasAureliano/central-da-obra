@@ -60,7 +60,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   // If we have a preferenceId, show ONLY the checkout brick
   if (preferenceId) {
     return (
-      <div className="screen-content flex flex-col items-center justify-center p-8 bg-[var(--bg-base)] hide-scrollbar pb-32">
+      <div className="screen-content flex flex-col items-center justify-center p-8 bg-transparent hide-scrollbar pb-32">
         <h2 className="text-2xl font-black text-[var(--text-main)] mb-2">Finalizar Assinatura</h2>
         <p className="text-[var(--text-muted)] mb-8">Escolha sua forma de pagamento preferida.</p>
         
@@ -370,7 +370,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             placeholder="Ex: CENTRAL100" 
             value={coupon}
             onChange={e => setCoupon(e.target.value.toUpperCase())}
-            className="flex-1 bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-lg px-3 outline-none text-sm text-[var(--text-main)] focus:border-blue-500"
+            className="flex-1 bg-transparent border border-[var(--border-subtle)] rounded-lg px-3 outline-none text-sm text-[var(--text-main)] focus:border-blue-500"
           />
           <button 
             className="btn-secondary py-2 px-4 rounded-lg text-sm font-bold"

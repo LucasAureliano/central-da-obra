@@ -48,7 +48,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ onNavigate }) => {
             </div>
             <button
               onClick={() => setShowUpgradeModal(false)}
-              className="w-8 h-8 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+              className="w-8 h-8 rounded-full bg-transparent border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
             >
               <X size={16} />
             </button>
@@ -64,7 +64,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ onNavigate }) => {
             </p>
 
             {upgradeBenefits && upgradeBenefits.length > 0 && (
-              <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl p-5 mb-6">
+              <div className="bg-transparent border border-[var(--border-subtle)] rounded-2xl p-5 mb-6">
                 <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider mb-4 opacity-80">O que você ganha:</p>
                 <div className="flex flex-col gap-3">
                   {upgradeBenefits.map((benefit, i) => (

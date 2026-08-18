@@ -104,7 +104,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
           className="relative w-full max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden border border-[var(--border-subtle)] flex flex-col max-h-[90vh] text-[var(--text-main)]"
         >
           {/* Header */}
-          <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-[var(--bg-elevated)]">
+          <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-transparent">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
                 <Shield size={20} />
@@ -121,7 +121,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
 
           <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
             {/* User Card Info */}
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-transparent border border-[var(--border-subtle)]">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl flex-shrink-0 shadow-lg">
                 {userProfile.name?.charAt(0) || userProfile.email?.charAt(0) || '?'}
               </div>
@@ -149,7 +149,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 <select 
                   value={userRole || 'owner'} 
                   onChange={(e) => setUserRole(e.target.value as UserRole)}
-                  className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
                 >
                   <option value="owner">Proprietário (Owner)</option>
                   <option value="service">Prestador de Serviço (Service)</option>
@@ -165,7 +165,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 <select 
                   value={subStatus} 
                   onChange={(e) => setSubStatus(e.target.value as SubscriptionStatus)}
-                  className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
                 >
                   <option value="FREE">FREE</option>
                   <option value="ACTIVE">ACTIVE (Ativo)</option>
@@ -185,7 +185,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 <select 
                   value={subPlan} 
                   onChange={(e) => setSubPlan(e.target.value)}
-                  className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
                 >
                   <option value="free">Gratuito (R$ 0,00)</option>
                   <option value="starter">Básico (R$ 29,99/mês)</option>
@@ -200,7 +200,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 <select 
                   value={subSource || ''} 
                   onChange={(e) => setSubSource(e.target.value as SubscriptionSource || null)}
-                  className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
                 >
                   <option value="">Nenhuma</option>
                   <option value="subscription">Assinatura (Gateway MP)</option>
@@ -221,7 +221,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                     type="date" 
                     value={expiresAtStr}
                     onChange={(e) => setExpiresAtStr(e.target.value)}
-                    className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-xl p-3 pl-10 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 pl-10 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
                   />
                 </div>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1">Deixe em branco para acesso sem expiração definida.</p>
@@ -229,7 +229,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
 
               {/* Admin Access Switch */}
               <div className="pt-3 border-t border-[var(--border-subtle)]">
-                <label className="flex items-center gap-3 cursor-pointer p-3.5 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-base)] transition-colors border border-[var(--border-subtle)]">
+                <label className="flex items-center gap-3 cursor-pointer p-3.5 rounded-xl bg-transparent hover:bg-transparent/5 transition-colors border border-[var(--border-subtle)]">
                   <input 
                     type="checkbox" 
                     checked={isAdminFlag}
@@ -260,7 +260,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                       <button
                         type="button"
                         onClick={() => setShowConfirmDelete(false)}
-                        className="px-4 py-2 rounded-lg bg-[var(--bg-base)] text-xs font-semibold text-[var(--text-muted)]"
+                        className="px-4 py-2 rounded-lg bg-transparent/5 text-xs font-semibold text-[var(--text-muted)]"
                       >
                         Cancelar
                       </button>
@@ -280,7 +280,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex justify-end gap-3">
+          <div className="p-4 border-t border-[var(--border-subtle)] bg-transparent flex justify-end gap-3">
             <button 
               type="button"
               onClick={onClose}
