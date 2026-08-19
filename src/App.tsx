@@ -14,6 +14,8 @@ import { LandingPage } from './components/LandingPage';
 import { SubscriptionPlans } from './components/SubscriptionPlans';
 import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
 import { Menu } from './components/Menu';
+import { InterstitialAd } from './components/shared/InterstitialAd';
+import { PlansUpsellPopup } from './components/shared/PlansUpsellPopup';
 
 import { Profile } from './components/Profile';
 import { Login } from './components/Login';
@@ -25,6 +27,13 @@ const InsightsCentral = lazy(() => import('./components/insights/InsightsCentral
 const ProviderWorkDashboard = lazy(() => import('./components/provider/ProviderWorkDashboard').then(m => ({ default: m.ProviderWorkDashboard })));
 const CalculatorsWizard = lazy(() => import('./components/calculators_library/CalculatorsWizard').then(m => ({ default: m.CalculatorsWizard })));
 const Reports = lazy(() => import('./components/Reports').then(m => ({ default: m.Reports })));
+
+// Connect Modules
+const ProfessionalConnectDashboard = lazy(() => import('./components/connect/ProfessionalConnectDashboard').then(m => ({ default: m.ProfessionalConnectDashboard })));
+const OwnerConnectDashboard = lazy(() => import('./components/connect/OwnerConnectDashboard').then(m => ({ default: m.OwnerConnectDashboard })));
+const PublicProfileView = lazy(() => import('./components/connect/public/PublicProfileView').then(m => ({ default: m.PublicProfileView })));
+const PublicPortfolioView = lazy(() => import('./components/connect/public/PublicPortfolioView').then(m => ({ default: m.PublicPortfolioView })));
+
 import { Finance } from './components/Finance';
 import { Shopping } from './components/Shopping';
 import { Register } from './components/Register';
@@ -32,7 +41,6 @@ import { RoleSelection } from './components/RoleSelection';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { useWorks } from './contexts/WorksContext';
-import { WeatherProvider } from './contexts/WeatherContext';
 import { ConstructionIndexesProvider } from './contexts/ConstructionIndexesContext';
 import { MapsProvider } from './contexts/MapsContext';
 import { AssistantProvider } from './contexts/AssistantContext';
@@ -109,6 +117,8 @@ function App() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const sharedWorkId = urlParams.get('shared');
+  const connectProfileId = urlParams.get('connect');
+  const portfolioItemId = urlParams.get('portfolio');
   const isPreview = urlParams.get('preview');
 
   // Handle hash routes
@@ -137,8 +147,52 @@ function App() {
     }
   }
 
+  if (hash.startsWith('#/checkout-success')) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', padding: 20, textAlign: 'center' }}>
+        <div style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Pagamento Aprovado!</h1>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 32, maxWidth: 400 }}>Sua assinatura foi processada com sucesso. Aproveite todos os recursos do seu novo plano.</p>
+        <button 
+          onClick={() => { window.location.hash = ''; window.location.reload(); }}
+          className="btn-primary"
+        >
+          Voltar ao App
+        </button>
+      </div>
+    );
+  }
+
+  if (hash.startsWith('#/checkout-failure') || hash.startsWith('#/checkout-pending')) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', padding: 20, textAlign: 'center' }}>
+        <div style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        </div>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Pagamento Não Concluído</h1>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 32, maxWidth: 400 }}>Não foi possível confirmar o pagamento ou ele está pendente. Verifique com a operadora do seu cartão.</p>
+        <button 
+          onClick={() => { window.location.hash = ''; window.location.reload(); }}
+          className="btn-primary"
+        >
+          Tentar Novamente
+        </button>
+      </div>
+    );
+  }
+
   if (sharedWorkId) {
     return <SharedWorkView token={sharedWorkId} theme={theme} />;
+  }
+
+  if (portfolioItemId && connectProfileId) {
+    return <PublicPortfolioView workId={portfolioItemId} uid={connectProfileId} theme={theme} onBack={() => window.history.back()} />;
+  }
+
+  if (connectProfileId) {
+    return <PublicProfileView uid={connectProfileId} theme={theme} />;
   }
 
   if (isPreview === 'true') {
@@ -233,6 +287,10 @@ function App() {
   }
 
   const handleMenuSelect = (title: string) => {
+    if (title === 'connect') {
+      setActiveTab('connect');
+      return;
+    }
     if (title === 'planos' || title === 'Meu Plano' || title === 'Planos' || title === 'Assinatura' || title === 'Meu Plano & Assinatura') {
       setActiveTab('planos');
       return;
@@ -529,6 +587,9 @@ function App() {
       case 'equipe': 
         if (activeRole === 'builder') return <BuilderTeams key="equipe" onBack={() => handleNavigate('menu')} />;
         return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;
+      case 'connect':
+        if (activeRole === 'owner') return <OwnerConnectDashboard key="connect" onNavigate={handleNavigate} />;
+        return <ProfessionalConnectDashboard key="connect" onNavigate={handleNavigate} />;
       case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} />;
       case 'planos': return <SubscriptionPlans key="planos" onBack={() => handleNavigate('menu')} />;
       case 'dicas': return <div key="dicas" className="screen-content" style={{ padding: '24px 20px' }}><TipsWidget onNavigate={handleNavigate} /></div>;
@@ -541,7 +602,7 @@ function App() {
   };
 
   return (
-    <WeatherProvider>
+    
       <ConstructionIndexesProvider>
         <MapsProvider>
           <AssistantProvider>
@@ -571,7 +632,7 @@ function App() {
           </AssistantProvider>
         </MapsProvider>
       </ConstructionIndexesProvider>
-    </WeatherProvider>
+    
   );
 }
 

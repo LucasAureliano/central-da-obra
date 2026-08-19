@@ -113,7 +113,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
           padding: 24,
           borderRadius: 24,
           marginBottom: 20,
-          backgroundImage: project.coverUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${project.coverUrl})` : 'linear-gradient(135deg, #1E1B4B 0%, #4C1D95 100%)',
+          backgroundImage: project.coverUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(${project.coverUrl})` : 'linear-gradient(135deg, #1E1B4B 0%, #4C1D95 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#FFF'

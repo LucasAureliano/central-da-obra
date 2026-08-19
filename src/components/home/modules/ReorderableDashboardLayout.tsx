@@ -4,6 +4,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Settings, EyeOff, GripVertical, Plus } from 'lucide-react';
+import { AppInstallBanner } from '../../ui/AppInstallBanner';
 
 interface ReorderableDashboardLayoutProps {
   defaultOrder: string[];
@@ -129,6 +130,13 @@ export function ReorderableDashboardLayout({ defaultOrder, renderWidget, widgetN
           {isEditing ? 'Concluir Edição' : 'Personalizar Painel'}
         </button>
       </div>
+
+      {/* App Install Banner */}
+      {!isEditing && (
+        <div style={{ marginTop: 16 }}>
+          <AppInstallBanner />
+        </div>
+      )}
     </div>
   );
 }
@@ -144,7 +152,7 @@ function DraggableDashboardItem({ id, widgetNode, isEditing, onHide }: any) {
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: 'auto' }}
       exit={{ opacity: 0, height: 0, scale: 0.9 }}
-      transition={{ duration: 0.2 }}
+      transition={{ type: "spring", bounce: 0, duration: 0.4 }}
       style={{ position: 'relative', marginBottom: isEditing ? 8 : 0 }} 
       whileDrag={{ scale: 1.02, cursor: 'grabbing', zIndex: 50 }}
       dragListener={false}

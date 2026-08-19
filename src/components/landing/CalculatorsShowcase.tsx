@@ -86,7 +86,7 @@ export function CalculatorsShowcase({ onRegister }: CalculatorsShowcaseProps) {
             
             <div style={{ position: 'relative', zIndex: 1, padding: 32, width: '100%' }}>
               {/* Mockup simplificado de calculadora */}
-              <div style={{ background: 'var(--bg-glass)', backdropFilter: 'blur(10px)', borderRadius: 16, border: '1px solid var(--border-subtle)', padding: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+              <div style={{ background: 'var(--bg-glass)', backdropFilter: 'blur(24px)', borderRadius: 16, border: '1px solid var(--border-subtle)', padding: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
                   <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(255,107,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
                     <Calculator size={20} />

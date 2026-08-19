@@ -88,10 +88,10 @@ export function ProjectPhotoGallery({ projectId }: { projectId: string }) {
                 alt={photo.description} 
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
               />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
               
               <div style={{ position: 'absolute', bottom: 8, left: 8, right: 8, zIndex: 2 }}>
-                <p style={{ color: '#fff', fontSize: 11, fontWeight: 600, textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+                <p style={{ color: '#fff', fontSize: 11, fontWeight: 600, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
                   {photo.description || 'Sem descrição'}
                 </p>
               </div>

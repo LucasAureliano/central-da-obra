@@ -21,7 +21,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({ theme, authView, setAuth
         {showAuthModal && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)',
             zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <div className="glass-panel modal-content-scroll animate-fade-in" style={{ width: '90%', maxWidth: 400, borderRadius: 24, overflowX: 'hidden', position: 'relative' }}>
@@ -45,7 +45,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({ theme, authView, setAuth
         {showGuestAlert && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)',
             zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
           }}>
             <motion.div

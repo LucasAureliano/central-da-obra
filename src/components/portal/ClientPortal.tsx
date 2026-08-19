@@ -230,7 +230,7 @@ export function ClientPortal({ token, theme }: { token: string; theme: 'light' |
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
             style={{ height: '100%' }}
           >
             {activeTab === 'dashboard' ? (

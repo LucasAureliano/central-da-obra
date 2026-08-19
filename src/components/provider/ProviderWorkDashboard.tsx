@@ -54,7 +54,7 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
           padding: 24,
           borderRadius: 24,
           marginBottom: 20,
-          backgroundImage: work.coverUrl || work.photoUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${work.coverUrl || work.photoUrl})` : 'linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%)',
+          backgroundImage: work.coverUrl || work.photoUrl ? `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(${work.coverUrl || work.photoUrl})` : 'linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#FFF'

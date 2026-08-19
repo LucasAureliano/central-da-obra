@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save, Calendar, Shield, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { toast } from 'react-hot-toast';
 import type { UserProfile, SubscriptionData, SubscriptionStatus, SubscriptionSource, UserRole } from '../../contexts/AuthContext';
-import { PLANS_CONFIG } from '../../config/plans';
 
 interface UserManagementModalProps {
   isOpen: boolean;
@@ -50,7 +50,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
         status: subStatus,
         source: subSource || 'admin_grant',
         autoRenew: userProfile.subscription?.autoRenew || false,
-        expiresAt: expiresAtVal,
+        expiresAt: expiresAtVal as any,
       };
 
       await updateDoc(userRef, {
@@ -86,14 +86,14 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/70 backdrop-blur-md"
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
           onClick={onClose}
         />
         
@@ -101,55 +101,49 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-[90vw] max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden border border-[var(--border-subtle)] flex flex-col max-h-[90vh] text-[var(--text-main)]"
+          className="glass-panel"
+          style={{ 
+            position: 'relative', 
+            width: '100%', 
+            maxWidth: 480, 
+            borderRadius: 24, 
+            overflow: 'hidden', 
+            border: '1px solid var(--border-subtle)', 
+            backgroundColor: 'var(--bg-panel)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}
         >
-          {/* Header */}
-          <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-transparent">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                <Shield size={20} />
+          <div style={{ padding: '24px 24px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Shield size={20} color="#8B5CF6" />
               </div>
-              <div>
-                <h2 className="text-lg font-black text-[var(--text-main)] leading-tight">Gerenciar Conta</h2>
-                <p className="text-xs text-[var(--text-muted)]">Ajuste de permissões e assinaturas</p>
-              </div>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Gerenciar Usuário</h2>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-[var(--text-muted)]">
-              <X size={20} />
+            <button
+              onClick={onClose}
+              style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <X size={16} color="var(--text-muted)" />
             </button>
           </div>
 
-          <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
-            {/* User Card Info */}
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-transparent border border-[var(--border-subtle)]">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl flex-shrink-0 shadow-lg">
-                {userProfile.name?.charAt(0) || userProfile.email?.charAt(0) || '?'}
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="font-extrabold text-[var(--text-main)] truncate text-base">{userProfile.name || 'Sem Nome'}</h3>
-                <p className="text-xs text-[var(--text-muted)] truncate">{userProfile.email}</p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 uppercase">
-                    {userRole}
-                  </span>
-                  {userProfile.isAdmin && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 border border-purple-500/30">
-                      ADMIN
-                    </span>
-                  )}
-                </div>
-              </div>
+          <div style={{ padding: 24, maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ marginBottom: 24, padding: 16, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>
+                {userProfile.name || 'Sem Nome'}
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>{userProfile.email}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>ID: <span style={{ fontFamily: 'monospace', opacity: 0.7 }}>{userProfile.uid}</span></p>
             </div>
 
-            {/* Editable Fields */}
-            <div className="space-y-4">
-              {/* Role Select */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div>
-                <label className="block text-xs font-extrabold text-[var(--text-main)] uppercase tracking-wider mb-2">Perfil / Role</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Perfil (Role)</label>
                 <select 
                   value={userRole || 'owner'} 
                   onChange={(e) => setUserRole(e.target.value as UserRole)}
-                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  style={{ width: '100%', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: 12, fontSize: 14, fontWeight: 600, color: 'var(--text-main)', outline: 'none' }}
                 >
                   <option value="owner">Proprietário (Owner)</option>
                   <option value="service">Prestador de Serviço (Service)</option>
@@ -159,13 +153,12 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 </select>
               </div>
 
-              {/* Status Select */}
               <div>
-                <label className="block text-xs font-extrabold text-[var(--text-main)] uppercase tracking-wider mb-2">Status da Assinatura</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Status da Assinatura</label>
                 <select 
                   value={subStatus} 
                   onChange={(e) => setSubStatus(e.target.value as SubscriptionStatus)}
-                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  style={{ width: '100%', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: 12, fontSize: 14, fontWeight: 600, color: 'var(--text-main)', outline: 'none' }}
                 >
                   <option value="FREE">FREE</option>
                   <option value="ACTIVE">ACTIVE (Ativo)</option>
@@ -179,28 +172,26 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 </select>
               </div>
 
-              {/* Plan Select */}
               <div>
-                <label className="block text-xs font-extrabold text-[var(--text-main)] uppercase tracking-wider mb-2">Plano Concedido</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Plano Concedido</label>
                 <select 
                   value={subPlan} 
                   onChange={(e) => setSubPlan(e.target.value)}
-                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  style={{ width: '100%', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: 12, fontSize: 14, fontWeight: 600, color: 'var(--text-main)', outline: 'none' }}
                 >
                   <option value="free">Gratuito (R$ 0,00)</option>
-                  <option value="starter">Básico (R$ 29,99/mês)</option>
-                  <option value="pro">PRO (R$ 49,99/mês)</option>
-                  <option value="business">Business / Enterprise (R$ 99,99/mês)</option>
+                  <option value="starter">Básico (R$ 29,90/mês)</option>
+                  <option value="pro">PRO (R$ 49,90/mês)</option>
+                  <option value="business">Business / Enterprise (R$ 79,90/mês)</option>
                 </select>
               </div>
 
-              {/* Concession Source */}
               <div>
-                <label className="block text-xs font-extrabold text-[var(--text-main)] uppercase tracking-wider mb-2">Origem da Concessão</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Origem da Concessão</label>
                 <select 
                   value={subSource || ''} 
                   onChange={(e) => setSubSource(e.target.value as SubscriptionSource || null)}
-                  className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                  style={{ width: '100%', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: 12, fontSize: 14, fontWeight: 600, color: 'var(--text-main)', outline: 'none' }}
                 >
                   <option value="">Nenhuma</option>
                   <option value="subscription">Assinatura (Gateway MP)</option>
@@ -210,57 +201,54 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                 </select>
               </div>
 
-              {/* Expiration Date */}
               <div>
-                <label className="block text-xs font-extrabold text-[var(--text-main)] uppercase tracking-wider mb-2">Data de Expiração</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-[var(--text-muted)]">
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Data de Expiração</label>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: 12, left: 12, pointerEvents: 'none', color: 'var(--text-muted)' }}>
                     <Calendar size={18} />
                   </div>
                   <input 
                     type="date" 
                     value={expiresAtStr}
                     onChange={(e) => setExpiresAtStr(e.target.value)}
-                    className="w-full bg-transparent/5 border border-[var(--border-subtle)] rounded-xl p-3 pl-10 text-sm font-semibold text-[var(--text-main)] outline-none focus:border-blue-500 transition-all"
+                    style={{ width: '100%', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: '12px 12px 12px 40px', fontSize: 14, fontWeight: 600, color: 'var(--text-main)', outline: 'none' }}
                   />
                 </div>
-                <p className="text-[11px] text-[var(--text-muted)] mt-1">Deixe em branco para acesso sem expiração definida.</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Deixe em branco para acesso sem expiração definida.</p>
               </div>
 
-              {/* Admin Access Switch */}
-              <div className="pt-3 border-t border-[var(--border-subtle)]">
-                <label className="flex items-center gap-3 cursor-pointer p-3.5 rounded-xl bg-transparent hover:bg-transparent/5 transition-colors border border-[var(--border-subtle)]">
+              <div style={{ paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: 12, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.1)', border: '1px solid var(--border-subtle)' }}>
                   <input 
                     type="checkbox" 
                     checked={isAdminFlag}
                     onChange={(e) => setIsAdminFlag(e.target.checked)}
-                    className="w-5 h-5 accent-purple-600 rounded cursor-pointer"
+                    style={{ width: 20, height: 20, accentColor: '#8B5CF6', borderRadius: 4, cursor: 'pointer' }}
                   />
                   <div>
-                    <span className="block font-bold text-sm text-[var(--text-main)]">Permissão de Administrador</span>
-                    <span className="text-xs text-[var(--text-muted)]">Garante acesso ao painel de administração geral do aplicativo.</span>
+                    <span style={{ display: 'block', fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Permissão de Administrador</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Garante acesso ao painel de administração geral.</span>
                   </div>
                 </label>
               </div>
 
-              {/* Danger Zone: Delete User */}
-              <div className="pt-4 border-t border-[var(--border-subtle)]">
+              <div style={{ paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
                 {!showConfirmDelete ? (
                   <button
                     type="button"
                     onClick={() => setShowConfirmDelete(true)}
-                    className="w-full py-3 px-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 font-bold text-xs flex items-center justify-center gap-2 hover:bg-red-500/20 transition-all"
+                    style={{ width: '100%', padding: 12, borderRadius: 12, border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.1)', color: '#F87171', fontWeight: 800, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}
                   >
                     <Trash2 size={16} /> Excluir Conta do Usuário
                   </button>
                 ) : (
-                  <div className="p-4 rounded-2xl bg-red-500/15 border border-red-500/40 text-center space-y-3">
-                    <p className="text-xs font-bold text-red-300">Tem certeza que deseja excluir permanentemente esta conta?</p>
-                    <div className="flex gap-2 justify-center">
+                  <div style={{ padding: 16, borderRadius: 16, backgroundColor: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', textAlign: 'center' }}>
+                    <p style={{ fontSize: 12, fontWeight: 800, color: '#FCA5A5', marginBottom: 12 }}>Tem certeza que deseja excluir permanentemente esta conta?</p>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
                       <button
                         type="button"
                         onClick={() => setShowConfirmDelete(false)}
-                        className="px-4 py-2 rounded-lg bg-transparent/5 text-xs font-semibold text-[var(--text-muted)]"
+                        style={{ padding: '8px 16px', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.2)', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', border: 'none', cursor: 'pointer' }}
                       >
                         Cancelar
                       </button>
@@ -268,7 +256,7 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
                         type="button"
                         onClick={handleDeleteUser}
                         disabled={isDeleting}
-                        className="px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-black flex items-center gap-1"
+                        style={{ padding: '8px 16px', borderRadius: 8, backgroundColor: '#DC2626', color: '#FFF', fontSize: 12, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 4, border: 'none', cursor: 'pointer' }}
                       >
                         {isDeleting ? 'Excluindo...' : 'Confirmar Exclusão'}
                       </button>
@@ -279,12 +267,11 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
             </div>
           </div>
 
-          {/* Footer Actions */}
-          <div className="p-4 border-t border-[var(--border-subtle)] bg-transparent flex justify-end gap-3">
+          <div style={{ padding: 16, borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
             <button 
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 font-bold text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+              style={{ padding: '10px 16px', fontWeight: 800, fontSize: 14, color: 'var(--text-muted)', backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               Cancelar
             </button>
@@ -292,13 +279,15 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({ isOpen
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="btn-primary px-6 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 shadow-lg"
+              className="btn-primary"
+              style={{ padding: '10px 24px', borderRadius: 12, fontWeight: 900, fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}
             >
               {isSaving ? 'Salvando...' : <><Save size={18} /> Salvar Alterações</>}
             </button>
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

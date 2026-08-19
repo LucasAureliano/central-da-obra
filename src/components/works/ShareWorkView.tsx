@@ -28,7 +28,8 @@ const PERMISSIONS = [
   { id: 'financeiro', label: 'Ver Financeiro' },
   { id: 'cronograma', label: 'Ver Cronograma' },
   { id: 'compras', label: 'Ver Compras' },
-  { id: 'diario', label: 'Ver Diário' }
+  { id: 'diario', label: 'Ver Diário' },
+  { id: 'fotos', label: 'Ver Galeria de Fotos' }
 ];
 
 export function ShareWorkView({ workId }: ShareWorkViewProps) {

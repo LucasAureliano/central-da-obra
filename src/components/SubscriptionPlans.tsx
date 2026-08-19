@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { CheckCircle2, Zap, Building2, Crown, ShieldCheck, X, Sparkles, ChevronRight, FileText, Bot, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { PLANS_CONFIG } from '../config/plans';
 import { useAuth } from '../contexts/AuthContext';
-import { CheckoutBrick } from './shared/CheckoutBrick';
 
 interface SubscriptionPlansProps {
   onBack?: () => void;
@@ -16,88 +16,115 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   const [coupon, setCoupon] = useState('');
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const STRIPE_PRICES = {
+    monthly: { starter: 'price_1U5y52Ht1GuKvdoeS6nyP9KJ', pro: 'price_1U5y5VHt1GuKvdoeG7DX2UrR', business: 'price_1U5y5wHt1GuKvdoefGFVgWho' },
+    annual: { starter: 'price_1U5yKNHt1GuKvdoelS5v4j5E', pro: 'price_1U5yL4Ht1GuKvdoezJcnlgtc', business: 'price_1U5yMwHt1GuKvdoemZrVbRne' }
+  };
+  const [showMockCheckout, setShowMockCheckout] = useState<{plan: string, price: number, isAnnual?: boolean} | null>(null);
+  const [isAnnual, setIsAnnual] = useState(false);
   const { subscription, usage, limits, plan } = useSubscription();
-  const { profile } = useAuth();
+  const { profile, isGuest, setShowGuestModal, setGuestActionName } = useAuth();
   
   const roleKey = profile?.role || 'owner';
   const rolePlans = PLANS_CONFIG[roleKey];
   
+  const starterPriceObj = isAnnual ? { val: 299.90, label: '/ano' } : { val: 29.90, label: '/mês' };
+  const proPriceObj = isAnnual ? { val: 499.90, label: '/ano' } : { val: 49.90, label: '/mês' };
+  const businessPriceObj = isAnnual ? { val: 799.00, label: '/ano' } : { val: 79.90, label: '/mês' };
+
   const freePrice = 0;
-  const starterPrice = 29.99;
-  const proPrice = 49.99;
-  const businessPrice = 99.99;
+  const starterPrice = starterPriceObj.val;
+  const proPrice = proPriceObj.val;
+  const businessPrice = businessPriceObj.val;
 
   const handleSubscribe = async (selectedPlan: 'starter' | 'pro' | 'business') => {
     if (!profile) return;
+    
+    if (isGuest) {
+      setGuestActionName('assinar um plano');
+      setShowGuestModal(true);
+      return;
+    }
+
+    if (Capacitor.isNativePlatform()) {
+      toast.error('Gerencie sua assinatura através da loja de aplicativos (App Store ou Google Play).', {
+        duration: 5000,
+        icon: '📱'
+      });
+      return;
+    }
+
     try {
       setLoadingCheckout(true);
-      const price = selectedPlan === 'pro' ? proPrice : selectedPlan === 'starter' ? starterPrice : businessPrice;
-      const res = await fetch('/api/mercadopago/create-preference', {
+      const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: profile.uid,
           userEmail: profile.email,
           planId: selectedPlan,
-          price: price,
-          title: `CentralObra ${selectedPlan.toUpperCase()} (Mensal)`
+          isAnnual: isAnnual,
+          priceId: STRIPE_PRICES[isAnnual ? 'annual' : 'monthly'][selectedPlan]
         })
       });
       const data = await res.json();
-      if (data.id) {
-        setPreferenceId(data.id);
+      if (data.url) {
+        window.location.href = data.url;
+      } else if (data.error && data.error !== 'MOCK_CHECKOUT_TRIGGER') {
+        toast.error(data.details || data.error);
+        setLoadingCheckout(false);
       } else {
-        toast.error('Erro ao gerar pagamento.');
+        // Fallback to mock UI
+        setShowMockCheckout({
+          plan: selectedPlan,
+          price: isAnnual ? (selectedPlan === 'pro' ? 499.90 : selectedPlan === 'starter' ? 299.90 : 799.00) : (selectedPlan === 'pro' ? 49.90 : selectedPlan === 'starter' ? 29.90 : 79.90),
+          isAnnual
+        });
+        setLoadingCheckout(false);
       }
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao conectar com o gateway.');
-    } finally {
+      toast.error('Erro ao conectar com o provedor de pagamentos.');
       setLoadingCheckout(false);
     }
   };
 
-  // If we have a preferenceId, show ONLY the checkout brick
-  if (preferenceId) {
-    return (
-      <div className="screen-content flex flex-col items-center justify-center p-8 bg-transparent hide-scrollbar pb-32">
-        <h2 className="text-2xl font-black text-[var(--text-main)] mb-2">Finalizar Assinatura</h2>
-        <p className="text-[var(--text-muted)] mb-8">Escolha sua forma de pagamento preferida.</p>
-        
-        <CheckoutBrick 
-          preferenceId={preferenceId} 
-          onSuccess={() => {
-            toast.success('Pagamento processado com sucesso! Validando...', { icon: '🎉' });
-            setPreferenceId(null);
-            if (onBack) onBack();
-          }}
-          onError={() => toast.error('Houve um erro no processamento.')}
-        />
-        
-        <button 
-          onClick={() => setPreferenceId(null)}
-          className="mt-6 text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold"
-        >
-          Cancelar e Voltar
-        </button>
-      </div>
-    );
-  }
+  
+  const handleMockPayment = async () => {
+    if (!showMockCheckout || !profile) return;
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore');
+      const { db } = await import('../lib/firebase');
+      await updateDoc(doc(db, 'users', profile.uid), {
+        subscription: {
+          planId: showMockCheckout.plan,
+          status: 'ACTIVE',
+          source: 'sandbox_test',
+          autoRenew: true,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        },
+        updatedAt: new Date()
+      });
+      toast.success('Pagamento simulado com sucesso! Plano ativado.');
+      setShowMockCheckout(null);
+      setTimeout(() => { window.location.hash = '#/checkout-success'; window.location.reload(); }, 500);
+    } catch (e) {
+      console.error(e);
+      toast.error('Erro ao simular pagamento.');
+    }
+  };
+
+
 
   return (
-    <div className="screen-content hide-scrollbar" style={{ padding: '24px 20px 100px 20px', overflowX: 'hidden', width: '100%', boxSizing: 'border-box' }}>
+    <div className="animate-fade-in" style={{ padding: '20px 20px 100px', position: 'relative' }}>
       
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        {onBack && (
-          <button onClick={onBack} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', width: 40, height: 40, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', cursor: 'pointer' }}>
-            <X size={20} />
-          </button>
-        )}
-      </div>
-
-      <div style={{ textAlign: 'center', marginBottom: 40, maxWidth: 600, margin: '0 auto 40px' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-main)', marginBottom: 12, lineHeight: 1.2 }}>
+      {/* Header Centralizado */}
+      <div style={{ textAlign: 'center', marginBottom: 40, maxWidth: 800, margin: '0 auto 40px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 20, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', fontSize: 13, fontWeight: 700, marginBottom: 16 }}>
+          <Sparkles size={16} /> Planos e Assinaturas
+        </div>
+        <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-main)', marginBottom: 12, lineHeight: 1.3, whiteSpace: 'normal', wordBreak: 'break-word' }}>
           {roleKey === 'service' ? 'Cresça seus serviços com a' : 
            roleKey === 'architect' || roleKey === 'engineer' ? 'Gestão avançada para seus' : 
            roleKey === 'builder' ? 'Escale sua Construtora com a' : 
@@ -114,12 +141,12 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
       </div>
 
       {/* Uso Atual - Meu Plano */}
-      <div className="glass-panel mb-12 p-6 max-w-[800px] mx-auto rounded-2xl border border-[var(--border-subtle)] bg-transparent relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl" />
+      <div className="glass-panel" style={{ marginBottom: 48, padding: 24, maxWidth: 800, margin: '0 auto 48px', borderRadius: 24, border: '1px solid var(--border-subtle)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, width: 120, height: 120, backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: '50%', filter: 'blur(40px)' }} />
         
-        <div className="flex items-center justify-between mb-6 relative z-10">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, position: 'relative', zIndex: 10 }}>
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
               <Activity size={20} color="var(--color-primary)" />
               Seu Uso Atual
             </h3>
@@ -132,63 +159,85 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-          {/* Orçamentos */}
-          {limits.maxQuotes < 9999 && (
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-[var(--text-main)] font-medium">Orçamentos Mês</span>
-                <span className="text-[var(--text-muted)]">{usage.quotesCount} de {limits.maxQuotes} utilizados</span>
-              </div>
-              <div className="h-2 w-full bg-[var(--bg-surface)] rounded-full overflow-hidden">
-                <div 
-                  className={`h-full rounded-full transition-all duration-500 ${usage.quotesCount >= limits.maxQuotes ? 'bg-red-500' : usage.quotesCount / limits.maxQuotes > 0.8 ? 'bg-amber-500' : 'bg-blue-500'}`} 
-                  style={{ width: `${Math.min(100, (usage.quotesCount / limits.maxQuotes) * 100)}%` }}
-                />
-              </div>
-              {usage.quotesCount > 0 && usage.quotesCount < limits.maxQuotes && (usage.quotesCount / limits.maxQuotes > 0.8) && (
-                <p className="text-xs text-amber-500 mt-2">Você está próximo do limite gratuito.</p>
-              )}
-            </div>
-          )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 24, position: 'relative', zIndex: 10 }}>
           
-          {/* Obras */}
-          {limits.maxWorks < 9999 && (
+          {/* Obras / Projetos */}
+          {(roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : limits.maxProjects) < 9999 && (
             <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-[var(--text-main)] font-medium">Obras Ativas</span>
-                <span className="text-[var(--text-muted)]">{usage.worksCount} de {limits.maxWorks} utilizadas</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
+                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{roleKey === 'owner' || roleKey === 'builder' ? 'Obras Ativas' : 'Projetos'}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{roleKey === 'owner' || roleKey === 'builder' ? usage.worksCount : usage.projectsCount} de {roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : limits.maxProjects}</span>
               </div>
-              <div className="h-2 w-full bg-[var(--bg-surface)] rounded-full overflow-hidden">
+              <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
                 <div 
-                  className={`h-full rounded-full transition-all duration-500 ${usage.worksCount >= limits.maxWorks ? 'bg-red-500' : usage.worksCount / limits.maxWorks >= 0.8 ? 'bg-amber-500' : 'bg-emerald-500'}`} 
-                  style={{ width: `${Math.min(100, (usage.worksCount / limits.maxWorks) * 100)}%` }}
+                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#3B82F6', width: `${Math.min(100, ((roleKey === 'owner' || roleKey === 'builder' ? usage.worksCount : usage.projectsCount) / (roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : limits.maxProjects)) * 100)}%` }}
                 />
               </div>
-              {usage.worksCount > 0 && usage.worksCount < limits.maxWorks && (usage.worksCount / limits.maxWorks >= 0.8) && (
-                <p className="text-xs text-amber-500 mt-2">Você está próximo do limite gratuito.</p>
-              )}
             </div>
           )}
 
-          {/* Clientes */}
-          {limits.maxClients < 9999 && (
+          {/* Orçamentos (Service only) */}
+          {roleKey === 'service' && limits.maxQuotes < 9999 && (
             <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-[var(--text-main)] font-medium">Clientes</span>
-                <span className="text-[var(--text-muted)]">{usage.clientsCount} de {limits.maxClients} utilizados</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
+                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos (Mês)</span>
+                <span style={{ color: 'var(--text-muted)' }}>{usage.quotesCount} de {limits.maxQuotes}</span>
               </div>
-              <div className="h-2 w-full bg-[var(--bg-surface)] rounded-full overflow-hidden">
+              <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
                 <div 
-                  className={`h-full rounded-full transition-all duration-500 ${usage.clientsCount >= limits.maxClients ? 'bg-red-500' : usage.clientsCount / limits.maxClients > 0.8 ? 'bg-amber-500' : 'bg-purple-500'}`} 
-                  style={{ width: `${Math.min(100, (usage.clientsCount / limits.maxClients) * 100)}%` }}
+                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#F59E0B', width: `${Math.min(100, (usage.quotesCount / limits.maxQuotes) * 100)}%` }}
                 />
               </div>
-              {usage.clientsCount > 0 && usage.clientsCount < limits.maxClients && (usage.clientsCount / limits.maxClients > 0.8) && (
-                <p className="text-xs text-amber-500 mt-2">Você está próximo do limite gratuito.</p>
-              )}
             </div>
           )}
+          
+          {/* Clientes (Service, Architect, Engineer) */}
+          {roleKey !== 'owner' && roleKey !== 'builder' && limits.maxClients < 9999 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
+                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Clientes</span>
+                <span style={{ color: 'var(--text-muted)' }}>{usage.clientsCount} de {limits.maxClients}</span>
+              </div>
+              <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
+                <div 
+                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#A855F7', width: `${Math.min(100, (usage.clientsCount / limits.maxClients) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Equipe (Builder only) */}
+          {roleKey === 'builder' && limits.maxTeamMembers < 9999 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
+                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Membros da Equipe</span>
+                <span style={{ color: 'var(--text-muted)' }}>{usage.teamMembersCount} de {limits.maxTeamMembers}</span>
+              </div>
+              <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
+                <div 
+                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#10B981', width: `${Math.min(100, (usage.teamMembersCount / limits.maxTeamMembers) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 32, gap: 12 }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: !isAnnual ? 'var(--text-main)' : 'var(--text-muted)' }}>Mensal</span>
+          <div 
+            style={{ width: 64, height: 36, borderRadius: 18, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', position: 'relative', cursor: 'pointer' }}
+            onClick={() => setIsAnnual(!isAnnual)}
+          >
+            <motion.div 
+              animate={{ x: !isAnnual ? 4 : 32 }}
+              style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'var(--color-primary)', position: 'absolute', top: 4 }}
+            />
+          </div>
+          <span style={{ fontSize: 16, fontWeight: 600, color: isAnnual ? 'var(--text-main)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+            Anual <span style={{ fontSize: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: 12 }}>2 meses grátis</span>
+          </span>
         </div>
       </div>
 
@@ -236,11 +285,11 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para quem precisa de mais sem pagar pelo Pro.</p>
           </div>
           <div style={{ marginBottom: 32 }}>
-            <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {starterPrice.toFixed(2).replace('.', ',')}</span>
-            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>/mês</span>
+            <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {starterPriceObj.val.toFixed(2).replace('.', ',')}</span>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-            {(rolePlans.starter?.features || ['Até 3 obras ativas', 'Até 15 orçamentos/mês', 'Até 30 clientes', 'Suporte por email']).map((feature, i) => (
+            {(rolePlans.starter?.features || ['Até 3 obras ativas', `Até 15 orçamentos${isAnnual ? '/ano' : '/mês'}`, 'Até 30 clientes', 'Suporte por email']).map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <CheckCircle2 size={18} color="#3B82F6" style={{ flexShrink: 0, marginTop: 2 }} />
                 <span style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 500 }}>{feature}</span>
@@ -286,8 +335,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               </div>
             ) : (
               <>
-                <span style={{ fontSize: 48, fontWeight: 900, color: 'var(--text-main)' }}>R$ {proPrice.toFixed(2).replace('.', ',')}</span>
-                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>/mês</span>
+                <span style={{ fontSize: 48, fontWeight: 900, color: 'var(--text-main)' }}>R$ {proPriceObj.val.toFixed(2).replace('.', ',')}</span>
+                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
               </>
             )}
           </div>
@@ -343,8 +392,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para construtoras e grandes operações.</p>
             </div>
             <div style={{ marginBottom: 32 }}>
-              <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {businessPrice.toFixed(2).replace('.', ',')}</span>
-              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>/mês</span>
+              <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {businessPriceObj.val.toFixed(2).replace('.', ',')}</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
               {rolePlans.business.features.map((feature, i) => (
@@ -390,6 +439,87 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           Pagamento seguro e transparente. Você pode cancelar sua assinatura premium a qualquer momento, sem taxas adicionais.
         </p>
       </div>
+
+      {preferenceId && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 20
+        }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="glass-panel hide-scrollbar"
+            style={{
+              width: '100%',
+              maxWidth: 500,
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: 24,
+              padding: 0,
+              backgroundColor: 'var(--bg-panel)',
+              position: 'relative',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}
+          >
+            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-panel)', padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Finalizar Assinatura</h2>
+              <button 
+                onClick={() => setPreferenceId(null)}
+                style={{
+                  background: 'rgba(128,128,128,0.1)',
+                  border: 'none',
+                  width: 32, height: 32,
+                  borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--text-main)', cursor: 'pointer'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div style={{ padding: 24 }}>
+              
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {showMockCheckout && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }} style={{ width: '100%', maxWidth: 400, background: 'var(--bg-panel)', borderRadius: 24, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ background: 'var(--bg-surface)', padding: '24px 24px 32px', textAlign: 'center', position: 'relative' }}>
+              <button onClick={() => setShowMockCheckout(null)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(128,128,128,0.1)', border: 'none', padding: 8, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X size={20} color="var(--text-main)" />
+              </button>
+              <div style={{ width: 64, height: 64, borderRadius: 32, background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <Crown size={32} />
+              </div>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Ambiente de Testes</h2>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: 14 }}>As chaves do Stripe não estão configuradas. Utilize a simulação.</p>
+            </div>
+            <div style={{ padding: '32px 24px 24px', textAlign: 'center', marginTop: -20, background: 'var(--bg-panel)', borderRadius: '24px 24px 0 0' }}>
+              <div style={{ marginBottom: 32 }}>
+                <p style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>Plano Selecionado</p>
+                <h3 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '-0.02em', marginBottom: 8 }}>{showMockCheckout.plan}</h3>
+                <p style={{ fontSize: 36, fontWeight: 900, color: 'var(--color-primary)', margin: 0, letterSpacing: '-0.03em' }}>R$ {showMockCheckout.price.toFixed(2).replace('.', ',')}<span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 600 }}>{isAnnual ? '/ano' : '/mês'}</span></p>
+              </div>
+              <button onClick={handleMockPayment} className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                Simular Pagamento <Sparkles size={18} />
+              </button>
+              <button onClick={() => setShowMockCheckout(null)} className="btn-secondary" style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 700, fontSize: 16, marginTop: 12, background: 'transparent' }}>
+                Cancelar
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
     </div>
   );

@@ -14,7 +14,7 @@ export function ArticleView({ article, onBack, onNavigateToCalc, onNavigateToArt
   return (
     <div className="screen-content animate-fade-in" style={{ paddingBottom: 120 }}>
       {/* Header Sticky */}
-      <div style={{ padding: '20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', position: 'sticky', top: 0, backgroundColor: 'rgba(var(--bg-main-rgb), 0.9)', backdropFilter: 'blur(10px)', zIndex: 10 }}>
+      <div style={{ padding: '20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', position: 'sticky', top: 0, backgroundColor: 'rgba(var(--bg-main-rgb), 0.9)', backdropFilter: 'blur(24px)', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer' }}>
             <ArrowLeft size={24} />

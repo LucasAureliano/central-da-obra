@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Home, Briefcase, Sparkles, Calculator, Calendar, Menu as MenuIcon } from 'lucide-react';
 import { CustomLogo } from '../CustomLogo';
 import { GlobalHeader } from '../ui/GlobalHeader';
+import { AppInstallBanner } from '../ui/AppInstallBanner';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -114,7 +115,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           toggleTheme={toggleTheme} 
           onOpenMenu={() => setActiveTab('menu')} 
         />
-
         {/* Main Content Area */}
         <main className="main-content hide-scrollbar">
           <AnimatePresence mode="wait">

@@ -6,6 +6,8 @@ import { useWorks } from '../contexts/WorksContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SponsoredAd } from './shared/SponsoredAd';
+import { AppInstallBanner } from './ui/AppInstallBanner';
 
 import { 
   User, 
@@ -42,7 +44,8 @@ import {
   ShieldAlert,
   Calculator,
   HelpCircle,
-  Crown
+  Crown,
+  MapPin,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -291,6 +294,12 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           ]
         },
         {
+          title: 'Profissionais',
+          items: [
+            { icon: <MapPin size={20} />, label: 'Encontrar Profissionais', color: '#8B5CF6', action: () => onMenuSelect('connect') },
+          ]
+        },
+        {
           title: 'Recursos & Inspiração',
           items: [
             { icon: <Sparkles size={20} />, label: 'Assistente Inteligente', color: '#10B981', action: () => onMenuSelect('Assistente') },
@@ -334,6 +343,12 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           ]
         },
         {
+          title: 'Marketing & Portfólio',
+          items: [
+            { icon: <MapPin size={20} />, label: 'CentralObra Connect', color: '#8B5CF6', action: () => onMenuSelect('connect') },
+          ]
+        },
+        {
           title: 'Configurações',
           items: [
             { icon: <User size={20} />, label: 'Perfil Profissional', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
@@ -355,7 +370,15 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             { icon: <Users size={20} />, label: 'Clientes & Links', color: '#3B82F6', action: () => onMenuSelect('Clientes') },
             { icon: <CalendarDays size={20} />, label: 'Agenda Técnica', color: '#F59E0B', action: () => onMenuSelect('Agenda') },
             { icon: <ClipboardCheck size={20} />, label: 'Vistorias Técnicas', color: '#10B981', action: () => onMenuSelect('Vistorias') },
-            { icon: <Camera size={20} />, label: 'Diário Técnico de Obra', color: '#EC4899', action: () => onMenuSelect('Diário Técnico') },
+            { icon: <Camera size={20} />, label: 'Diário Técnico', color: '#EC4899', action: () => onMenuSelect('Diário Técnico') },
+            { icon: <FileText size={20} />, label: 'Orçamentos', color: '#FF6B00', action: () => onMenuSelect('Orcamentos') },
+            { icon: <Receipt size={20} />, label: 'Financeiro', color: '#10B981', action: () => onMenuSelect('Financeiro') },
+          ]
+        },
+        {
+          title: 'Marketing & Portfólio',
+          items: [
+            { icon: <MapPin size={20} />, label: 'CentralObra Connect', color: '#8B5CF6', action: () => onMenuSelect('connect') },
           ]
         },
         {
@@ -409,6 +432,12 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           ]
         },
         {
+          title: 'Marketing & Portfólio',
+          items: [
+            { icon: <MapPin size={20} />, label: 'CentralObra Connect', color: '#8B5CF6', action: () => onMenuSelect('connect') },
+          ]
+        },
+        {
           title: 'Recursos & BI',
           items: [
             { icon: <BookOpen size={20} />, label: 'Biblioteca Técnica', color: '#8B5CF6', action: () => onMenuSelect('Biblioteca & Normas') },
@@ -422,7 +451,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           items: [
             { icon: <Truck size={20} />, label: 'Gestão de Fornecedores', color: '#3B82F6', action: () => onMenuSelect('Fornecedores') },
             { icon: <Wrench size={20} />, label: 'Equipamentos & Patrimônio', color: '#F59E0B', action: () => onMenuSelect('Equipamentos') },
-            { icon: <Link size={20} />, label: 'CentralObra Connect', color: '#8B5CF6', action: () => { toast.success('Portal do cliente ativo!'); } },
+            { icon: <Link size={20} />, label: 'CentralObra Connect', color: '#8B5CF6', action: () => onMenuSelect('connect') },
           ]
         },
         {
@@ -510,6 +539,11 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           </div>
         ))}
 
+        {/* App Install Banner no menu Ajuda / Footer */}
+        <div className="animate-stagger-4" style={{ marginTop: 16 }}>
+          <AppInstallBanner />
+        </div>
+
         {/* Auth Actions - Conditionally Rendered */}
         <div style={{ marginTop: 8 }} className="animate-stagger-5">
           {isAuthenticated ? (
@@ -545,7 +579,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           {showRoleModal && (
             <div style={{
               position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+              backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)',
               zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: 20
             }}>

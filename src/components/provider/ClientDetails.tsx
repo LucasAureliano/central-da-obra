@@ -151,7 +151,7 @@ export function ClientDetails({ client, onBack, onEdit }: ClientDetailsProps) {
         key={activeTab}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
+        transition={{ type: "spring", bounce: 0, duration: 0.4 }}
       >
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Carregando dados...</div>

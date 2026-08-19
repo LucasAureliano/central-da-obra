@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function GuestRestrictionModal() {
-  const { showGuestModal, setShowGuestModal, guestActionName, signInWithGoogle } = useAuth();
+  const { showGuestModal, setShowGuestModal, guestActionName, signInWithGoogle, signOut } = useAuth();
 
   if (!showGuestModal) return null;
 
@@ -70,7 +70,7 @@ export function GuestRestrictionModal() {
             <div style={{
               width: 64, height: 64, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 16px', backdropFilter: 'blur(10px)'
+              margin: '0 auto 16px', backdropFilter: 'blur(24px)'
             }}>
               <Lock size={32} color="#FFF" />
             </div>
@@ -114,11 +114,14 @@ export function GuestRestrictionModal() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <button
-                onClick={handleLogin}
+                onClick={async () => {
+                  setShowGuestModal(false);
+                  if (signOut) signOut();
+                }}
                 className="btn-primary"
                 style={{ width: '100%', height: 48, fontSize: 15, fontWeight: 700, display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center', borderRadius: 16 }}
               >
-                Fazer Login com Google <ChevronRight size={18} />
+                Criar Conta / Fazer Login <ChevronRight size={18} />
               </button>
               <button
                 onClick={() => setShowGuestModal(false)}

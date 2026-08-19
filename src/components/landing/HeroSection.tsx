@@ -52,7 +52,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
               border: '1px solid var(--border-subtle)',
               background: 'var(--bg-glass)',
               marginBottom: 32,
-              backdropFilter: 'blur(10px)',
+              backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(10px)',
               whiteSpace: 'nowrap',
               maxWidth: '90vw',
@@ -87,7 +87,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
           </motion.p>
           
           <motion.div 
-            style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 64, width: '100%', maxWidth: 400 }}
+            style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 32, width: '100%', maxWidth: 400 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -98,6 +98,20 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             <button onClick={handleShowDemo} className="btn-landing-secondary" style={{ flex: '1 1 180px' }}>
               Explorar a Plataforma <Play size={18} />
             </button>
+          </motion.div>
+
+          <motion.div
+            style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 64, width: '100%' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderRadius: 12, background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', textDecoration: 'none', transition: 'all 0.2s' }}>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Baixar na App Store" style={{ height: 32 }} />
+            </a>
+            <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderRadius: 12, background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', textDecoration: 'none', transition: 'all 0.2s' }}>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Disponível no Google Play" style={{ height: 32 }} />
+            </a>
           </motion.div>
           
           {showDemo && (

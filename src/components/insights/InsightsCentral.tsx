@@ -84,7 +84,7 @@ export function InsightsCentral({ onBack, onNavigate }: { onBack: () => void, on
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
               >
                 <InsightCard insight={insight} onClickAction={onNavigate} />
               </motion.div>

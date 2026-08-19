@@ -23,12 +23,12 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ onNavigate }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
           onClick={() => setShowUpgradeModal(false)}
         />
         
@@ -36,58 +36,70 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ onNavigate }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-[var(--border-subtle)] glass-panel text-[var(--text-main)]"
+          className="glass-panel"
+          style={{ 
+            position: 'relative', 
+            width: '100%', 
+            maxWidth: 420, 
+            borderRadius: 24, 
+            overflow: 'hidden', 
+            border: '1px solid var(--border-subtle)', 
+            backgroundColor: 'var(--bg-panel)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}
         >
           {/* Header */}
-          <div className="relative p-6 pb-4 flex items-center justify-between border-b border-[var(--border-subtle)]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center">
-                <Crown size={20} className="text-blue-500" />
+          <div style={{ padding: '24px 24px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Crown size={20} color="#3B82F6" />
               </div>
-              <h2 className="text-lg font-bold text-[var(--text-main)]">Upgrade Premium</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Upgrade Premium</h2>
             </div>
             <button
               onClick={() => setShowUpgradeModal(false)}
-              className="w-8 h-8 rounded-full bg-transparent border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+              style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             >
-              <X size={16} />
+              <X size={16} color="var(--text-muted)" />
             </button>
           </div>
 
-          <div className="p-6">
-            <h3 className="text-xl font-black text-[var(--text-main)] mb-2 leading-tight">
+          <div style={{ padding: 24 }}>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-main)', marginBottom: 8, lineHeight: 1.2 }}>
               {upgradeTitle}
             </h3>
             
-            <p className="text-[var(--text-muted)] text-sm mb-6 leading-relaxed">
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 24, lineHeight: 1.5 }}>
               {upgradeMessage}
             </p>
 
             {upgradeBenefits && upgradeBenefits.length > 0 && (
-              <div className="bg-transparent border border-[var(--border-subtle)] rounded-2xl p-5 mb-6">
-                <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider mb-4 opacity-80">O que você ganha:</p>
-                <div className="flex flex-col gap-3">
+              <div style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 16, padding: 20, marginBottom: 24 }}>
+                <p style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16, opacity: 0.8 }}>O que você ganha:</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {upgradeBenefits.map((benefit, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <CheckCircle2 size={16} className="text-blue-500 shrink-0 mt-0.5" />
-                      <span className="text-sm font-medium text-[var(--text-main)] leading-snug">{benefit}</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <CheckCircle2 size={18} color="#3B82F6" style={{ flexShrink: 0, marginTop: 1 }} />
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.4 }}>{benefit}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="flex flex-col gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <button
                 onClick={handleGoToPlans}
-                className="btn-primary w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                className="btn-primary"
+                style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)' }}
               >
                 <Sparkles size={18} />
-                Ver Planos a partir de R$ 29,99
+                Ver Planos a partir de R$ 29,90
               </button>
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="w-full py-3 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+                className="btn-secondary"
+                style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 700, fontSize: 14, backgroundColor: 'transparent', border: 'none', color: 'var(--text-muted)' }}
               >
                 Continuar no Plano Atual ({plan.name})
               </button>

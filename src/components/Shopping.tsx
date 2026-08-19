@@ -329,7 +329,7 @@ export function Shopping({ workId, embedded, parentCollection = 'works' }: { wor
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
               >
                 <TiltCard style={{ padding: 16, borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
                   <button

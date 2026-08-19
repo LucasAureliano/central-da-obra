@@ -19,13 +19,11 @@ export function GlobalHeader({
 
   const initial = user?.email ? user.email[0].toUpperCase() : 'V';
 
-  let headerTitle = 'CentralObra';
-  if (!isGuest && profile) {
-    if (profile.role === 'owner') headerTitle = 'Minha Obra';
-    else if (profile.role === 'service') headerTitle = 'Meus Serviços';
-    else if (profile.role === 'architect') headerTitle = 'Meus Projetos';
-    else if (profile.role === 'builder') headerTitle = 'Painel Geral';
-  }
+  let headerTitle = 'CentralObra.';
+
+  const handleHomeClick = () => {
+    window.location.hash = '#/';
+  };
 
   return (
     <>
@@ -36,7 +34,7 @@ export function GlobalHeader({
         className="mobile-header glass-panel"
         style={{ display: 'flex', padding: 'env(safe-area-inset-top, 0px) 20px 0 20px', height: 'calc(72px + env(safe-area-inset-top, 0px))', zIndex: 40 }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer' }} onClick={handleHomeClick}>
           <CustomLogo theme={theme} variant="icon" size={32} />
           <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', opacity: 0.9 }}>
             {headerTitle}

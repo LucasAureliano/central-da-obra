@@ -92,7 +92,7 @@ export function WizardEngine({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
             style={{ padding: 24, paddingBottom: 40 }}
           >
             <div style={{ marginBottom: 24 }}>

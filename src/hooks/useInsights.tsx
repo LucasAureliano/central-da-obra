@@ -298,7 +298,7 @@ export function useInsights() {
           id: 'spec-pintor',
           icon: <Settings size={20} color="#8B5CF6" />,
           title: 'Dica de Pintura',
-          description: 'Certifique-se de que a parede está totalmente seca e lixada antes de aplicar a primeira demão de selador.',
+          description: 'Lembre-se de respeitar o tempo de cura da massa corrida e aplicar o fundo preparador antes da tinta final.',
           priority: 'info',
           category: 'technical',
           date: now,
@@ -308,20 +308,71 @@ export function useInsights() {
       }
     }
 
-    // Async queries for Calculations & Shopping list (Only run if owner has active work, or general for others if needed. For now, keep it simple for owner)
+
+
+    // Realtime Schedule Stages integration
+    let unsubStages: (() => void) | null = null;
     let unsubscribeCalcs: () => void = () => {};
     let unsubscribeShopping: () => void = () => {};
 
     const evaluateAsyncInsights = async () => {
-      const dynamicInsights = [...generatedInsights];
+      let dynamicInsights = [...generatedInsights];
       const pValues = { critical: 4, high: 3, medium: 2, info: 1 };
       
-      const pushInsight = (insight: Insight) => {
-        if (!dynamicInsights.find(i => i.id === insight.id)) {
-          dynamicInsights.push(insight);
-          setInsights([...dynamicInsights].sort((a, b) => pValues[b.priority] - pValues[a.priority]));
-        }
+      const updateInsights = () => {
+        setInsights([...dynamicInsights].sort((a, b) => pValues[b.priority] - pValues[a.priority]));
       };
+
+      const pushInsight = (insight: Insight) => {
+        dynamicInsights = dynamicInsights.filter(i => i.id !== insight.id);
+        dynamicInsights.push(insight);
+        updateInsights();
+      };
+
+      if (activeWork) {
+        const qStages = query(collection(db, 'works', activeWork.id, 'schedule_stages'));
+        unsubStages = onSnapshot(qStages, (snap) => {
+          // Clear previous stage insights
+          dynamicInsights = dynamicInsights.filter(i => !i.id.startsWith('delayed-') && !i.id.startsWith('pendency-'));
+          
+          snap.forEach(doc => {
+            const stage = doc.data();
+            if (stage.endDate) {
+              const end = new Date(stage.endDate);
+              if (end < new Date() && !stage.completed) {
+                dynamicInsights.push({
+                  id: `delayed-${doc.id}`,
+                  icon: <AlertCircle size={20} color="#EF4444" />,
+                  title: `Etapa Atrasada: ${stage.title || stage.name}`,
+                  description: `A etapa '${stage.title || stage.name}' deveria ter sido concluída em ${end.toLocaleDateString()}.`,
+                  priority: 'critical',
+                  category: 'execution',
+                  date: now,
+                  suggestedAction: 'Ver Cronograma',
+                  actionRoute: 'cronograma'
+                });
+              }
+            }
+            if (!stage.completed && stage.startDate) {
+              const start = new Date(stage.startDate);
+              if (start <= new Date() && (!stage.endDate || new Date(stage.endDate) >= new Date())) {
+                dynamicInsights.push({
+                  id: `pendency-${doc.id}`,
+                  icon: <Construction size={20} color="#F59E0B" />,
+                  title: `Próxima Etapa: ${stage.title || stage.name}`,
+                  description: `A etapa está em andamento ou prestes a iniciar. Mantenha a equipe informada.`,
+                  priority: 'high',
+                  category: 'schedule',
+                  date: now,
+                  suggestedAction: 'Ver Etapas',
+                  actionRoute: 'cronograma'
+                });
+              }
+            }
+          });
+          updateInsights();
+        });
+      }
 
       // Only check shopping/calcs for owner with active work
       if (role === 'owner' && activeWork) {
@@ -364,17 +415,21 @@ export function useInsights() {
               suggestedAction: 'Ver Lista',
               actionRoute: 'compras'
             });
+          } else {
+             dynamicInsights = dynamicInsights.filter(i => i.id !== 'shopping-many');
+             updateInsights();
           }
         });
       } else {
         // If not owner or no active work, just set static insights we already gathered
-        setInsights(dynamicInsights.sort((a, b) => pValues[b.priority] - pValues[a.priority]));
+        updateInsights();
       }
     };
 
     evaluateAsyncInsights();
 
     return () => {
+      if (unsubStages) unsubStages();
       unsubscribeCalcs();
       unsubscribeShopping();
     };

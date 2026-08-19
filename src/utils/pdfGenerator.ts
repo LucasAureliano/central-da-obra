@@ -11,76 +11,97 @@ interface PDFExportParams {
   profile?: any;
 }
 
-export function drawHeader(doc: jsPDF, userName: string, _userEmail: string, workName?: string, logoBase64?: string | null) {
+export async function drawHeader(doc: jsPDF, userName: string, _userEmail: string, workName?: string, customLogoUrl?: string | null) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const centerX = pageWidth / 2;
+  let currentY = 40;
 
-  let currentY = 30;
-
-  if (logoBase64) {
+  // Render Logo
+  if (customLogoUrl) {
     try {
-      const props = doc.getImageProperties(logoBase64);
-      const ratio = props.width / props.height;
-      const imgHeight = 35; 
-      const imgWidth = imgHeight * ratio;
-      // Logo no canto superior esquerdo com proporções originais, sem fundo branco
-      doc.addImage(logoBase64, 'PNG', 40, 20, imgWidth, imgHeight);
+      const logoBase64 = await fetchImageAsBase64(customLogoUrl);
+      if (logoBase64) {
+        const props = doc.getImageProperties(logoBase64);
+        const ratio = props.width / props.height;
+        const imgHeight = 40; 
+        const imgWidth = imgHeight * ratio;
+        doc.addImage(logoBase64, 'PNG', 40, 20, imgWidth, imgHeight);
+      } else {
+        drawDefaultLogo(doc);
+      }
     } catch (e) {
-      doc.addImage(logoBase64, 'PNG', 40, 20, 100, 35);
+      // Fallback if custom logo fails to load
+      drawDefaultLogo(doc);
     }
   } else {
-    // Fallback: Ícone Dourado no canto superior esquerdo
-    doc.setFillColor(212, 175, 55);
-    doc.rect(40, 20, 24, 24, 'F');
-    doc.setFillColor(255, 255, 255);
-    doc.rect(43, 34, 18, 3, 'F');
-    doc.rect(46, 26, 12, 9, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(17, 24, 39);
-    doc.text('CentralObra', 72, 37, { align: 'left' });
+    drawDefaultLogo(doc);
   }
 
+  // Header texts
   doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(31, 41, 55); // text-gray-800
+  doc.text(`Responsável: ${userName || 'Usuário'}`, pageWidth - 40, currentY, { align: 'right' });
+  
+  currentY += 14;
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(107, 114, 128);
-  doc.text(`Responsável: ${userName || 'Usuário'}`, centerX, currentY, { align: 'center' });
-  currentY += 15;
+  doc.setTextColor(107, 114, 128); // text-gray-500
+  
   if (workName) {
-    doc.text(`Obra: ${workName}  |  Data: ${formatDate()}`, centerX, currentY, { align: 'center' });
-  } else {
-    doc.text(`Data: ${formatDate()}`, centerX, currentY, { align: 'center' });
+    doc.text(`Obra: ${workName}`, pageWidth - 40, currentY, { align: 'right' });
+    currentY += 14;
   }
+  doc.text(`Data: ${formatDate()}`, pageWidth - 40, currentY, { align: 'right' });
 
-  return currentY + 30;
+  return Math.max(currentY, 60) + 30; // Return currentY for subsequent drawing
+}
+
+function drawDefaultLogo(doc: jsPDF) {
+  // CentralObra Modern Default Logo
+  doc.setFillColor(17, 24, 39); // Preto escuro/Cinza 900
+  doc.roundedRect(40, 25, 120, 32, 6, 6, 'F');
+  
+  // Ícone minimalista azul/dourado dentro do retangulo
+  doc.setFillColor(59, 130, 246); // Azul
+  doc.rect(48, 33, 12, 16, 'F');
+  doc.setFillColor(139, 92, 246); // Roxo/Indigo
+  doc.rect(62, 39, 12, 10, 'F');
+
+  // Texto "CentralObra"
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(255, 255, 255); // Branco
+  doc.text('CentralObra', 80, 47, { align: 'left' });
 }
 
 export function drawFooter(doc: jsPDF) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  doc.setFillColor(245, 245, 245);
+  // Subtle background footer
+  doc.setFillColor(249, 250, 251); // gray-50
   doc.rect(0, pageHeight - 40, pageWidth, 40, 'F');
 
-  doc.setDrawColor(230, 230, 230);
+  doc.setDrawColor(229, 231, 235); // gray-200
+  doc.setLineWidth(0.5);
   doc.line(0, pageHeight - 40, pageWidth, pageHeight - 40);
 
   doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
+  doc.setTextColor(156, 163, 175); // gray-400
   doc.setFont('helvetica', 'normal');
-  doc.text('Documento gerado pela plataforma CentralObra', pageWidth / 2, pageHeight - 26, { align: 'center' });
+  doc.text('Documento gerado pela plataforma CentralObra', pageWidth / 2, pageHeight - 24, { align: 'center' });
   
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(255, 107, 0);
-  doc.text('centralobra.vercel.app', pageWidth / 2, pageHeight - 14, { align: 'center' });
+  doc.setTextColor(107, 114, 128); // gray-500
+  doc.text('centralobra.com', pageWidth / 2, pageHeight - 12, { align: 'center' });
 
   const pageCount = (doc as any).internal.getNumberOfPages();
   const currentPage = (doc as any).internal.getCurrentPageInfo().pageNumber;
   doc.setFontSize(8);
-  doc.setTextColor(180, 180, 180);
+  doc.setTextColor(156, 163, 175);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Página ${currentPage} de ${pageCount}`, pageWidth - 20, pageHeight - 26, { align: 'right' });
+  doc.text(`Página ${currentPage} de ${pageCount}`, pageWidth - 40, pageHeight - 18, { align: 'right' });
 }
 
 export function applyGlobalWatermark(doc: jsPDF, isPro: boolean = false) {
@@ -129,9 +150,9 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
 
   const userName = profile?.name || user?.displayName || user?.email || 'Usuário';
   const userEmail = user?.email || '';
-
-  const logoBase64 = await fetchImageAsBase64(logoUrl);
-  let y = drawHeader(doc, userName, userEmail, work?.name, logoBase64);
+  const isPro = profile?.subscriptionPlan === 'pro' || profile?.subscriptionPlan === 'business';
+  const customLogo = isPro ? profile?.logoUrl : null;
+  let y = await drawHeader(doc, userName, userEmail, work?.name, customLogo);
 
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
@@ -184,12 +205,13 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
     doc.text('Nenhum cálculo registrado para esta obra.', 40, y + 20);
   }
 
-  calculations.forEach((calc, index) => {
-    if (!calc.resultData || !calc.resultData.materials || calc.resultData.materials.length === 0) return;
+  for (let index = 0; index < calculations.length; index++) {
+    const calc = calculations[index];
+    if (!calc.resultData || !calc.resultData.materials || calc.resultData.materials.length === 0) continue;
 
-    if (y > 680) {
+    if (y > 750) {
       doc.addPage();
-      y = drawHeader(doc, userName, userEmail, work?.name, logoBase64) + 20;
+      y = await drawHeader(doc, userName, userEmail, work?.name, customLogo) + 20;
     }
 
     doc.setFontSize(14);
@@ -251,11 +273,11 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
     });
 
     y = (doc as any).lastAutoTable.finalY + 30;
-  });
+  }
 
   if (y > 720) {
     doc.addPage();
-    y = drawHeader(doc, userName, userEmail, work?.name, logoBase64) + 20;
+    y = await drawHeader(doc, userName, userEmail, work?.name, customLogo) + 20;
   }
 
   doc.setFillColor(255, 107, 0);
@@ -280,7 +302,7 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
     drawFooter(doc);
   }
 
-  const isPro = profile?.subscriptionPlan === 'pro' || profile?.subscriptionPlan === 'business' || true; // Em testes, libera premium
+
   applyGlobalWatermark(doc, isPro);
   // Use blob URL approach for Capacitor/Android WebView compatibility
   const blob = doc.output('blob');
@@ -348,35 +370,51 @@ export async function generateCommercialQuotePDF({
 
   let currentY = margin;
 
-  // Tenta carregar a logo oficial
-  const logoBase64 = await fetchImageAsBase64(logoUrl);
-  
-  if (logoBase64) {
-    // Desenha a imagem centralizada (Ex: 120x120 proporção)
-    const imgWidth = 140;
-    const imgHeight = 50; 
-    doc.setFillColor(255, 255, 255);
-    doc.rect(centerX - (imgWidth/2), currentY, imgWidth, imgHeight, 'F');
-    doc.addImage(logoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
-    currentY += imgHeight + 20;
-  } else {
-    // Fallback: Ícone de "Prédio/Casa" Dourado Centralizado
-    doc.setFillColor(212, 175, 55); // Dourado
-    doc.rect(centerX - 16, currentY, 32, 32, 'F');
-    doc.setFillColor(255, 255, 255);
-    doc.rect(centerX - 12, currentY + 18, 24, 4, 'F');
-    doc.rect(centerX - 8, currentY + 8, 16, 12, 'F');
+  // Tenta carregar a logo customizada se for PRO/Business
+  const isPro = profile?.subscriptionPlan === 'pro' || profile?.subscriptionPlan === 'business';
+  const customLogoUrl = isPro ? profile?.logoUrl : null;
+  let customLogoBase64 = null;
+  if (customLogoUrl) {
+    customLogoBase64 = await fetchImageAsBase64(customLogoUrl);
+  }
 
-    // "CentralObra" App Name Abaixo do Logo
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(26);
-    doc.setTextColor(17, 24, 39); // Quase Preto
-    doc.text('CentralObra', centerX - 30, currentY + 55, { align: 'center' });
+  if (customLogoBase64) {
+    try {
+      const props = doc.getImageProperties(customLogoBase64);
+      const ratio = props.width / props.height;
+      const imgHeight = 50; 
+      const imgWidth = imgHeight * ratio;
+      // Centraliza a imagem mantendo a proporção original
+      doc.addImage(customLogoBase64, 'PNG', centerX - (imgWidth/2), currentY, imgWidth, imgHeight);
+      currentY += imgHeight + 20;
+    } catch(e) {
+      // Fallback
+      doc.setFillColor(17, 24, 39);
+      doc.roundedRect(centerX - 60, currentY, 120, 32, 6, 6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(255, 255, 255);
+      doc.text('CentralObra', centerX, currentY + 20, { align: 'center' });
+      currentY += 50;
+    }
+  } else {
+    // Fallback: Logo Padrão Moderno Centralizado
+    doc.setFillColor(17, 24, 39); // Preto escuro/Cinza 900
+    doc.roundedRect(centerX - 60, currentY, 120, 32, 6, 6, 'F');
     
-    // Ponto Laranja
-    doc.setFillColor(249, 115, 22); // Laranja
-    doc.rect(centerX + 40, currentY + 50, 4, 4, 'F');
-    currentY += 75;
+    // Ícone minimalista azul/dourado dentro do retangulo
+    doc.setFillColor(59, 130, 246); // Azul
+    doc.rect(centerX - 52, currentY + 8, 12, 16, 'F');
+    doc.setFillColor(139, 92, 246); // Roxo/Indigo
+    doc.rect(centerX - 38, currentY + 14, 12, 10, 'F');
+
+    // Texto "CentralObra"
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(255, 255, 255); // Branco
+    doc.text('CentralObra', centerX - 20, currentY + 22, { align: 'left' });
+    
+    currentY += 50;
   }
 
   // Proposta Comercial Title below it
@@ -604,24 +642,10 @@ export async function generateCommercialQuotePDF({
 
   // Footer para todas as páginas geradas
   const pageCount = (doc as any).internal.getNumberOfPages();
-  const isPro = profile?.subscriptionPlan === 'pro' || profile?.subscriptionPlan === 'business';
 
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    const pWidth = doc.internal.pageSize.getWidth();
-    const pHeight = doc.internal.pageSize.getHeight();
-    
-    doc.setFontSize(8);
-    doc.setTextColor(156, 163, 175);
-    doc.setFont('helvetica', 'normal');
-    
-    if (isPro) {
-      doc.text('Documento Autenticado Eletronicamente', margin, pHeight - 20);
-    } else {
-      doc.text('Gerado com CentralObra - Plataforma de Gestão', margin, pHeight - 20);
-    }
-    
-    doc.text(`Página ${i} de ${pageCount}`, pWidth - margin, pHeight - 20, { align: 'right' });
+    drawFooter(doc);
   }
 
   applyGlobalWatermark(doc, isPro);

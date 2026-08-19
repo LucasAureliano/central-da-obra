@@ -88,7 +88,7 @@ export function Agenda() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 24, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
@@ -160,7 +160,7 @@ export function Agenda() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
               <div>

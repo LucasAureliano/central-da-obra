@@ -123,7 +123,7 @@ export function GenericInfoPage({ pageId, onBack, onLogin, onNavigate, theme }: 
             <ArrowLeft size={16} /> Voltar
           </button>
           
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }}>
             <h1 className="landing-section-title" style={{ textAlign: 'left', marginBottom: 40, fontSize: 40 }}>{data.title}</h1>
             
             <div className="glass-panel" style={{ padding: '32px 40px', borderRadius: 24, fontSize: 16, lineHeight: 1.6, color: 'var(--text-main)', border: '1px solid var(--border-subtle)' }}>

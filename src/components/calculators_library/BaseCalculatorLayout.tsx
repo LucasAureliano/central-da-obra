@@ -320,7 +320,7 @@ export function BaseCalculatorLayout({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.3 }}
+      transition={{ type: "spring", bounce: 0, duration: 0.4 }}
       className="screen-content" 
       style={{ padding: '0 20px', paddingTop: 24, paddingBottom: 120 }}
     >

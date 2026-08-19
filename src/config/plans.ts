@@ -9,6 +9,7 @@ export interface PlanLimits {
   hasAdvancedPDF: boolean;
   hasFunnel: boolean;
   hasPremiumSupport: boolean;
+  hasAds: boolean;
 }
 
 export interface PlanDefinition {
@@ -36,6 +37,7 @@ export const DEFAULT_LIMITS: PlanLimits = {
   hasAdvancedPDF: false,
   hasFunnel: false,
   hasPremiumSupport: false,
+  hasAds: false,
 };
 
 export const PLANS_CONFIG: Record<string, RolePlans> = {
@@ -50,6 +52,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         maxWorks: 1,
         maxQuotes: 10,
         maxClients: 10,
+        hasAds: true,
       },
       features: [
         '1 obra ativa',
@@ -107,14 +110,17 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
       yearlyPrice: 0,
       limits: {
         ...DEFAULT_LIMITS,
-        maxQuotes: 5,
-        maxClients: 10,
+        maxQuotes: 3,
+        maxProjects: 2,
+        maxWorks: 2,
+        maxClients: 5,
+        hasAds: true,
       },
       features: [
-        'Até 5 orçamentos por mês',
-        'Até 10 clientes',
-        'Cadastro de serviços e agenda',
-        'Calculadoras ilimitadas'
+        'Até 3 orçamentos por mês',
+        'Até 2 projetos/obras',
+        'Até 5 clientes',
+        'Com anúncios na plataforma'
       ]
     },
     starter: {
@@ -186,6 +192,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         ...DEFAULT_LIMITS,
         maxProjects: 2,
         maxClients: 5,
+        hasAds: true,
       },
       features: [
         'Até 2 projetos ativos',
@@ -243,6 +250,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         ...DEFAULT_LIMITS,
         maxProjects: 2,
         maxClients: 5,
+        hasAds: true,
       },
       features: [
         'Até 2 projetos ativos',
@@ -299,6 +307,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         ...DEFAULT_LIMITS,
         maxWorks: 1,
         maxTeamMembers: 2,
+        hasAds: true,
       },
       features: [
         '1 obra ativa',

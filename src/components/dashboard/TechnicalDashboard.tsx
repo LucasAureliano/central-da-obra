@@ -1,4 +1,5 @@
 ﻿import { motion } from 'framer-motion';
+import { SponsoredAd } from '../shared/SponsoredAd';
 import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -194,7 +195,8 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
-      {/* KPI Stats (Glassmorphism) */}
+      <SponsoredAd probability={0.3} location='tech-dashboard' />
+        {/* KPI Stats (Glassmorphism) */}
       <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 32 }}>
         <TiltCard style={{ padding: 20, borderRadius: 24, background: 'linear-gradient(145deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.02) 100%)', border: '1px solid rgba(59, 130, 246, 0.2)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>

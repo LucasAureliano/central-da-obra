@@ -178,9 +178,9 @@ export function Register({ onGoToLogin, theme = 'dark' }: RegisterProps) {
 
         <div style={{ marginTop: 32, textAlign: 'center' }}>
           <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-            Já possui uma conta?{' '}
+            Já tem conta?{' '}
             <span style={{ fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }} onClick={onGoToLogin}>
-              Fazer login
+              Fazer Login
             </span>
           </p>
         </div>

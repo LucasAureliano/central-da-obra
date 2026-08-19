@@ -955,3 +955,61 @@ h1, h2, h3, h4, h5, h6 {
     background-position: 0% 50%;
   }
 }
+
+/* ========================================================= */
+/* APPLE DESIGN FOUNDATIONS (Fluid Interfaces)               */
+/* ========================================================= */
+
+/* 1. Response: Kill Latency (Immediate Active States) */
+button, 
+.btn-primary, 
+.btn-secondary, 
+.btn-danger, 
+.glass-button,
+.card-hover {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:active, 
+.btn-primary:active, 
+.btn-secondary:active, 
+.btn-danger:active, 
+.glass-button:active,
+.card-hover:active {
+  transform: scale(0.96) !important;
+  transition: transform 50ms ease-out !important;
+}
+
+/* 2. Typography: Optical Sizing & Tracking */
+h1, h2, .display-text {
+  letter-spacing: -0.03em;
+  font-optical-sizing: auto;
+  line-height: 1.1;
+}
+
+h3, h4 {
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+/* 3. Deep Materials: Thicker blur for hierarchical depth */
+.apple-glass {
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+}
+
+.apple-glass-heavy {
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+}
+
+/* Improve bottom nav translucency */
+.menu-bar, .bottom-nav {
+  background-color: rgba(22, 24, 33, 0.7) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+}
+[data-theme='light'] .menu-bar, [data-theme='light'] .bottom-nav {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+}
+

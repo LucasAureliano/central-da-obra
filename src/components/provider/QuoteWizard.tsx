@@ -332,7 +332,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
           key={currentStep.id}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ type: "spring", bounce: 0, duration: 0.4 }}
         >
           <h1 style={{ fontSize: step === 0 ? 32 : 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px 0', lineHeight: 1.2 }}>
             {currentStep.title}
@@ -467,7 +467,7 @@ export function QuoteWizard({ onFinish }: { onFinish: () => void }) {
         {showGuestWarning && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)',
             zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
           }}>
             <motion.div

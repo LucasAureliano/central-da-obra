@@ -131,7 +131,7 @@ function MinhaObraWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string
             <Home size={40} color="rgba(255,255,255,0.3)" />
           </div>
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }} />
         
         {/* Name + Badge */}
         <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16 }}>

@@ -50,6 +50,8 @@ import { TechnicalDashboard } from './dashboard/TechnicalDashboard';
 
 
 import { ProviderDashboard } from './provider/ProviderDashboard';
+import { SponsoredAd } from './shared/SponsoredAd';
+
 
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { isGuest, profile } = useAuth();
@@ -219,7 +221,8 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 style={{ padding: 24, borderRadius: 24, background: 'linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-elevated) 100%)', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
                 onClick={() => onNavigate('obras')}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                <SponsoredAd probability={0.4} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
                   <div>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: 'var(--color-primary-alpha)', padding: '4px 12px', borderRadius: 12, marginBottom: 12 }}>
                       <div style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: 'var(--color-primary)' }} />
@@ -235,7 +238,8 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <SponsoredAd probability={0.4} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <span style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>Progresso Geral</span>
                     <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{activeWork.progress || 0}%</span>
                   </div>

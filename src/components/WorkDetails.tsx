@@ -122,23 +122,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         </button>
 
         <button 
-          onClick={async () => {
-            try {
-              const token = crypto.randomUUID();
-              await addDoc(collection(db, 'shared_links'), {
-                token: token,
-                workId: workId,
-                role: 'viewer',
-                createdAt: new Date().toISOString()
-              });
-              const link = `${window.location.origin}/?shared=${token}`;
-              navigator.clipboard.writeText(link);
-              alert('Link seguro copiado para a área de transferência! Acesso de Apenas Leitura.');
-            } catch(e) {
-              console.error(e);
-              alert('Erro ao gerar link.');
-            }
-          }}
+          onClick={() => setActiveTab('compartilhamento' as any)}
           style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF', border: 'none', cursor: 'pointer' }}
           title="Compartilhar Obra"
         >

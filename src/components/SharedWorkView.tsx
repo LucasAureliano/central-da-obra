@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Briefcase, MapPin, Calendar, CheckCircle2, Circle, User, Phone, Mail } from 'lucide-react';
+import { Briefcase, MapPin, Calendar, CheckCircle2, Circle, User, Phone, Mail, Image as ImageIcon } from 'lucide-react';
 import { CustomLogo } from './CustomLogo';
 import { formatDate } from '../utils/formatters';
 
@@ -10,6 +10,8 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
   const [providerProfile, setProviderProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [permissions, setPermissions] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchWork() {
@@ -22,6 +24,7 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
         }
         
         const linkData = snap.docs[0].data();
+        setPermissions(linkData.permissions || []);
         
         if (linkData.workId) {
           const { getDoc, doc } = await import('firebase/firestore');
@@ -63,6 +66,26 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
     fetchWork();
   }, [token]);
 
+  // Fetch photos if permitted
+  useEffect(() => {
+    if (work?.id && permissions.includes('fotos')) {
+      const qDocs = query(collection(db, 'works', work.id, 'documents'));
+      const unsub = onSnapshot(qDocs, (snap) => {
+        const fetchedPhotos: any[] = [];
+        snap.forEach(doc => {
+          const data = doc.data();
+          if (data.type && data.type.startsWith('image/')) {
+            fetchedPhotos.push({ id: doc.id, ...data });
+          }
+        });
+        setPhotos(fetchedPhotos);
+      }, (err) => {
+        console.error("Could not fetch photos due to permissions", err);
+      });
+      return () => unsub();
+    }
+  }, [work?.id, permissions]);
+
   if (loading) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}>
@@ -91,18 +114,28 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', paddingBottom: 40 }}>
       <header className="glass-panel" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
-        <CustomLogo theme={theme} />
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>
+        <a href="https://centralobra.com" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', textDecoration: 'none', alignItems: 'center' }}>
+          <CustomLogo theme={theme} />
+        </a>
+        <a href="https://centralobra.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textDecoration: 'none' }}>
           Acompanhamento de Obra
-        </div>
+        </a>
       </header>
+
+      {work.image && (
+        <div style={{ width: '100%', height: 240, overflow: 'hidden' }}>
+          <img src={work.image} alt={work.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
+      )}
 
       <main style={{ maxWidth: 800, margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div className="card-premium">
           <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
-            <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Briefcase size={28} />
-            </div>
+            {!work.image && (
+              <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Briefcase size={28} />
+              </div>
+            )}
             <div>
               <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>
                 {work.name}
@@ -181,6 +214,22 @@ export function SharedWorkView({ token, theme }: { token: string; theme: 'light'
             </div>
           </div>
         </div>
+
+        {photos.length > 0 && (
+          <div className="card-premium" style={{ marginTop: 8 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <ImageIcon size={20} color="var(--color-primary)" />
+              Galeria de Fotos
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12 }}>
+              {photos.map(photo => (
+                <a key={photo.id} href={photo.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', backgroundColor: 'var(--bg-base)' }}>
+                  <img src={photo.url} alt={photo.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         {providerProfile && (
           <div className="card-premium" style={{ marginTop: 24, padding: 24 }}>

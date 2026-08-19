@@ -603,7 +603,7 @@ export function InteractiveSchedule({ onBack, workId, projectId, embedded = fals
 
       {/* Add Stage Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 440, maxHeight: '90dvh', overflowY: 'auto', borderRadius: 28, padding: 24, position: 'relative' }}>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 20 }}>Nova Etapa do Cronograma</h2>
 
@@ -658,7 +658,7 @@ export function InteractiveSchedule({ onBack, workId, projectId, embedded = fals
 
       {/* Edit Stage Modal */}
       {editStageId && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 440, maxHeight: '90dvh', overflowY: 'auto', borderRadius: 28, padding: 24, position: 'relative' }}>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 20 }}>Editar Etapa</h2>
 

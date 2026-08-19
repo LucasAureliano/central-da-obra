@@ -76,7 +76,7 @@ export function FaqSection() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ type: "spring", bounce: 0, duration: 0.4 }}
                     style={{ overflow: 'hidden' }}
                   >
                     <p className="faq-answer">{faq.answer}</p>
@@ -92,7 +92,7 @@ export function FaqSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ type: "spring", bounce: 0, duration: 0.4 }}
         >
           <p style={{ color: 'var(--text-muted)', marginBottom: 16 }}>Ainda tem dúvidas?</p>
           <a href="mailto:contato@centralobra.com.br" className="btn-landing-secondary">
