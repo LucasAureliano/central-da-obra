@@ -62,6 +62,8 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
   const { works } = worksContext;
   const { openAuthModal } = useAuthModal();
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
+  const [changingSpecialty, setChangingSpecialty] = useState(false);
   const [changingRole, setChangingRole] = useState(false);
 
   const isAuthenticated = user && !isGuest;
@@ -321,6 +323,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             { icon: <User size={20} />, label: 'Meu Perfil', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
             { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
+              ...(activeRole as string === 'service' ? [{ icon: <Wrench size={20} />, label: 'Alterar Tipo de Serviço', color: '#10B981', action: () => setShowSpecialtyModal(true) }] : []),
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
             { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },
           ]

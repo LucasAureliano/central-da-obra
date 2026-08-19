@@ -1,7 +1,11 @@
+import { ElectricalDesignStudio } from '../architect/ElectricalDesignStudio';
+import { PlumbingDesignStudio } from '../architect/PlumbingDesignStudio';
+import { LightingDesignEngine } from '../architect/LightingDesignEngine';
+import { AutomationDesignStudio } from '../architect/AutomationDesignStudio';
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { ArrowLeft, MapPin, Star, Activity, DollarSign, ShoppingCart, Calendar, Share2, Users, Lightbulb, TrendingUp, AlertTriangle, Clock } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Activity, DollarSign, ShoppingCart, Calendar, Share2, Users, Lightbulb, TrendingUp, AlertTriangle, Clock, Briefcase, Wrench } from 'lucide-react';
 import { ShareWorkView } from '../works/ShareWorkView';
 import { InteractiveSchedule } from './InteractiveSchedule';
 import { Finance } from '../Finance';
@@ -17,7 +21,7 @@ interface OwnerWorkDetailsProps {
   initialTab?: TabId;
 }
 
-type TabId = 'resumo' | 'cronograma' | 'financeiro' | 'compras' | 'cotacoes' | 'compartilhamento';
+type TabId = 'resumo' | 'cronograma' | 'financeiro' | 'compras' | 'cotacoes' | 'compartilhamento' | 'projetos';
 
 export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetailsProps) {
   const { user } = useAuth();
@@ -27,6 +31,7 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
   const [totalSpent, setTotalSpent] = useState(0);
   const [stagesInfo, setStagesInfo] = useState({ total: 0, completed: 0, nextStage: '', stages: [] as any[] });
   const [shoppingInfo, setShoppingInfo] = useState({ pending: 0, purchased: 0 });
+  const [activeProject, setActiveProject] = useState<string | null>(null);
 
   const isPrimary = primaryWork?.id === workId;
 
@@ -115,6 +120,7 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
     { id: 'cronograma', label: 'Cronograma', icon: <Calendar size={14} /> },
     { id: 'financeiro', label: 'Financeiro', icon: <DollarSign size={14} /> },
     { id: 'compras', label: 'Materiais', icon: <ShoppingCart size={14} /> },
+      { id: 'projetos', label: 'Projetos', icon: <Briefcase size={14} /> },
     { id: 'cotacoes', label: 'Cotações', icon: <Users size={14} /> },
     { id: 'compartilhamento', label: 'Compartilhar', icon: <Share2 size={14} /> },
   ];
@@ -274,7 +280,52 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
             <ProviderQuotes workId={workId} />
           )}
 
-          {/* === COMPARTILHAMENTO === */}
+          
+            {/* === PROJETOS === */}
+            {activeTab === 'projetos' && (
+              <div className="animate-fade-in" style={{ padding: 20, overflowX: 'hidden' }}>
+                {!activeProject ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16 }}>
+                    <button onClick={() => setActiveProject('eletrico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                      <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
+                        <Lightbulb size={24} color="#EAB308" />
+                      </div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Projeto Elétrico</h3>
+                    </button>
+                    
+                    <button onClick={() => setActiveProject('hidraulico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                      <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(14, 165, 233, 0.1)' }}>
+                        <Briefcase size={24} color="#0EA5E9" />
+                      </div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Projeto Hidráulico</h3>
+                    </button>
+                    
+                    <button onClick={() => setActiveProject('luminotecnico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                      <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
+                        <Lightbulb size={24} color="#F59E0B" />
+                      </div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Luminotécnico</h3>
+                    </button>
+                    
+                    <button onClick={() => setActiveProject('automacao')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                      <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+                        <Wrench size={24} color="#10B981" />
+                      </div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Automação</h3>
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ position: 'relative', marginTop: -20, marginLeft: -20, marginRight: -20 }}>
+                    {activeProject === 'eletrico' && <ElectricalDesignStudio onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'hidraulico' && <PlumbingDesignStudio onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'luminotecnico' && <LightingDesignEngine onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'automacao' && <AutomationDesignStudio onBack={() => setActiveProject(null)} />}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* === COMPARTILHAMENTO === */}
           {activeTab === 'compartilhamento' && (
             <div className="animate-fade-in">
               <ShareWorkView workId={work.id} />

@@ -1,6 +1,12 @@
+import { ElectricalDesignStudio } from '../architect/ElectricalDesignStudio';
+import { PlumbingDesignStudio } from '../architect/PlumbingDesignStudio';
+import { LightingDesignEngine } from '../architect/LightingDesignEngine';
+import { AutomationDesignStudio } from '../architect/AutomationDesignStudio';
+import { WoodworkingDesignStudio } from '../architect/WoodworkingDesignStudio';
 import { useState } from 'react';
 import { useWorks } from '../../contexts/WorksContext';
-import { ArrowLeft, MapPin, HardHat, CheckCircle2, LayoutDashboard, CalendarDays, Wallet, Truck, FileText, Image as ImageIcon, Users } from 'lucide-react';
+import { ArrowLeft, MapPin, HardHat, CheckCircle2, LayoutDashboard, CalendarDays, Wallet, Truck, FileText, Image as ImageIcon, Users, Briefcase, Lightbulb, Wrench, Hammer } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { InteractiveSchedule } from '../owner/InteractiveSchedule';
 import { ProviderWorkFinance } from './ProviderWorkFinance';
 import { DocumentsView } from '../works/DocumentsView';
@@ -17,8 +23,12 @@ interface ProviderWorkDashboardProps {
   onBack: () => void;
 }
 
+type TabId = 'resumo' | 'cronograma' | 'financeiro' | 'fornecedores' | 'anotacoes' | 'fotos' | 'connect' | 'projetos';
+
 export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financeiro' | 'fornecedores' | 'fotos' | 'connect' | 'anotacoes'>('resumo');
+  const { profile } = useAuth();
+  const [activeProject, setActiveProject] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabId>('resumo');
   const { works } = useWorks();
   const work = works.find(w => w.id === workId);
   const [serviceType, setServiceType] = useState(work?.providerServiceType || '');
@@ -91,13 +101,14 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
           { id: 'cronograma', label: 'Cronograma', icon: <CalendarDays size={14} /> },
           { id: 'financeiro', label: 'Financeiro', icon: <Wallet size={14} /> },
           { id: 'fornecedores', label: 'Fornecedores', icon: <Truck size={14} /> },
-          { id: 'anotacoes', label: 'Anotações', icon: <FileText size={14} /> },
+          { id: 'projetos', label: 'Projetos', icon: <Briefcase size={14} /> },
+            { id: 'anotacoes', label: 'Anotações', icon: <FileText size={14} /> },
           { id: 'fotos', label: 'Galeria', icon: <ImageIcon size={14} /> },
           { id: 'connect', label: 'Connect', icon: <Users size={14} /> }
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as TabId)}
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '7px 14px', borderRadius: 10, whiteSpace: 'nowrap',
@@ -188,7 +199,65 @@ export function ProviderWorkDashboard({ workId, onBack }: ProviderWorkDashboardP
             </motion.div>
           )}
 
-          {activeTab === 'anotacoes' && (
+          
+            {activeTab === 'projetos' && (
+              <motion.div key="projetos" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                {!activeProject ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16 }}>
+                    {(!profile?.specialty || ['Eletricista', 'Empreiteiro Geral', 'Mestre de Obras', 'Construção Residencial'].includes(profile?.specialty)) && (
+                      <>
+                        <button onClick={() => setActiveProject('eletrico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                          <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
+                            <Lightbulb size={24} color="#EAB308" />
+                          </div>
+                          <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)', textAlign: 'center' }}>Projeto Elétrico</h3>
+                        </button>
+                        <button onClick={() => setActiveProject('luminotecnico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                          <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
+                            <Lightbulb size={24} color="#F59E0B" />
+                          </div>
+                          <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)', textAlign: 'center' }}>Luminotécnico</h3>
+                        </button>
+                        <button onClick={() => setActiveProject('automacao')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                          <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+                            <Wrench size={24} color="#10B981" />
+                          </div>
+                          <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)', textAlign: 'center' }}>Automação</h3>
+                        </button>
+                      </>
+                    )}
+                    
+                    {(!profile?.specialty || ['Encanador', 'Empreiteiro Geral', 'Mestre de Obras', 'Construção Residencial'].includes(profile?.specialty)) && (
+                      <button onClick={() => setActiveProject('hidraulico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                        <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(14, 165, 233, 0.1)' }}>
+                          <Briefcase size={24} color="#0EA5E9" />
+                        </div>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)', textAlign: 'center' }}>Projeto Hidráulico</h3>
+                      </button>
+                    )}
+
+                    {(!profile?.specialty || ['Marceneiro', 'Carpinteiro', 'Empreiteiro Geral', 'Mestre de Obras', 'Construção Residencial'].includes(profile?.specialty)) && (
+                      <button onClick={() => setActiveProject('marcenaria')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                        <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(139, 92, 246, 0.1)' }}>
+                          <Hammer size={24} color="#8B5CF6" />
+                        </div>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)', textAlign: 'center' }}>Marcenaria</h3>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ position: 'relative', marginTop: -20, marginLeft: -20, marginRight: -20 }}>
+                    {activeProject === 'eletrico' && <ElectricalDesignStudio onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'hidraulico' && <PlumbingDesignStudio onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'luminotecnico' && <LightingDesignEngine onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'automacao' && <AutomationDesignStudio onBack={() => setActiveProject(null)} />}
+                    {activeProject === 'marcenaria' && <WoodworkingDesignStudio onBack={() => setActiveProject(null)} />}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'anotacoes' && (
             <motion.div key="anotacoes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               <WorkDiary workId={workId} />
             </motion.div>

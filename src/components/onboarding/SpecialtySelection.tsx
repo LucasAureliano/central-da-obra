@@ -4,7 +4,7 @@ import { Check } from 'lucide-react';
 
 const SPECIALTIES = [
   'Pedreiro', 'Pintor', 'Eletricista', 'Encanador', 'Gesseiro', 
-  'Azulejista', 'Mestre de Obras', 'Carpinteiro', 'Serralheiro', 
+  'Marceneiro', 'Azulejista', 'Mestre de Obras', 'Carpinteiro', 'Serralheiro', 
   'Telhadista', 'Drywall', 'Piso Laminado', 'Piso Vinílico', 'Outro'
 ];
 
