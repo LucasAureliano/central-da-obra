@@ -36,14 +36,14 @@ export function InsightCard({ insight, onClickAction }: { insight: Insight; onCl
         }}>
           {insight.icon}
         </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-            <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{insight.title}</h4>
-            <span style={{ fontSize: 11, fontWeight: 600, color: colors.color, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 }}>
+            <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{insight.title}</h4>
+            <span style={{ fontSize: 11, fontWeight: 600, color: colors.color, textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 }}>
               {insight.priority}
             </span>
           </div>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.5, wordBreak: 'break-word' }}>
             {insight.description}
           </p>
         </div>

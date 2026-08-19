@@ -82,7 +82,7 @@ function RaioXModal({ isOpen, onClose, _primaryWork, stagesInfo, budget, spent }
 }
 
 // ─── Widget: Minha Obra Principal ──────────────────────────────────────────────
-function MinhaObraWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string) => void; primaryWork: Work }) {
+function MinhaObraWidget({ onNavigate, primaryWork, totalSpent }: { onNavigate: (tab: string) => void; primaryWork: Work; totalSpent?: number; }) {
   const [stagesInfo, setStagesInfo] = useState({ total: 0, completed: 0, nextStage: '' });
   const [showRaioX, setShowRaioX] = useState(false);
 
@@ -109,7 +109,7 @@ function MinhaObraWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string
   }, [primaryWork?.id]);
 
   const budget = primaryWork.budget || 0;
-  const spent = primaryWork.spent || 0;
+  const spent = totalSpent || primaryWork.spent || 0;
   const saldo = budget - spent;
   const progress = stagesInfo.total > 0 ? Math.round((stagesInfo.completed / stagesInfo.total) * 100) : (primaryWork.progress || 0);
   const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -224,9 +224,9 @@ function MinhaObraWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string
 }
 
 // ─── Widget: Financeiro da Obra ───────────────────────────────────────────────
-function OwnerFinanceWidget({ onNavigate, primaryWork }: { onNavigate: (tab: string) => void; primaryWork: Work }) {
+function OwnerFinanceWidget({ onNavigate, primaryWork, totalSpent }: { onNavigate: (tab: string) => void; primaryWork: Work; totalSpent?: number; }) {
   const budget = primaryWork.budget || 0;
-  const spent = primaryWork.spent || 0;
+  const spent = totalSpent || primaryWork.spent || 0;
   const balance = budget - spent;
   const percent = budget > 0 ? (spent / budget) * 100 : 0;
   const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -395,7 +395,7 @@ function NoPrimaryWorkState({ onNavigate }: { onNavigate: (tab: string) => void 
 
 // ─── Dashboard Principal do Proprietário ──────────────────────────────────────
 export function OwnerDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  const { works, primaryWork } = useWorks();
+  const { works, primaryWork, primaryWorkStats } = useWorks();
   const [showSelector, setShowSelector] = useState(false);
 
   // If multiple works and no primary selected, prompt
@@ -414,8 +414,8 @@ export function OwnerDashboard({ onNavigate }: { onNavigate: (tab: string) => vo
   const renderWidget = (id: string) => {
     if (!primaryWork && id !== 'calculos' && id !== 'dicas') return null;
     switch (id) {
-      case 'minha-obra': return primaryWork ? <MinhaObraWidget onNavigate={onNavigate} primaryWork={primaryWork} /> : null;
-      case 'financeiro': return primaryWork ? <OwnerFinanceWidget onNavigate={onNavigate} primaryWork={primaryWork} /> : null;
+      case 'minha-obra': return primaryWork ? <MinhaObraWidget onNavigate={onNavigate} primaryWork={primaryWork} totalSpent={primaryWorkStats?.totalSpent} /> : null;
+      case 'financeiro': return primaryWork ? <OwnerFinanceWidget onNavigate={onNavigate} primaryWork={primaryWork} totalSpent={primaryWorkStats?.totalSpent} /> : null;
       case 'compras': return primaryWork ? <OwnerShoppingWidget onNavigate={onNavigate} primaryWork={primaryWork} /> : null;
       case 'calculos': return <CalculatorsCentralWidget onNavigate={onNavigate} />;
       case 'dicas': return <TipsWidget onNavigate={onNavigate} />;

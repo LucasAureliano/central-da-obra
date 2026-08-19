@@ -34,12 +34,15 @@ export function GlobalHeader({
         className="mobile-header glass-panel"
         style={{ display: 'flex', padding: 'env(safe-area-inset-top, 0px) 20px 0 20px', height: 'calc(72px + env(safe-area-inset-top, 0px))', zIndex: 40 }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer' }} onClick={handleHomeClick}>
-          <CustomLogo theme={theme} variant="icon" size={32} />
-          <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', opacity: 0.9 }}>
-            {headerTitle}
-          </span>
-        </div>
+        <motion.div 
+          style={{ display: 'flex', alignItems: 'center', flex: 1, cursor: 'pointer' }} 
+          onClick={handleHomeClick}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        >
+          <CustomLogo theme={theme} variant="horizontal" size={32} />
+        </motion.div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20 }} onClick={toggleTheme}>

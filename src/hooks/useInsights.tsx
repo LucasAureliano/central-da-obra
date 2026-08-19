@@ -22,7 +22,7 @@ export interface Insight {
 
 export function useInsights() {
   const { user, profile } = useAuth();
-  const { activeWork, works } = useWorks();
+  const { activeWork, works, primaryWorkStats } = useWorks();
   const [insights, setInsights] = useState<Insight[]>([]);
 
   useEffect(() => {
@@ -205,25 +205,37 @@ export function useInsights() {
       });
     }
 
-    // Owner logic follows the current work active
-    if (role === 'owner' && activeWork) {
-      const budget = activeWork.budget || 0;
-      const spent = activeWork.spent || 0;
-      const percentSpent = budget > 0 ? (spent / budget) * 100 : 0;
+      // Owner logic follows the current work active
+      if (role === 'owner' && activeWork) {
+        const budget = activeWork.budget || 0;
+        const spent = primaryWorkStats?.totalSpent || activeWork.spent || 0;
+        const percentSpent = budget > 0 ? (spent / budget) * 100 : 0;
 
-      if (budget > 0 && percentSpent >= 90) {
-        generatedInsights.push({
-          id: 'finance-critical',
-          icon: <AlertCircle size={20} color="#EF4444" />,
-          title: 'Orçamento Crítico',
-          description: `Você já utilizou ${percentSpent.toFixed(0)}% do orçamento total. Risco alto de ultrapassar o limite.`,
-          priority: 'critical',
-          category: 'finance',
-          date: now,
-          suggestedAction: 'Ver Financeiro',
-          actionRoute: 'financeiro'
-        });
-      } else if (budget > 0 && percentSpent >= 70) {
+        if (budget > 0 && spent > budget) {
+          generatedInsights.push({
+            id: 'finance-overbudget',
+            icon: <AlertCircle size={20} color="#EF4444" />,
+            title: 'Orçamento Ultrapassado',
+            description: `Atenção! Você ultrapassou o orçamento em ${Math.abs(budget - spent).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}.`,
+            priority: 'critical',
+            category: 'finance',
+            date: now,
+            suggestedAction: 'Ver Financeiro',
+            actionRoute: 'financeiro'
+          });
+        } else if (budget > 0 && percentSpent >= 90) {
+          generatedInsights.push({
+            id: 'finance-critical',
+            icon: <AlertCircle size={20} color="#EF4444" />,
+            title: 'Orçamento Crítico',
+            description: `Você já utilizou ${percentSpent.toFixed(0)}% do orçamento total. Risco alto de ultrapassar o limite.`,
+            priority: 'critical',
+            category: 'finance',
+            date: now,
+            suggestedAction: 'Ver Financeiro',
+            actionRoute: 'financeiro'
+          });
+        } else if (budget > 0 && percentSpent >= 70) {
         generatedInsights.push({
           id: 'finance-high',
           icon: <TrendingUp size={20} color="#F59E0B" />,
