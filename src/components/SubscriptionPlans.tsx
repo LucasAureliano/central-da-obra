@@ -17,8 +17,16 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const STRIPE_PRICES = {
-    monthly: { starter: 'price_1U5y52Ht1GuKvdoeS6nyP9KJ', pro: 'price_1U5y5VHt1GuKvdoeG7DX2UrR', business: 'price_1U5y5wHt1GuKvdoefGFVgWho' },
-    annual: { starter: 'price_1U5yKNHt1GuKvdoelS5v4j5E', pro: 'price_1U5yL4Ht1GuKvdoezJcnlgtc', business: 'price_1U5yMwHt1GuKvdoemZrVbRne' }
+    monthly: { 
+      starter: import.meta.env.VITE_STRIPE_PRICE_STARTER_MONTHLY || 'price_1U5y52Ht1GuKvdoeS6nyP9KJ', 
+      pro: import.meta.env.VITE_STRIPE_PRICE_PRO_MONTHLY || 'price_1U5y5VHt1GuKvdoeG7DX2UrR', 
+      business: import.meta.env.VITE_STRIPE_PRICE_BUSINESS_MONTHLY || 'price_1U5y5wHt1GuKvdoefGFVgWho' 
+    },
+    annual: { 
+      starter: import.meta.env.VITE_STRIPE_PRICE_STARTER_ANNUAL || 'price_1U5yKNHt1GuKvdoelS5v4j5E', 
+      pro: import.meta.env.VITE_STRIPE_PRICE_PRO_ANNUAL || 'price_1U5yL4Ht1GuKvdoezJcnlgtc', 
+      business: import.meta.env.VITE_STRIPE_PRICE_BUSINESS_ANNUAL || 'price_1U5yMwHt1GuKvdoemZrVbRne' 
+    }
   };
   const [showMockCheckout, setShowMockCheckout] = useState<{plan: string, price: number, isAnnual?: boolean} | null>(null);
   const [isAnnual, setIsAnnual] = useState(false);
