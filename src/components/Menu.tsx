@@ -239,7 +239,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
     } else if (activeRole === 'service') {
       actions = [
         { label: '+ Orçamento', icon: <Plus size={14} />, action: () => onMenuSelect('Novo Orçamento') },
-        { label: 'Agenda', icon: <CalendarDays size={14} />, action: () => onMenuSelect('Agenda') },
+        { label: 'Cálculos', icon: <Calculator size={14} />, action: () => onMenuSelect('Calculadoras') },
         { label: 'Clientes', icon: <Users size={14} />, action: () => onMenuSelect('Clientes') },
         { label: 'Recebimentos', icon: <Receipt size={14} />, action: () => onMenuSelect('Recebimentos') },
       ];

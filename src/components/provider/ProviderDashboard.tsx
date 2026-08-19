@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { AlertCircle, Activity, Briefcase, FileText, Plus } from 'lucide-react';
+import { AlertCircle, Activity, Briefcase, FileText, Plus, CalendarDays } from 'lucide-react';
 import { formatDate } from '../../utils/formatters';
 
 // Basic TiltCard mockup since we can't easily import the exact one from Dashboard without refactoring
@@ -201,9 +201,9 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
             <Activity size={20} />
             <span style={{ fontSize: 11, fontWeight: 700, textAlign: 'center' }}>Serviços</span>
           </button>
-          <button className="btn-secondary" style={{ padding: '12px 4px', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }} onClick={() => onNavigate('catalogo-servicos')}>
-            <FileText size={20} />
-            <span style={{ fontSize: 11, fontWeight: 700, textAlign: 'center' }}>Catálogo</span>
+          <button className="btn-secondary" style={{ padding: '12px 4px', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }} onClick={() => onNavigate('agenda-completa')}>
+            <CalendarDays size={20} />
+            <span style={{ fontSize: 11, fontWeight: 700, textAlign: 'center' }}>Agenda</span>
           </button>
         </div>
 
