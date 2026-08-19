@@ -48,16 +48,40 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const handleSend = async (text: string) => {
     if (!text.trim() || isTyping) return;
     
-    setMessages(prev => [...prev, { role: 'user', text }]);
+    const newMessages = [...messages, { role: 'user' as const, text }];
+    setMessages(newMessages);
     setQuery('');
     setIsTyping(true);
 
+    if (!isPremium) {
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          text: 'A Inteligência Artificial avançada, análise de projetos e consulta online de preços de mercado são ferramentas exclusivas dos planos PRO e Business. Porém, você pode explorar nossas funções gratuitas abaixo!',
+          suggestions: [
+            { label: 'Central de Cálculos', action: () => onNavigate('calculos'), icon: <Calculator size={16} /> },
+            { label: 'Ver Planos', action: () => onNavigate('planos'), icon: <Sparkles size={16} /> }
+          ]
+        }]);
+        setIsTyping(false);
+      }, 600);
+      return;
+    }
+
     try {
+      const apiMessages = newMessages.map(m => ({ role: m.role, content: m.text }));
+      
       const response = await assistantService.sendMessage({
-        text,
+        messages: apiMessages,
         contextData: {
-          currentWorkId: currentWork?.id,
-          role: profile?.role as string | undefined
+          currentWork: currentWork ? {
+            name: currentWork.name,
+            progress: currentWork.progress,
+            budget: currentWork.budget,
+            spent: currentWork.spent,
+            status: currentWork.status
+          } : null,
+          role: profile?.role
         }
       });
       
@@ -74,7 +98,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
       console.error(err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: 'Desculpe, ocorreu um erro ao conectar com o Copilot. Tente novamente mais tarde.'
+        text: 'Desculpe, ocorreu um erro de conexão com a API do Copilot. Tente novamente em instantes.'
       }]);
     } finally {
       setIsTyping(false);
