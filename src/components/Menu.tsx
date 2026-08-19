@@ -291,6 +291,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             { icon: <Wallet size={20} />, label: 'Financeiro', color: '#10B981', action: () => onMenuSelect('Financeiro') },
             { icon: <ShoppingCart size={20} />, label: 'Materiais', color: '#F59E0B', action: () => onMenuSelect('Materiais') },
             { icon: <Building2 size={20} />, label: 'Minhas Obras', color: '#8B5CF6', action: () => onMenuSelect('Minhas Obras') },
+            { icon: <FileText size={20} />, label: 'Notas da Obra', color: '#EC4899', action: () => onMenuSelect('notas') },
           ]
         },
         {
@@ -334,6 +335,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           items: [
             { icon: <Briefcase size={20} />, label: 'Minha Empresa', color: '#F59E0B', action: () => onMenuSelect('inicio') },
             { icon: <Plus size={20} />, label: 'Nova Obra', color: '#8B5CF6', action: () => onMenuSelect('Controle de Projetos') },
+            { icon: <FileText size={20} />, label: 'Notas da Obra', color: '#EC4899', action: () => onMenuSelect('notas') },
             { icon: <CalendarDays size={20} />, label: 'Agenda', color: '#3B82F6', action: () => onMenuSelect('Agenda') },
             { icon: <FileText size={20} />, label: 'Orçamentos', color: '#FF6B00', action: () => onMenuSelect('Orcamentos') },
             { icon: <Receipt size={20} />, label: 'Recebimentos', color: '#10B981', action: () => onMenuSelect('Recebimentos') },
@@ -367,6 +369,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           title: 'Gestão de Projetos & Clientes',
           items: [
             { icon: <Briefcase size={20} />, label: 'Controle de Projetos', color: '#8B5CF6', action: () => onMenuSelect('Controle de Projetos') },
+              { icon: <FileText size={20} />, label: 'Notas da Obra', color: '#EC4899', action: () => onMenuSelect('notas') },
             { icon: <Users size={20} />, label: 'Clientes & Links', color: '#3B82F6', action: () => onMenuSelect('Clientes') },
             { icon: <CalendarDays size={20} />, label: 'Agenda Técnica', color: '#F59E0B', action: () => onMenuSelect('Agenda') },
             { icon: <ClipboardCheck size={20} />, label: 'Vistorias Técnicas', color: '#10B981', action: () => onMenuSelect('Vistorias') },
@@ -426,6 +429,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           items: [
             { icon: <Building2 size={20} />, label: 'Centro de Operações', color: '#3B82F6', action: () => onMenuSelect('Centro de Operações') },
             { icon: <Briefcase size={20} />, label: 'Gerenciamento de Obras', color: '#FF6B00', action: () => onMenuSelect('Obras') },
+              { icon: <FileText size={20} />, label: 'Notas da Obra', color: '#EC4899', action: () => onMenuSelect('notas') },
             { icon: <Users size={20} />, label: 'Equipes & Mão de Obra', color: '#8B5CF6', action: () => onMenuSelect('Equipe') },
             { icon: <ShoppingCart size={20} />, label: 'Centro de Materiais', color: '#F59E0B', action: () => onMenuSelect('Centro de Compras') },
             { icon: <Wallet size={20} />, label: 'Financeiro Corporativo', color: '#10B981', action: () => onMenuSelect('Financeiro Corporativo') },

@@ -64,6 +64,7 @@ import { Agenda } from './components/Agenda';
 import { ProjectControl } from './components/architect/ProjectControl';
 import { TechnicalJournal } from './components/architect/TechnicalJournal';
 import { Inspections } from './components/architect/Inspections';
+import { WorkNotes } from './components/works/WorkNotes';
 import { Documents } from './components/architect/Documents';
 import { Schedule } from './components/architect/Schedule';
 import { LightingDesignEngine } from './components/architect/LightingDesignEngine';
@@ -558,6 +559,7 @@ function App() {
       case 'compatibilizacao': return <ProjectCoordination key="compatibilizacao" onBack={() => handleNavigate('inicio')} />;
       case 'diario-tecnico': return <TechnicalJournal key="diario-tecnico" />;
       case 'vistorias': return <Inspections key="vistorias" />;
+      case 'notas': return <WorkNotes key="notas" onBack={() => handleNavigate('inicio')} />;
       case 'documentos-tecnicos': return <Documents key="documentos-tecnicos" />;
       case 'cronograma-medicoes': return activeRole === 'owner' ? <InteractiveSchedule key="cronograma-owner" onBack={() => handleNavigate('inicio')} /> : <Schedule key="cronograma-medicoes" />;
       case 'centro-operacoes': 

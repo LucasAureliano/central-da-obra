@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Home, ChevronDown, Star, DollarSign, ShoppingCart, ChevronRight, TrendingDown, Package, CheckCircle, ArrowRight, Activity, X } from 'lucide-react';
+import { Home, ChevronDown, Star, DollarSign, ShoppingCart, ChevronRight, TrendingDown, Package, CheckCircle, ArrowRight, Activity, X, FileText } from 'lucide-react';
 import { InsightsWidget } from './InsightsWidget';
 import { CalculatorsCentralWidget } from './CalculatorsCentralWidget';
 import { TipsWidget } from './TipsWidget';
@@ -200,6 +200,13 @@ function MinhaObraWidget({ onNavigate, primaryWork, totalSpent }: { onNavigate: 
             style={{ flex: 1, borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
             <Activity size={16} /> Raio-X
+          </button>
+          <button
+            onClick={() => onNavigate('notas')}
+            className="btn-secondary"
+            style={{ flex: 1, borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            <FileText size={16} /> Notas
           </button>
           <button
             onClick={() => onNavigate('obras')}
