@@ -30,8 +30,8 @@ export const ArchitectDemo: React.FC<DemoProps> = ({ step, onActionComplete }) =
           style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}
         >
           {step === 0 && 'Design Studio & Marcas'}
-          {step === 1 && 'Compatibilização Inteligente'}
-          {step === 2 && 'Assistente com IA'}
+          {step === 1 && 'Projetos Complementares'}
+          {step === 2 && 'CentralObra Connect'}
           {step === 3 && 'Calculadoras Avançadas'}
         </motion.h2>
         <motion.p 
@@ -40,8 +40,8 @@ export const ArchitectDemo: React.FC<DemoProps> = ({ step, onActionComplete }) =
           style={{ fontSize: 16, color: 'var(--text-muted)' }}
         >
           {step === 0 && 'Especifique revestimentos e texturas reais (Portobello, Deca, etc) com preços atualizados.'}
-          {step === 1 && 'Integre projetos elétricos, luminotécnicos e hidráulicos com precisão.'}
-          {step === 2 && 'Tire dúvidas técnicas, pesquise normas e peça dicas em linguagem natural.'}
+          {step === 1 && 'Módulos interativos para projetos elétrico, hidrosanitário, luminotécnico, automação e marcenaria.'}
+          {step === 2 && 'Crie seu portfólio público, encontre clientes e conecte-se com prestadores.'}
           {step === 3 && 'Dezenas de calculadoras para pisos, gesso, iluminação e quantitativos.'}
         </motion.p>
       </div>

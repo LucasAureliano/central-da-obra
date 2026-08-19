@@ -30,7 +30,7 @@ export const OwnerDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => {
           style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}
         >
           {step === 0 && 'Cadastre sua Obra'}
-          {step === 1 && 'Assistente Virtual IA'}
+          {step === 1 && 'Raio-X & Insights'}
           {step === 2 && 'Calcule Materiais'}
           {step === 3 && 'Agenda & Financeiro'}
         </motion.h2>
@@ -40,9 +40,9 @@ export const OwnerDemo: React.FC<DemoProps> = ({ step, onActionComplete }) => {
           style={{ fontSize: 16, color: 'var(--text-muted)' }}
         >
           {step === 0 && 'Comece criando o perfil da sua construção.'}
-          {step === 1 && 'Tire dúvidas técnicas, normas e dicas 24h com nossa IA.'}
+          {step === 1 && 'O sistema te alerta de orçamentos estourados e tarefas atrasadas.'}
           {step === 2 && 'Calcule a quantidade exata para evitar desperdícios.'}
-          {step === 3 && 'Veja o que falta terminar hoje e controle seus gastos.'}
+          {step === 3 && 'Veja o que falta terminar hoje e controle seus gastos globais.'}
         </motion.p>
       </div>
 

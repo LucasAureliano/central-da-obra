@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ClipboardList, ChevronRight, Palette, Lightbulb, MapPin, Zap, Droplet, Cpu } from 'lucide-react';
+import { ClipboardList, ChevronRight, Palette, Lightbulb, MapPin, Zap, Droplet, Cpu, Hammer } from 'lucide-react';
 import { InsightsWidget } from './InsightsWidget';
 import { ProjectsWidget } from './ProjectsWidget';
 import { LibraryWidget } from './LibraryWidget';
@@ -128,6 +128,20 @@ function EngineeringProjectsWidget({ onNavigate }: { onNavigate: (tab: string) =
             </div>
           </div>
           <button onClick={() => onNavigate('projeto-automacao')} className="btn-primary" style={{ padding: '6px 12px', borderRadius: 10, fontSize: 12, backgroundColor: '#10B981' }}>Abrir</button>
+        </div>
+
+        {/* Marcenaria */}
+        <div style={{ padding: 14, backgroundColor: 'rgba(139, 92, 246, 0.05)', borderRadius: 16, border: '1px solid rgba(139, 92, 246, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)', padding: 8, borderRadius: 10 }}>
+              <Hammer size={20} color="#8B5CF6" />
+            </div>
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>Marcenaria</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Móveis Sob Medida</span>
+            </div>
+          </div>
+          <button onClick={() => onNavigate('projeto-marcenaria')} className="btn-primary" style={{ padding: '6px 12px', borderRadius: 10, fontSize: 12, backgroundColor: '#8B5CF6' }}>Abrir</button>
         </div>
       </div>
     </motion.div>

@@ -1,36 +1,36 @@
 import { motion } from 'framer-motion';
-import { Smartphone, Zap, Cloud, Lock, Users, PieChart } from 'lucide-react';
+import { Lightbulb, Settings2, Users, PieChart, Calculator, ShieldCheck } from 'lucide-react';
 
 const features = [
   {
-    icon: <Smartphone size={24} />,
-    title: 'Mobile First',
-    description: 'Feito para funcionar perfeitamente no canteiro de obras, direto do seu celular.'
+    icon: <PieChart size={24} />,
+    title: 'Raio-X & Insights',
+    description: 'Diagnóstico financeiro ao vivo. O sistema te avisa caso a obra esteja estourando o orçamento ou atrasada.'
   },
   {
-    icon: <Zap size={24} />,
-    title: 'Mais Rápido',
-    description: 'Crie orçamentos e pedidos de material em segundos, não em horas.'
-  },
-  {
-    icon: <Cloud size={24} />,
-    title: 'Sincronização em Nuvem',
-    description: 'Seus dados sempre seguros e acessíveis de qualquer dispositivo, a qualquer momento.'
-  },
-  {
-    icon: <Lock size={24} />,
-    title: 'Segurança Bancária',
-    description: 'Proteção avançada para os dados financeiros dos seus clientes e da sua empresa.'
+    icon: <Lightbulb size={24} />,
+    title: 'Projetos Complementares',
+    description: 'Módulos interativos para Elétrica, Hidráulica, Automação, Interiores, Luminotécnica e Marcenaria.'
   },
   {
     icon: <Users size={24} />,
-    title: 'Trabalho em Equipe',
-    description: 'Compartilhe o progresso com clientes e delegue tarefas para sua equipe.'
+    title: 'CentralObra Connect',
+    description: 'Um hub de talentos. Crie seu Portfólio Público e encontre clientes ou profissionais próximos a você.'
   },
   {
-    icon: <PieChart size={24} />,
-    title: 'Relatórios Inteligentes',
-    description: 'Gráficos automáticos mostrando para onde está indo o dinheiro da obra.'
+    icon: <Calculator size={24} />,
+    title: 'Central de Cálculos',
+    description: 'Mais de 15 calculadoras técnicas integradas: alvenaria, pisos, tintas, gesso, ar-condicionado e mais.'
+  },
+  {
+    icon: <Settings2 size={24} />,
+    title: 'Gestão Inteligente',
+    description: 'Integração de Cronograma Interativo com Lista de Compras. Tudo o que precisa ser feito, com o que precisa ser comprado.'
+  },
+  {
+    icon: <ShieldCheck size={24} />,
+    title: 'Planos & Assinaturas',
+    description: 'Ecossistema seguro com Checkout nativo, permitindo upgrade de recursos para donos, prestadores e construtoras.'
   }
 ];
 

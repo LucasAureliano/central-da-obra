@@ -70,6 +70,7 @@ import { LightingDesignEngine } from './components/architect/LightingDesignEngin
 import { ElectricalDesignStudio } from './components/architect/ElectricalDesignStudio';
 import { PlumbingDesignStudio } from './components/architect/PlumbingDesignStudio';
 import { AutomationDesignStudio } from './components/architect/AutomationDesignStudio';
+import { WoodworkingDesignStudio } from './components/architect/WoodworkingDesignStudio';
 import { SiteVisitsManager } from './components/architect/SiteVisitsManager';
 import { ProjectCoordination } from './components/architect/ProjectCoordination';
 import { ExecutiveTimeline } from './components/builder/ExecutiveTimeline';
@@ -552,6 +553,7 @@ function App() {
       case 'projeto-eletrico': return <ElectricalDesignStudio key="eletrico" onBack={() => handleNavigate('inicio')} />;
       case 'projeto-hidraulico': return <PlumbingDesignStudio key="hidraulico" onBack={() => handleNavigate('inicio')} />;
       case 'projeto-automacao': return <AutomationDesignStudio key="automacao" onBack={() => handleNavigate('inicio')} />;
+      case 'projeto-marcenaria': return <WoodworkingDesignStudio key="marcenaria" onBack={() => handleNavigate('inicio')} />;
       case 'acompanhamento-obras': return <SiteVisitsManager key="acompanhamento" onBack={() => handleNavigate('inicio')} />;
       case 'compatibilizacao': return <ProjectCoordination key="compatibilizacao" onBack={() => handleNavigate('inicio')} />;
       case 'diario-tecnico': return <TechnicalJournal key="diario-tecnico" />;
