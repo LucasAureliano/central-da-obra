@@ -168,7 +168,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
   return (
     <motion.div 
       className="screen-content" 
-      style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, paddingBottom: 100, maxWidth: 1400, margin: '0 auto', width: '100%' }}
+      style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, paddingBottom: 24, maxWidth: 1400, margin: '0 auto', width: '100%' }}
       variants={containerVariants}
       initial="hidden"
       animate="show"

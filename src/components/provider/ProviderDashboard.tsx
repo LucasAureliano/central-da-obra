@@ -159,7 +159,7 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
   const fmt = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
-    <div style={{ padding: '24px 20px', paddingBottom: 100 }}>
+    <div style={{ padding: '24px 20px', paddingBottom: 24 }}>
       {/* INSIGHTS */}
       {insights.length > 0 && (
         <>

@@ -52,8 +52,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       payment_method_types: ['card', 'boleto'],
       line_items: [{ price: stripePriceId, quantity: 1 }],
       mode: 'subscription',
-      success_url: \/#/checkout-success?session_id={CHECKOUT_SESSION_ID}\,
-      cancel_url: \/#/checkout-failure\,
+      success_url: `${origin}/#/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/#/checkout-failure`,
       customer_email: userEmail,
       client_reference_id: userId,
       metadata: {

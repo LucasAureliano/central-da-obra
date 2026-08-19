@@ -41,10 +41,10 @@ export function ProfessionalConnectDashboard({ onNavigate }: { onNavigate: (tab:
 
   return (
     <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>CentralObra Connect</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Sua vitrine profissional pública</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: 0 }}>Sua vitrine profissional pública</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: 700 }} onClick={() => window.open('?connect=' + user?.uid, '_blank')}>

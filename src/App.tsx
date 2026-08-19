@@ -626,6 +626,7 @@ function App() {
                   setAuthView={setAuthView} 
                 />
                 <GuestRestrictionModal />
+                <PlansUpsellPopup onGoToPlans={() => handleNavigate('planos')} />
                 <UpgradeModal onNavigate={handleNavigate} />
               </div>
             </PortalProvider>

@@ -163,7 +163,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             <span>Assistente</span>
           </button>
 
-          {activeRole === 'owner' ? (
+          {(activeRole === 'owner' || activeRole === 'service') ? (
             <button 
               className={`nav-item ${activeTab === 'calculos' ? 'active' : ''}`}
               onClick={() => setActiveTab('calculos')}

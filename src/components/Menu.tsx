@@ -498,7 +498,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
   }
 
   return (
-    <div className="screen-content animate-fade-in" style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, paddingBottom: 100 }}>
+    <div className="screen-content animate-fade-in" style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, paddingBottom: 24 }}>
       
       {/* 1. Profile Adaptive Header */}
       {renderAdaptiveHeader()}
