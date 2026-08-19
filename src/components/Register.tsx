@@ -58,7 +58,7 @@ export function Register({ onGoToLogin, theme = 'dark' }: RegisterProps) {
             <UserIcon size={20} color="var(--text-muted)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
             <input 
               type="text"
-              placeholder="Nome completo"
+              placeholder="Como gostaria de ser chamado?"
               className="input-premium"
               style={{ paddingLeft: 48, backgroundColor: 'var(--bg-input-glass)' }}
               value={name}

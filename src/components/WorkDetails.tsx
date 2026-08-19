@@ -29,6 +29,24 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
   const { profile, user } = useAuth();
   const [work, setWork] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'compras' | 'orcamento' | 'diario' | 'documentos' | 'compartilhamento' | 'projetos'>('resumo');
+
+  const getAvailableProjects = () => {
+    const role = profile?.role || localStorage.getItem('pendingRole');
+    const spec = profile?.specialty || localStorage.getItem('pendingSpecialty');
+    
+    if (role === 'owner') return [];
+    if (role === 'service') {
+      if (spec === 'Eletricista') return ['eletrico', 'luminotecnico', 'automacao'];
+      if (spec === 'Encanador') return ['hidraulico'];
+      if (spec === 'Gesseiro') return ['luminotecnico'];
+      return []; 
+    }
+    return ['eletrico', 'hidraulico', 'luminotecnico', 'automacao'];
+  };
+
+  const availableProjects = getAvailableProjects();
+  const showProjectsTab = availableProjects.length > 0;
+
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [calculations, setCalculations] = useState<any[]>([]);
   
@@ -149,7 +167,7 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
           { id: 'financas', label: 'Finanças', icon: <Wallet size={14} /> },
           { id: 'compras', label: 'Materiais', icon: <Package size={14} /> },
           { id: 'orcamento', label: 'Orçamentos', icon: <Calculator size={14} /> },
-          { id: 'projetos', label: 'Projetos', icon: <Briefcase size={14} /> },
+          ...(showProjectsTab ? [{ id: 'projetos', label: 'Projetos', icon: <Briefcase size={14} /> }] : []),
           { id: 'documentos', label: 'Documentos', icon: <FolderOpen size={14} /> },
           { id: 'compartilhamento', label: 'Compartilhamento', icon: <Users size={14} /> }
         ].map(tab => (
@@ -254,34 +272,39 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
         <div className="animate-fade-in" style={{ padding: 20, overflowX: 'hidden' }}>
           {!activeProject ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16 }}>
-              <button onClick={() => setActiveProject('eletrico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+              {availableProjects.includes('eletrico') && (
+<button onClick={() => setActiveProject('eletrico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
                   <Lightbulb size={24} color="#EAB308" />
                 </div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Projeto Elétrico</h3>
               </button>
-              
-              <button onClick={() => setActiveProject('hidraulico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+)}
+{availableProjects.includes('hidraulico') && (
+<button onClick={() => setActiveProject('hidraulico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(14, 165, 233, 0.1)' }}>
                   <Briefcase size={24} color="#0EA5E9" />
                 </div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Projeto Hidráulico</h3>
               </button>
-              
-              <button onClick={() => setActiveProject('luminotecnico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+)}
+{availableProjects.includes('luminotecnico') && (
+<button onClick={() => setActiveProject('luminotecnico')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
                   <Lightbulb size={24} color="#F59E0B" />
                 </div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Luminotécnico</h3>
               </button>
-              
-              <button onClick={() => setActiveProject('automacao')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+)}
+{availableProjects.includes('automacao') && (
+<button onClick={() => setActiveProject('automacao')} style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
                   <Wrench size={24} color="#10B981" />
                 </div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Automação</h3>
               </button>
-            </div>
+)}
+</div>
           ) : (
             <div style={{ position: 'relative', marginTop: -20, marginLeft: -20, marginRight: -20 }}>
               {activeProject === 'eletrico' && <ElectricalDesignStudio onBack={() => setActiveProject(null)} />}

@@ -4,6 +4,7 @@ import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import type { PublicProfile, ProfessionalService, PortfolioItem } from '../../../types/connect';
 import { MapPin, Star, Phone, Camera as Instagram, MapPin as Globe, CheckCircle2, ShieldCheck, Mail } from 'lucide-react';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { Helmet } from 'react-helmet-async';
 
 export function PublicProfileView({ uid, theme }: { uid: string, theme: string }) {
   const [profile, setProfile] = useState<PublicProfile | null>(null);

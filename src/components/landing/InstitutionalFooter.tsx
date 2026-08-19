@@ -68,7 +68,9 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
           <div>
             <h4 className="footer-col-title">Produto</h4>
             <ul className="footer-links">
-              <li><a href="#calculadoras" onClick={(e) => handleScrollTo(e, 'calculadoras')} className="footer-link">Calculadoras</a></li>
+              <li><a href="#calculadoras" onClick={(e) => handleScrollTo(e, 'calculadoras')} className="footer-link">Calculadoras App</a></li>
+              <li><a href="/?calc=concreto" className="footer-link" style={{ color: 'var(--color-primary)' }}>Calculadoras Gratuitas</a></li>
+              <li><a href="/?blog=true" className="footer-link" style={{ color: 'var(--color-primary)' }}>Blog de Engenharia</a></li>
               <li><a href="#gestao" onClick={(e) => handleScrollTo(e, 'gestao')} className="footer-link">Gestão Financeira</a></li>
               <li><a href="#biblioteca" onClick={(e) => handleScrollTo(e, 'biblioteca')} className="footer-link">Biblioteca Técnica</a></li>
               <li><a href="#demonstracao" onClick={(e) => handleScrollTo(e, 'demonstracao')} className="footer-link">Demonstração</a></li>

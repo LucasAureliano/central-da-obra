@@ -189,12 +189,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onFinishOnboarding }) =>
 
         <form onSubmit={(e) => { e.preventDefault(); setStep('profile-select'); }} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div className="input-group">
-            <span className="input-label">Nome Completo</span>
+            <span className="input-label">Como gostaria de ser chamado?</span>
             <div className="input-field-wrapper">
               <span className="input-icon-left"><User size={18} /></span>
               <input 
                 type="text" 
-                placeholder="Seu nome" 
+                placeholder="Digite seu nome" 
                 className="input-field" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}

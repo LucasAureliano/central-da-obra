@@ -21,6 +21,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const currentWork = profile?.role === 'owner' ? primaryWork : activeWork;
   const isPremium = profile?.subscription?.planId === 'pro' || profile?.subscription?.planId === 'business' || profile?.isAdmin;
   
+  const [freeCount, setFreeCount] = useState(0);
   const [messages, setMessages] = useState<{role: 'assistant'|'user', text: string, suggestions?: any[]}[]>([]);
 
   useEffect(() => {
@@ -53,20 +54,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
     setQuery('');
     setIsTyping(true);
 
-    if (!isPremium) {
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          text: 'A Inteligência Artificial avançada, análise de projetos e consulta online de preços de mercado são ferramentas exclusivas dos planos PRO e Business. Porém, você pode explorar nossas funções gratuitas abaixo!',
-          suggestions: [
-            { label: 'Central de Cálculos', action: () => onNavigate('calculos'), icon: <Calculator size={16} /> },
-            { label: 'Ver Planos', action: () => onNavigate('planos'), icon: <Sparkles size={16} /> }
-          ]
-        }]);
-        setIsTyping(false);
-      }, 600);
-      return;
-    }
+    // free limit removed
 
     try {
       const apiMessages = newMessages.map(m => ({ role: m.role, content: m.text }));
@@ -81,7 +69,8 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
             spent: currentWork.spent,
             status: currentWork.status
           } : null,
-          role: profile?.role
+          role: profile?.role,
+            isPremium: isPremium
         }
       });
       
@@ -141,24 +130,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const quickChips = getQuickChips();
 
 
-  if (!isPremium) {
-    return (
-      <div className="screen-content animate-fade-in" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, height: '100%' }}>
-        <div className="glass-panel" style={{ maxWidth: 400, textAlign: 'center', padding: 40, borderRadius: 24 }}>
-          <div style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(139, 92, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-            <Sparkles size={40} color="#8B5CF6" />
-          </div>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>CentralObra Copilot</h2>
-          <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 32 }}>
-            Sua Inteligência Artificial especialista em engenharia e gestão de obras. Desbloqueie dicas de materiais, normas, revisão de cronograma e muito mais.
-          </p>
-          <button className="btn-primary" onClick={() => onNavigate('planos')} style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 800, fontSize: 16 }}>
-            Fazer Upgrade para o PRO
-          </button>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div className="screen-content" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', maxWidth: 800, margin: '0 auto', width: '100%' }}>

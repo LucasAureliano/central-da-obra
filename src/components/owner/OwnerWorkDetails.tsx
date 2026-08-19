@@ -63,14 +63,14 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
     });
 
     // Listen to stages
-    const stagesQuery = collection(db, `works/${workId}/stages`);
+    const stagesQuery = collection(db, `works/${workId}/schedule_stages`);
     const unsubscribeStages = onSnapshot(stagesQuery, (snap) => {
       const stgs = snap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
       stgs.sort((a, b) => (a.order || 0) - (b.order || 0));
       let total = 0, completed = 0, nextStage = '';
       stgs.forEach(s => {
         total++;
-        const allDone = s.tasks?.every((t: any) => t.isCompleted) && s.tasks?.length > 0;
+        const allDone = s.completed === true;
         if (allDone) completed++;
         else if (!nextStage) nextStage = s.name || s.title || '';
       });

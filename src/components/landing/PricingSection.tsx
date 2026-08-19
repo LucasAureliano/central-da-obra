@@ -9,11 +9,11 @@ interface PricingSectionProps {
 export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe }) => {
   const [billingCycle, setBillingCycle] = useState<'mensal' | 'anual'>('anual');
 
-  const starterMonthly = 29.90;
-  const starterYearly = 24.99; // (299.90 / 12)
+  const starterMonthly = 29.99;
+  const starterYearly = 23.99; // (287.90 / 12)
 
-  const proMonthly = 49.90;
-  const proYearly = 41.65; // (499.90 / 12)
+  const proMonthly = 49.99;
+  const proYearly = 39.99; // (479.90 / 12)
 
   const businessMonthly = 79.90;
   const businessYearly = 66.58; // (799.00 / 12)

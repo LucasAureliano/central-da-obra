@@ -33,6 +33,8 @@ const ProfessionalConnectDashboard = lazy(() => import('./components/connect/Pro
 const OwnerConnectDashboard = lazy(() => import('./components/connect/OwnerConnectDashboard').then(m => ({ default: m.OwnerConnectDashboard })));
 const PublicProfileView = lazy(() => import('./components/connect/public/PublicProfileView').then(m => ({ default: m.PublicProfileView })));
 const PublicPortfolioView = lazy(() => import('./components/connect/public/PublicPortfolioView').then(m => ({ default: m.PublicPortfolioView })));
+const PublicBlogView = lazy(() => import('./components/public/PublicBlogView').then(m => ({ default: m.PublicBlogView })));
+const PublicCalculatorView = lazy(() => import('./components/public/PublicCalculatorView').then(m => ({ default: m.PublicCalculatorView })));
 
 import { Finance } from './components/Finance';
 import { Shopping } from './components/Shopping';
@@ -123,6 +125,10 @@ function App() {
   const connectProfileId = urlParams.get('connect');
   const portfolioItemId = urlParams.get('portfolio');
   const isPreview = urlParams.get('preview');
+  const isBlog = urlParams.has('blog');
+  const blogPostId = urlParams.get('blog');
+  const isFreeCalculator = urlParams.has('calc');
+  const calcId = urlParams.get('calc');
 
   // Handle hash routes
   const [hash, setHash] = useState(window.location.hash);
@@ -198,7 +204,15 @@ function App() {
     return <PublicProfileView uid={connectProfileId} theme={theme} />;
   }
 
-  if (isPreview === 'true') {
+  if (isFreeCalculator) {
+      return <PublicCalculatorView theme={theme} calcId={calcId || 'concreto'} />;
+    }
+
+    if (isBlog) {
+      return <PublicBlogView theme={theme} postId={blogPostId && blogPostId !== 'true' ? blogPostId : null} />;
+    }
+
+    if (isPreview === 'true') {
     return <DashboardRouter onNavigate={() => {}} />;
   }
 

@@ -7,6 +7,7 @@ import { AuthModalProvider } from './contexts/AuthModalContext.tsx';
 import { WorksProvider } from './contexts/WorksContext.tsx';
 import { BuilderProvider } from './contexts/BuilderContext.tsx';
 import { SubscriptionProvider } from './contexts/SubscriptionContext.tsx';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Optional: register the PWA service worker automatically
 if ('serviceWorker' in navigator) {
@@ -20,16 +21,18 @@ if ('serviceWorker' in navigator) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <AuthModalProvider>
-        <WorksProvider>
-          <BuilderProvider>
-            <SubscriptionProvider>
-              <App />
-            </SubscriptionProvider>
-          </BuilderProvider>
-        </WorksProvider>
-      </AuthModalProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <AuthModalProvider>
+          <WorksProvider>
+            <BuilderProvider>
+              <SubscriptionProvider>
+                <App />
+              </SubscriptionProvider>
+            </BuilderProvider>
+          </WorksProvider>
+        </AuthModalProvider>
+      </AuthProvider>
+    </HelmetProvider>
   </StrictMode>,
 );

@@ -323,7 +323,9 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             { icon: <User size={20} />, label: 'Meu Perfil', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
             { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
-              ...(activeRole as string === 'service' ? [{ icon: <Wrench size={20} />, label: 'Alterar Tipo de Serviço', color: '#10B981', action: () => setShowSpecialtyModal(true) }] : []),
+              { icon: <Wrench size={20} />, label: 'Alterar Especialidade', color: '#10B981', action: () => setShowSpecialtyModal(true) },
+              
+              
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
             { icon: <Settings size={20} />, label: 'Ajustes do App', color: '#6B7280', action: () => onMenuSelect('Ajustes do App') },
           ]
@@ -586,7 +588,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           {showRoleModal && (
             <div style={{
               position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)',
+              backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)', fontFamily: 'Inter, sans-serif',
               zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: 20
             }}>
@@ -642,8 +644,79 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             </div>
           )}
         </AnimatePresence>,
-        document.body
-      )}
+          document.body
+        )}
+
+        {/* Specialty Change Modal */}
+        {typeof document !== 'undefined' && createPortal(
+          <AnimatePresence>
+            {showSpecialtyModal && (
+              <div style={{
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)', fontFamily: 'Inter, sans-serif',
+                zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 20
+              }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  style={{
+                    background: 'var(--bg-panel)', borderRadius: 24, padding: 32,
+                    maxWidth: 400, width: '100%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                    border: '1px solid var(--border-subtle)', position: 'relative'
+                  }}
+                >
+                  <button onClick={() => setShowSpecialtyModal(false)} style={{
+                    position: 'absolute', top: 16, right: 16, background: 'none', border: 'none',
+                    color: 'var(--text-muted)', cursor: 'pointer'
+                  }}>
+                    <X size={24} />
+                  </button>
+                  <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8, textAlign: 'center' }}>
+                    Qual a sua especialidade?
+                  </h2>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12, marginTop: 24 }}>
+                    {['Pedreiro', 'Eletricista', 'Encanador', 'Marceneiro', 'Pintor', 'Gesseiro', 'Mestre de Obras'].map(spec => (
+                      <button
+                        key={spec}
+                        onClick={async () => {
+                          setChangingSpecialty(true);
+                          try {
+                            if (user) {
+                              const { doc, updateDoc } = await import('firebase/firestore');
+                              const { db } = await import('../lib/firebase');
+                              await updateDoc(doc(db, 'users', user.uid), { specialty: spec });
+                            } else {
+                              localStorage.setItem('pendingSpecialty', spec);
+                            }
+                            window.location.reload();
+                          } catch(e) {
+                            console.error(e);
+                          } finally {
+                            setChangingSpecialty(false);
+                          }
+                        }}
+                        style={{
+                          padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 14,
+                          background: (profile as any)?.specialty === spec ? 'var(--color-primary)' : 'var(--bg-surface)',
+                          color: (profile as any)?.specialty === spec ? '#fff' : 'var(--text-main)',
+                          border: '1px solid var(--border-subtle)', cursor: changingSpecialty ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        disabled={changingSpecialty}
+                      >
+                        {spec}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+
 
     </div>
   );
