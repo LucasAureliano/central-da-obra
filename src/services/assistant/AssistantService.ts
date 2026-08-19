@@ -1,11 +1,6 @@
-// import { apiClient } from '../../api/apiClient';
-
 export interface AssistantQuery {
-  text: string;
-  contextData?: {
-    currentWorkId?: string;
-    role?: string;
-  };
+  messages: { role: 'user' | 'assistant'; content: string }[];
+  contextData?: any;
 }
 
 export interface AssistantResponse {
@@ -35,7 +30,8 @@ class AssistantService {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: query.text }]
+          messages: query.messages,
+          contextData: query.contextData
         })
       });
 
@@ -47,57 +43,12 @@ class AssistantService {
       
       return {
         answer: data.reply || 'Não foi possível obter uma resposta.',
-        suggestions: [
-          { label: 'Central de Cálculos', actionKey: 'calculos' },
-          { label: 'Novo Orçamento', actionKey: 'novo-orcamento' }
-        ]
+        suggestions: data.suggestions || []
       };
     } catch (err) {
-      console.warn('[AssistantService] Falha na API real, usando fallback mock.', err);
-      return this.mockResponse(query.text);
+      console.warn('[AssistantService] Falha na API real.', err);
+      throw err;
     }
-  }
-
-  private mockResponse(text: string): AssistantResponse {
-    const lowerText = text.toLowerCase();
-    
-    if (lowerText.includes('concreto')) {
-      return {
-        answer: "Entendi! Você quer calcular o traço de concreto ou materiais para fundação.",
-        suggestions: [
-          { label: 'Calcular Traço', actionKey: 'calculos', actionParam: 'concrete-mix' },
-          { label: 'Normas', actionKey: 'biblioteca-normas', actionParam: 'concreto' }
-        ]
-      };
-    }
-    
-    if (lowerText.includes('chuveiro') || lowerText.includes('elétrica')) {
-      return {
-        answer: "Instalações elétricas exigem atenção às normas (NBR 5410).",
-        suggestions: [
-          { label: 'Calculadora Elétrica', actionKey: 'calculos', actionParam: 'electrical' },
-          { label: 'Consultar NBR 5410', actionKey: 'biblioteca-normas', actionParam: 'eletrica' }
-        ]
-      };
-    }
-
-    if (lowerText.includes('infiltração')) {
-      return {
-        answer: "Infiltrações podem ser causadas por falha na impermeabilização ou vazamentos.",
-        suggestions: [
-          { label: 'Normas de Impermeabilização', actionKey: 'biblioteca-normas', actionParam: 'impermeabilizacao' },
-          { label: 'Materiais', actionKey: 'compras', actionParam: 'impermeabilizante' }
-        ]
-      };
-    }
-
-    return {
-      answer: "Como posso ajudar na sua obra hoje?",
-      suggestions: [
-        { label: 'Central de Cálculos', actionKey: 'calculos' },
-        { label: 'Novo Orçamento', actionKey: 'novo-orcamento' }
-      ]
-    };
   }
 }
 

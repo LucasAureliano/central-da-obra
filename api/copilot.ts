@@ -1,123 +1,188 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import OpenAI from 'openai';
 import { adminAuth, adminDb } from './_lib/firebase-admin.js';
-
+import { searchLeroyMerlin } from './_adapters/leroyMerlin.js';
+import { searchObramax } from './_adapters/obramax.js';
 import { z } from 'zod';
 
-// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Zod Schema to validate incoming payload and prevent Wallet Exhaustion Attacks
 const CopilotMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
-  content: z.string().min(1).max(2000) // max 2000 chars per message
+  content: z.string().max(2000)
 });
 
 const CopilotPayloadSchema = z.object({
-  messages: z.array(CopilotMessageSchema).min(1).max(20), // max 20 messages per request
-  userRole: z.string().optional()
+  messages: z.array(CopilotMessageSchema).min(1).max(30),
+  contextData: z.any().optional()
 });
 
-// System prompt tailored for Civil Engineering & Construction
-const getSystemPrompt = (role?: string) => {
-  const base = `Você é o Copilot da Obra, um assistente especializado em Engenharia Civil e Gestão de Obras para a plataforma CentralObra.\nSua missão é ajudar engenheiros, arquitetos, mestres de obras e proprietários a resolver problemas do dia a dia da obra, esclarecer dúvidas técnicas e oferecer melhores práticas.\nResponda sempre de forma clara, técnica quando necessário, e acessível.\nVocê não deve fornecer projetos estruturais para execução sem o carimbo de um engenheiro habilitado; ofereça orientações e aconselhe sempre a consulta de um RT (Responsável Técnico) para decisões críticas.`;
+const getSystemPrompt = (contextData?: any) => {
+  const role = contextData?.role;
+  const currentWork = contextData?.currentWork;
+
+  let base = `Você é o Copilot da Obra, um assistente especializado em Engenharia Civil e Gestão de Obras.\nSua missão é ajudar engenheiros, arquitetos, mestres de obras e proprietários a resolver problemas do dia a dia da obra, esclarecer dúvidas, dar previsões de custo de materiais e sugerir ações.`;
   
   if (role === 'engineer' || role === 'architect') {
-    return `${base}\n\nATENÇÃO: O usuário atual é um Engenheiro ou Arquiteto. Atue como seu mentor de engenharia, ajudando a revisar normas, cálculos avançados, dimensionamentos e compatibilização de projetos.`;
+    base += `\n\nATENÇÃO: O usuário atual é um Engenheiro/Arquiteto. Atue como seu mentor técnico, ajudando com normas, cálculos avançados e compatibilização.`;
+  } else if (role === 'builder') {
+    base += `\n\nATENÇÃO: O usuário atual é um Construtor/Empreiteiro. Auxilie com cronogramas, equipes, logística e custos no canteiro de obras.`;
+  } else if (role === 'owner') {
+    base += `\n\nATENÇÃO: O usuário atual é o Proprietário da Obra. Explique termos técnicos de forma simples e ajude a controlar o orçamento.`;
   }
-  if (role === 'builder') {
-    return `${base}\n\nATENÇÃO: O usuário atual é um Construtor/Empreiteiro. Atue como seu consultor de gestão de obras, auxiliando com cronogramas, equipes, logística de materiais e controle de custos no canteiro de obras.`;
+
+  if (currentWork) {
+    base += `\n\n[CONTEXTO DA OBRA ATUAL]
+Nome: ${currentWork.name}
+Progresso: ${currentWork.progress}%
+Orçamento Total: R$ ${currentWork.budget}
+Gasto até o momento: R$ ${currentWork.spent}
+Você pode usar esses dados para contextualizar suas respostas.`;
   }
-  if (role === 'owner') {
-    return `${base}\n\nATENÇÃO: O usuário atual é o Proprietário da Obra. Atue como seu consultor de obras residenciais e finanças, explicando termos técnicos de forma simples, ajudando a controlar o orçamento e garantindo transparência no progresso.`;
-  }
-  if (role === 'service') {
-    return `${base}\n\nATENÇÃO: O usuário atual é um Prestador de Serviços/Fornecedor. Atue como seu parceiro comercial e técnico, focando em elaboração de orçamentos precisos, fidelização de clientes e recomendações de materiais.`;
-  }
+
+  base += `\n\nVocê tem acesso a Ferramentas (Tools). Sempre que o usuário perguntar o preço de um material, USE a ferramenta 'buscar_preco_material'. 
+Sempre que você quiser sugerir um botão de atalho para o usuário clicar e navegar no aplicativo, USE a ferramenta 'sugerir_atalho'. Sugira atalhos ativamente para telas como: calculos, novo-orcamento, diario, obras, compras, tendencias. Não diga a ele para 'clicar no botão', apenas use a ferramenta e a interface cuidará do resto.
+Responda de forma clara e objetiva.`;
+
   return base;
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+// Define the tools for OpenAI
+const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+  {
+    type: "function",
+    function: {
+      name: "buscar_preco_material",
+      description: "Busca o preço médio de mercado de um material de construção em lojas reais (Leroy Merlin, Obramax).",
+      parameters: {
+        type: "object",
+        properties: {
+          material: { type: "string", description: "O nome do material. Ex: 'Cimento Votorantim 50kg'" }
+        },
+        required: ["material"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "sugerir_atalho",
+      description: "Adiciona um botão interativo na interface para o usuário navegar até a funcionalidade desejada.",
+      parameters: {
+        type: "object",
+        properties: {
+          label: { type: "string", description: "O texto do botão. Ex: 'Novo Orçamento'" },
+          actionKey: { type: "string", description: "A chave de navegação: 'calculos', 'novo-orcamento', 'diario', 'obras', 'compras', 'tendencias', 'financeiro'" }
+        },
+        required: ["label", "actionKey"],
+      },
+    },
   }
+];
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // 1. Validate Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const token = authHeader.split('Bearer ')[1];
-    let decodedToken;
-    
     if (adminAuth) {
-      try {
-        decodedToken = await adminAuth.verifyIdToken(token);
-      } catch (err) {
-        console.error('Invalid token', err);
-        return res.status(403).json({ error: 'Unauthorized: Invalid token' });
+      try { await adminAuth.verifyIdToken(token); } catch (err) {
+        return res.status(403).json({ error: 'Invalid token' });
       }
-    } else {
-      // Allow fallback for local testing if admin isn't properly configured (optional)
-      if (process.env.NODE_ENV !== 'development') {
-        return res.status(500).json({ error: 'Firebase Admin not initialized properly' });
-      }
-      console.warn('Firebase Admin not initialized, bypassing auth check in development');
     }
 
-    // 2. Extract and Validate messages from the body using Zod
     const validationResult = CopilotPayloadSchema.safeParse(req.body);
-    
     if (!validationResult.success) {
-      return res.status(400).json({ 
-        error: 'Bad Request: Invalid payload structure or size limit exceeded', 
-        details: validationResult.error.format() 
-      });
+      return res.status(400).json({ error: 'Bad Request', details: validationResult.error.format() });
     }
 
-    const { messages, userRole } = validationResult.data;
+    const { messages, contextData } = validationResult.data;
 
-    // 3. Prepare the conversation for OpenAI
-    const conversation = [
-      { role: 'system', content: getSystemPrompt(userRole) },
+    let conversation: any[] = [
+      { role: 'system', content: getSystemPrompt(contextData) },
       ...messages
     ];
 
-    // 4. Call OpenAI API
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ 
-        error: 'OpenAI API is not configured', 
-        message: 'Mock response: Configuração de IA ausente no backend.' 
-      });
+      return res.status(503).json({ error: 'OpenAI API is not configured', reply: 'Configuração de IA ausente.' });
     }
 
-    const completion = await openai.chat.completions.create({
+    // 1st API Call
+    let completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: conversation as any,
+      messages: conversation,
       temperature: 0.7,
-      max_tokens: 1000,
+      tools: tools,
+      tool_choice: "auto",
     });
 
-    const reply = completion.choices[0]?.message?.content || 'Não foi possível gerar uma resposta.';
+    let responseMessage = completion.choices[0].message;
+    const finalSuggestions: any[] = [];
 
-    // 5. Optional: Save query log in Firestore for analytics/history
-    if (adminDb && decodedToken) {
-      try {
-        await adminDb.collection('copilot_logs').add({
-          userId: decodedToken.uid,
-          prompt: messages[messages.length - 1]?.content,
-          timestamp: new Date(),
-        });
-      } catch (dbErr) {
-        console.error('Could not log copilot usage', dbErr);
+    // Process tool calls
+    if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
+      conversation.push(responseMessage); // append the assistant's tool calls
+      
+      for (const toolCall of responseMessage.tool_calls) {
+        if (toolCall.function.name === 'buscar_preco_material') {
+          const args = JSON.parse(toolCall.function.arguments);
+          try {
+            const [leroy, obramax] = await Promise.allSettled([
+              searchLeroyMerlin(args.material),
+              searchObramax(args.material)
+            ]);
+            let prices = [];
+            if (leroy.status === 'fulfilled' && leroy.value) prices.push(`Leroy Merlin: R$ ${leroy.value.price} (${leroy.value.link})`);
+            if (obramax.status === 'fulfilled' && obramax.value) prices.push(`Obramax: R$ ${obramax.value.price} (${obramax.value.link})`);
+            
+            const resultText = prices.length > 0 ? prices.join('\n') : "Material não encontrado no momento.";
+            
+            conversation.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: toolCall.function.name,
+              content: resultText,
+            });
+          } catch (e) {
+            conversation.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: toolCall.function.name,
+              content: "Erro ao buscar preço.",
+            });
+          }
+        } else if (toolCall.function.name === 'sugerir_atalho') {
+          const args = JSON.parse(toolCall.function.arguments);
+          finalSuggestions.push({ label: args.label, actionKey: args.actionKey });
+          
+          conversation.push({
+            tool_call_id: toolCall.id,
+            role: "tool",
+            name: toolCall.function.name,
+            content: "Atalho adicionado com sucesso na interface.",
+          });
+        }
       }
+
+      // 2nd API Call with tool results
+      completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: conversation,
+        temperature: 0.7,
+      });
+      responseMessage = completion.choices[0].message;
     }
 
-    return res.status(200).json({ reply });
+    const reply = responseMessage.content || 'Não foi possível gerar uma resposta.';
+
+    return res.status(200).json({ reply, suggestions: finalSuggestions });
 
   } catch (error) {
     console.error('Copilot API error:', error);
