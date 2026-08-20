@@ -5,9 +5,9 @@
  */
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { DashboardRouter } from './components/DashboardRouter';
-import { Works } from './components/Works';
-import { WorkDetails } from './components/WorkDetails';
+const DashboardRouter = lazy(() => import('./components/DashboardRouter').then(m => ({ default: m.DashboardRouter })));
+const Works = lazy(() => import('./components/Works').then(m => ({ default: m.Works })));
+const WorkDetails = lazy(() => import('./components/WorkDetails').then(m => ({ default: m.WorkDetails })));
 import { Menu as MenuIcon, Home, Briefcase, LogIn, X, Loader2 } from 'lucide-react';
 import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
@@ -17,8 +17,9 @@ import { Menu } from './components/Menu';
 import { InterstitialAd } from './components/shared/InterstitialAd';
 import { PlansUpsellPopup } from './components/shared/PlansUpsellPopup';
 
-import { Profile } from './components/Profile';
+const Profile = lazy(() => import('./components/Profile').then(m => ({ default: m.Profile })));
 import { Login } from './components/Login';
+import { NetworkStatus } from './components/ui/NetworkStatus';
 
 // Lazy loaded heavy components
 const CalculatorLibrary = lazy(() => import('./components/calculators_library/CalculatorLibrary').then(m => ({ default: m.CalculatorLibrary })));
@@ -36,8 +37,8 @@ const PublicPortfolioView = lazy(() => import('./components/connect/public/Publi
 const PublicBlogView = lazy(() => import('./components/public/PublicBlogView').then(m => ({ default: m.PublicBlogView })));
 const PublicCalculatorView = lazy(() => import('./components/public/PublicCalculatorView').then(m => ({ default: m.PublicCalculatorView })));
 
-import { Finance } from './components/Finance';
-import { Shopping } from './components/Shopping';
+const Finance = lazy(() => import('./components/Finance').then(m => ({ default: m.Finance })));
+const Shopping = lazy(() => import('./components/Shopping').then(m => ({ default: m.Shopping })));
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
 import { useAuth } from './contexts/AuthContext';
@@ -622,6 +623,8 @@ function App() {
 
   return (
     
+      <>
+      <NetworkStatus />
       <ConstructionIndexesProvider>
         <MapsProvider>
           <AssistantProvider>
@@ -652,7 +655,7 @@ function App() {
           </AssistantProvider>
         </MapsProvider>
       </ConstructionIndexesProvider>
-    
+    </>
   );
 }
 
