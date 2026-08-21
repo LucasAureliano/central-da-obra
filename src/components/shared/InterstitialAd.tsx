@@ -1,43 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { Capacitor } from '@capacitor/core';
+import { AdMobService } from '../../services/ads/AdMobService';
 
-export const InterstitialAd: React.FC = () => {
-  const { plan } = useSubscription();
+interface InterstitialAdProps {
+  onComplete?: () => void;
+  triggerId?: string;
+  probability?: number;
+}
+
+export const InterstitialAd: React.FC<InterstitialAdProps> = ({ onComplete, triggerId = 'default', probability = 0.2 }) => {
+  const { limits } = useSubscription();
   const [isVisible, setIsVisible] = useState(false);
-  const [canClose, setCanClose] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [canClose, setCanClose] = useState(false);
 
-  const isPaidPlan = plan && plan.monthlyPrice > 0 && !plan.id.includes('free');
-  const ADS_ENABLED = false; // Temporarily disabled while AdSense is in review
-
-  useEffect(() => {
-    if (isPaidPlan) return;
-    const initialTimer = setTimeout(() => {
-      triggerAd();
-    }, 180000); // 3 minutes
-    return () => clearTimeout(initialTimer);
-  }, [isPaidPlan]);
-
-  const triggerAd = () => {
-    if (isPaidPlan) return;
-    setIsVisible(true);
-    setCanClose(false);
-    setCountdown(5);
-  };
+  const shouldShowAds = limits?.hasAds ?? true;
 
   useEffect(() => {
-    if (isVisible && countdown > 0) {
+    if (!shouldShowAds) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const shouldShow = Math.random() <= probability;
+    
+    if (shouldShow) {
+      if (Capacitor.isNativePlatform()) {
+        AdMobService.showInterstitial().then(() => {
+          setTimeout(() => {
+            if (onComplete) onComplete();
+          }, 5000);
+        });
+      } else {
+        setIsVisible(true);
+      }
+    } else {
+      if (onComplete) onComplete();
+    }
+  }, [shouldShowAds, probability, triggerId]);
+
+  useEffect(() => {
+    if (isVisible && countdown > 0 && !Capacitor.isNativePlatform()) {
       const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (isVisible && countdown === 0) {
+    } else if (countdown === 0) {
       setCanClose(true);
+      if (onComplete) {
+        setTimeout(() => {
+            setIsVisible(false);
+            onComplete();
+        }, 1000);
+      }
     }
-  }, [isVisible, countdown]);
+  }, [isVisible, countdown, onComplete]);
 
   useEffect(() => {
-    if (isVisible && !isPaidPlan) {
+    if (isVisible && shouldShowAds && !Capacitor.isNativePlatform()) {
       try {
         const w = window as any;
         (w.adsbygoogle = w.adsbygoogle || []).push({});
@@ -45,17 +65,9 @@ export const InterstitialAd: React.FC = () => {
         console.error("AdSense error", e);
       }
     }
-  }, [isVisible, isPaidPlan]);
+  }, [isVisible, shouldShowAds]);
 
-  const handleClose = () => {
-    if (!canClose) return;
-    setIsVisible(false);
-    setTimeout(() => {
-      triggerAd();
-    }, 5 * 60000); // 5 minutes
-  };
-
-  if (isPaidPlan || !ADS_ENABLED) return null;
+  if (!isVisible || Capacitor.isNativePlatform()) return null;
 
   return (
     <AnimatePresence>
@@ -76,21 +88,18 @@ export const InterstitialAd: React.FC = () => {
             }}
           >
             <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', gap: 8 }}>
-              {!canClose ? (
+              {!canClose && (
                 <div style={{ background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '6px 12px', borderRadius: 20, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                   Fechando em {countdown}s
                 </div>
-              ) : (
-                
               )}
             </div>
 
             <div style={{ padding: '48px 16px 24px', minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {/* Google AdSense Unit */}
               <ins className="adsbygoogle"
-                   style={{ display: 'block', width: '100%' }}
+                   style={{ display: 'block', width: '100%', height: 250 }}
                    data-ad-client="ca-pub-5169145738145346"
-                   data-ad-slot="2786365840"
+                   data-ad-slot="9876543210"
                    data-ad-format="auto"
                    data-full-width-responsive="true"></ins>
             </div>

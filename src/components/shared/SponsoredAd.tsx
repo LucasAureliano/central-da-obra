@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { Capacitor } from '@capacitor/core';
+import { AdMobService } from '../../services/ads/AdMobService';
 
 interface SponsoredAdProps {
   probability?: number;
@@ -13,24 +14,27 @@ interface SponsoredAdProps {
 export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, className = '', location = 'feed' }) => {
   const { limits } = useSubscription();
   const [isVisible, setIsVisible] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
 
-  // Disable AdSense in native apps to prevent account ban
-  const shouldShowAds = (limits?.hasAds ?? true) ;
-  const ADS_ENABLED = true;
+  const shouldShowAds = limits?.hasAds ?? true;
 
   useEffect(() => {
-    if (!shouldShowAds || isDismissed) {
+    if (!shouldShowAds) {
       setIsVisible(false);
       return;
     }
+    
+    if (Capacitor.isNativePlatform()) {
+      AdMobService.showBanner();
+      setIsVisible(false);
+      return;
+    }
+
     const shouldShow = Math.random() <= probability;
     setIsVisible(shouldShow);
-  }, [shouldShowAds, isDismissed, probability]);
+  }, [shouldShowAds, probability]);
 
-  // Inject AdSense when visible
   useEffect(() => {
-    if (isVisible && shouldShowAds) {
+    if (isVisible && shouldShowAds && !Capacitor.isNativePlatform()) {
       try {
         const w = window as any;
         (w.adsbygoogle = w.adsbygoogle || []).push({});
@@ -40,12 +44,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
     }
   }, [isVisible, shouldShowAds]);
 
-  if (!isVisible || !shouldShowAds || !ADS_ENABLED) return null;
-
-  const handleDismiss = () => {
-    setIsDismissed(true);
-    setIsVisible(false);
-  };
+  if (!isVisible || !shouldShowAds || Capacitor.isNativePlatform()) return null;
 
   return (
     <AnimatePresence>
@@ -54,7 +53,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
           initial={{ opacity: 0, y: 10, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95, height: 0, margin: 0, overflow: 'hidden' }}
-          className={`sponsored-ad-card ${className}`}
+          className={\sponsored-ad-card \\}
           style={{
             position: 'relative',
             background: 'var(--bg-panel)',
@@ -74,17 +73,15 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
               </div>
               <Star size={12} style={{ color: '#F59E0B' }} fill="#F59E0B" />
             </div>
-            
           </div>
 
-          <div style={{ width: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-            {/* Google AdSense Unit */}
+          <div style={{ minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-surface)', borderRadius: 8, overflow: 'hidden' }}>
             <ins className="adsbygoogle"
-                 style={{ display: 'block', width: '100%' }}
-                 data-ad-client="ca-pub-5169145738145346"
-                 data-ad-slot="2786365840"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
+                style={{ display: 'block', width: '100%', height: 90 }}
+                data-ad-client="ca-pub-5169145738145346"
+                data-ad-slot="1234567890"
+                data-ad-format="horizontal"
+                data-full-width-responsive="true"></ins>
           </div>
         </motion.div>
       )}
