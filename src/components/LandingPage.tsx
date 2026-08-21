@@ -110,6 +110,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
           <div className="nav-center mobile-hidden">
             <a href="#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
             <a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
+            <a href="/?calculadoras=true" className="landing-nav-link animated-link">Calculadoras Grátis</a>
             <a href="#planos" onClick={(e) => handleScrollTo(e, 'planos')} className="landing-nav-link animated-link">Planos</a>
             <a href="#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
           </div>
@@ -130,6 +131,14 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       
       <div id="perfis">
         <ProfilesSection />
+      </div>
+      
+      <div id="calculadoras" style={{ padding: '60px 20px', backgroundColor: 'var(--bg-surface)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Precisando calcular materiais?</h2>
+        <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 32px' }}>Acesse nossa biblioteca com dezenas de calculadoras gratuitas para estimar cimento, tijolos, tintas e pisos com precisão milimétrica.</p>
+        <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', padding: '16px 32px', fontSize: 18, textDecoration: 'none' }}>
+          Acessar Calculadoras Grátis
+        </a>
       </div>
       
       <div id="recursos">

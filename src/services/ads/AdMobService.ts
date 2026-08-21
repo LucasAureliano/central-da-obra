@@ -1,4 +1,5 @@
-import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, AdmobConsentStatus } from '@capacitor-community/admob';
+import { AdMob, BannerAdSize, BannerAdPosition, AdmobConsentStatus } from '@capacitor-community/admob';
+import type { BannerAdOptions } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 
 export class AdMobService {
@@ -9,8 +10,7 @@ export class AdMobService {
     
     try {
       await AdMob.initialize({
-        requestTrackingAuthorization: true,
-        initializeForTesting: process.env.NODE_ENV !== 'production',
+        initializeForTesting: import.meta.env.DEV,
       });
       
       const consentInfo = await AdMob.requestConsentInfo();
@@ -29,12 +29,11 @@ export class AdMobService {
 
     try {
       const options: BannerAdOptions = {
-        // REPLACE THESE WITH REAL ADMOB UNIT IDS (These are test IDs)
         adId: Capacitor.getPlatform() === 'ios' ? 'ca-app-pub-3940256099942544/2934735716' : 'ca-app-pub-3940256099942544/6300978111',
         adSize: BannerAdSize.BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
-        isTesting: process.env.NODE_ENV !== 'production'
+        isTesting: import.meta.env.DEV
       };
       await AdMob.showBanner(options);
     } catch (e) {
@@ -57,9 +56,8 @@ export class AdMobService {
 
     try {
       const options = {
-        // REPLACE THESE WITH REAL ADMOB UNIT IDS
         adId: Capacitor.getPlatform() === 'ios' ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-3940256099942544/1033173712',
-        isTesting: process.env.NODE_ENV !== 'production'
+        isTesting: import.meta.env.DEV
       };
       await AdMob.prepareInterstitial(options);
       await AdMob.showInterstitial();

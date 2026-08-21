@@ -53,7 +53,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
           initial={{ opacity: 0, y: 10, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95, height: 0, margin: 0, overflow: 'hidden' }}
-          className={\sponsored-ad-card \\}
+          className={"sponsored-ad-card " + className}
           style={{
             position: 'relative',
             background: 'var(--bg-panel)',
@@ -76,12 +76,19 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
           </div>
 
           <div style={{ minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-surface)', borderRadius: 8, overflow: 'hidden' }}>
-            <ins className="adsbygoogle"
-                style={{ display: 'block', width: '100%', height: 90 }}
-                data-ad-client="ca-pub-5169145738145346"
-                data-ad-slot="1234567890"
-                data-ad-format="horizontal"
-                data-full-width-responsive="true"></ins>
+            {import.meta.env.DEV ? (
+              <div style={{ padding: 20, color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', width: '100%', border: '1px dashed var(--border-subtle)' }}>
+                [Mock de Anúncio AdSense Web]<br/>
+                Na produção, este espaço será preenchido automaticamente pelo Google AdSense.
+              </div>
+            ) : (
+              <ins className="adsbygoogle"
+                  style={{ display: 'block', width: '100%', height: 90 }}
+                  data-ad-client="ca-pub-5169145738145346"
+                  data-ad-slot="1234567890"
+                  data-ad-format="horizontal"
+                  data-full-width-responsive="true"></ins>
+            )}
           </div>
         </motion.div>
       )}

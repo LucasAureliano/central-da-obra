@@ -16,6 +16,7 @@ import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
 import { Menu } from './components/Menu';
 import { InterstitialAd } from './components/shared/InterstitialAd';
 import { PlansUpsellPopup } from './components/shared/PlansUpsellPopup';
+import { AdMobService } from './services/ads/AdMobService';
 
 const Profile = lazy(() => import('./components/Profile').then(m => ({ default: m.Profile })));
 import { Login } from './components/Login';
