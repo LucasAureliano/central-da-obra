@@ -76,19 +76,12 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
           </div>
 
           <div style={{ minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-surface)', borderRadius: 8, overflow: 'hidden' }}>
-            {import.meta.env.DEV ? (
-              <div style={{ padding: 20, color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', width: '100%', border: '1px dashed var(--border-subtle)' }}>
-                [Mock de Anúncio AdSense Web]<br/>
-                Na produção, este espaço será preenchido automaticamente pelo Google AdSense.
-              </div>
-            ) : (
-              <ins className="adsbygoogle"
-                  style={{ display: 'block', width: '100%', height: 90 }}
-                  data-ad-client="ca-pub-5169145738145346"
-                  data-ad-slot="1234567890"
-                  data-ad-format="horizontal"
-                  data-full-width-responsive="true"></ins>
-            )}
+            <ins className="adsbygoogle"
+                 style={{ display: 'block', width: '100%', height: 90 }}
+                 data-ad-client="ca-pub-5169145738145346"
+                 data-ad-slot="1234567890"
+                 data-ad-format="horizontal"
+                 data-full-width-responsive="true"></ins>
           </div>
         </motion.div>
       )}

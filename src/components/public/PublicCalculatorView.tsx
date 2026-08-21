@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Calculator, ArrowRight, Lock, HardHat } from 'lucide-react';
-import { FloorTileCalc as TileCalc } from '../calculators_library/FloorTileCalc'; // Using existing calc
+import { ArrowRight, Lock } from 'lucide-react';
+import { FloorTileCalc as TileCalc } from '../calculators_library/FloorTileCalc';
 import { ConcreteMixCalc as ConcreteVolumeCalc } from '../calculators_library/ConcreteMixCalc';
 import { WallPaintCalc as PaintCalc } from '../calculators_library/WallPaintCalc';
+import { SponsoredAd } from '../shared/SponsoredAd';
 
 export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId: string }) {
-  
   const getCalcData = () => {
     switch(calcId) {
       case 'concreto': return { title: 'Calculadora de Concreto Grátis', component: <ConcreteVolumeCalc onBack={() => window.location.href = '/'} /> };
@@ -18,52 +18,23 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
   const { title, component } = getCalcData();
 
   return (
-    <div className="app-container" data-theme={theme} style={{ minHeight: '100vh', paddingBottom: 80, backgroundColor: 'var(--bg-main)' }}>
+    <div className="app-container" data-theme={theme} style={{ minHeight: '100vh', backgroundColor: 'var(--bg-main)', display: 'flex', flexDirection: 'column' }}>
       <Helmet>
         <title>{title} | CentralObra</title>
-        <meta name="description" content={`Use nossa ${title} sem precisar de cadastro. Calcule exatamente a quantidade de material que você precisa para sua obra, evitando desperdício.`} />
-        <meta property="og:title" content={`${title} | CentralObra`} />
-        <meta property="og:description" content="Pare de desperdiçar material na sua obra! Use a calculadora exata do CentralObra." />
+        <meta name="description" content={`Use nossa ${title} sem precisar de cadastro. Calcule a quantidade exata de material para evitar desperdício.`} />
       </Helmet>
 
-      {/* Header */}
-      <header style={{ 
-        padding: '24px 20px', 
-        background: 'linear-gradient(135deg, var(--color-primary), #8B5CF6)',
-        borderBottomLeftRadius: 32,
-        borderBottomRightRadius: 32,
-        marginBottom: 24,
-        boxShadow: '0 10px 30px -10px rgba(139, 92, 246, 0.4)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Calculator size={20} color="#FFF" />
-          </div>
-          <div>
-            <h1 style={{ fontSize: 20, fontWeight: 800, color: '#FFF', margin: 0 }}>Ferramenta Gratuita</h1>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', margin: 0 }}>CentralObra</p>
-          </div>
-        </div>
-        <p style={{ color: '#FFF', fontSize: 15, fontWeight: 500, lineHeight: 1.4 }}>
-          Descubra a quantidade exata de material para evitar desperdícios e compras desnecessárias.
-        </p>
-      </header>
+      <div style={{ padding: '16px 16px 0', maxWidth: 768, margin: '0 auto', width: '100%' }}>
+        <SponsoredAd probability={1} location="calc_top" />
+      </div>
 
-      {/* Calculator Body */}
-      <main style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div className="glass-panel" style={{ padding: 20, borderRadius: 24, border: '2px solid var(--color-primary-alpha)' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <HardHat size={20} color="var(--color-primary)" /> {title}
-          </h2>
-          
-          <div style={{ margin: '0 -16px' }}>
-            {component}
-          </div>
+      <main style={{ position: 'relative', width: '100%', maxWidth: 768, margin: '0 auto', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ position: 'relative', flex: 1, minHeight: 'calc(100vh - 200px)' }}>
+          {component}
         </div>
 
-        {/* Lead Magnet Call To Action */}
         <div style={{ 
-          padding: 24, borderRadius: 24, 
+          margin: '24px 16px', padding: 24, borderRadius: 24, 
           background: 'linear-gradient(145deg, var(--bg-panel) 0%, var(--bg-elevated) 100%)',
           border: '1px solid var(--border-subtle)',
           textAlign: 'center'
@@ -71,19 +42,15 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
           <div style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <Lock size={32} color="var(--color-primary)" />
           </div>
-          <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>
-            Mais de 80 Calculadoras
-          </h3>
-          <p style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.5 }}>
-            Acesse calculadoras de Tijolos, Argamassa, Ferragens, Fundação, Telhado e Inteligência Artificial para analisar sua obra completa.
-          </p>
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="btn-primary"
-            style={{ width: '100%', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-          >
+          <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 12 }}>Mais de 80 Calculadoras</h3>
+          <p style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.5 }}>Acesse calculadoras de Tijolos, Argamassa, Ferragens, Fundação, Telhado e Inteligência Artificial para analisar sua obra completa.</p>
+          <button onClick={() => window.location.href = '/'} className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, fontSize: 16, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             Criar Conta Grátis <ArrowRight size={20} />
           </button>
+        </div>
+        
+        <div style={{ padding: '0 16px 24px', maxWidth: 768, margin: '0 auto', width: '100%' }}>
+          <SponsoredAd probability={1} location="calc_bottom" />
         </div>
       </main>
     </div>

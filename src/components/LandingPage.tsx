@@ -110,7 +110,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
           <div className="nav-center mobile-hidden">
             <a href="#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
             <a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
-            <a href="/?calculadoras=true" className="landing-nav-link animated-link">Calculadoras Grátis</a>
+            <a href="/?calculadoras=true" className="landing-nav-link animated-link">Calculadoras</a>
             <a href="#planos" onClick={(e) => handleScrollTo(e, 'planos')} className="landing-nav-link animated-link">Planos</a>
             <a href="#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
           </div>
@@ -135,9 +135,29 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       
       <div id="calculadoras" style={{ padding: '60px 20px', backgroundColor: 'var(--bg-surface)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
         <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Precisando calcular materiais?</h2>
-        <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 32px' }}>Acesse nossa biblioteca com dezenas de calculadoras gratuitas para estimar cimento, tijolos, tintas e pisos com precisão milimétrica.</p>
+        <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 48px' }}>Acesse nossa biblioteca com dezenas de calculadoras gratuitas para estimar cimento, tijolos, tintas e pisos com precisão milimétrica.</p>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, maxWidth: 960, margin: '0 auto 48px', textAlign: 'left' }}>
+          <a href="/?calc=concreto" className="feature-card" style={{ textDecoration: 'none', background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Concreto</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Calcule areia, brita, água e cimento.</p>
+          </a>
+          <a href="/?calc=pisos" className="feature-card" style={{ textDecoration: 'none', background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Pisos e Revestimentos</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>M² de piso e argamassa exatos.</p>
+          </a>
+          <a href="/?calc=tinta" className="feature-card" style={{ textDecoration: 'none', background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Tinta</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Galões de tinta para suas paredes.</p>
+          </a>
+          <div className="feature-card" style={{ opacity: 0.6, background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px dashed var(--border-subtle)' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Alvenaria (Em Breve)</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Cálculo de tijolos e argamassa.</p>
+          </div>
+        </div>
+
         <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', padding: '16px 32px', fontSize: 18, textDecoration: 'none' }}>
-          Acessar Calculadoras Grátis
+          Acessar Hub Completo
         </a>
       </div>
       
