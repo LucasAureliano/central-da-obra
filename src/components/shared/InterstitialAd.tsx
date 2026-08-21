@@ -81,9 +81,7 @@ export const InterstitialAd: React.FC = () => {
                   Fechando em {countdown}s
                 </div>
               ) : (
-                <button onClick={handleClose} style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', width: 36, height: 36, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <X size={20} />
-                </button>
+                
               )}
             </div>
 

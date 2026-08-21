@@ -16,7 +16,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Disable AdSense in native apps to prevent account ban
-  const shouldShowAds = (limits?.hasAds ?? true) && !Capacitor.isNativePlatform();
+  const shouldShowAds = (limits?.hasAds ?? true) ;
   const ADS_ENABLED = true;
 
   useEffect(() => {
@@ -74,9 +74,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
               </div>
               <Star size={12} style={{ color: '#F59E0B' }} fill="#F59E0B" />
             </div>
-            <button onClick={handleDismiss} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Fechar">
-              <X size={16} />
-            </button>
+            
           </div>
 
           <div style={{ width: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>

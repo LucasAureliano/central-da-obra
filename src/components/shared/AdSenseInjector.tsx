@@ -8,7 +8,7 @@ export const AdSenseInjector: React.FC = () => {
   useEffect(() => {
     // Only inject if it's a free plan or hasAds is explicitly true
     // AND if we are NOT on a native mobile app to avoid Google bans
-    const shouldShowAds = (limits?.hasAds ?? true) && !Capacitor.isNativePlatform();
+    const shouldShowAds = (limits?.hasAds ?? true) ;
 
     if (shouldShowAds) {
       const existingScript = document.querySelector('script[src*="pagead2.googlesyndication.com"]');
