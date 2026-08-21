@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { SponsoredAd } from '../shared/SponsoredAd';
 import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
@@ -177,7 +177,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
       <motion.div variants={itemVariants} style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-            OlÃ¡, {profile?.name || 'Profissional'}
+            Olá, {(profile as any)?.displayName || user?.displayName || 'Profissional'} - {profile?.role === 'architect' ? 'Arquiteto' : 'Engenheiro'}
           </h1>
           <p style={{ fontSize: 16, color: 'var(--text-muted)', marginTop: 4 }}>
             {profile?.role === 'architect' ? 'Painel de Arquitetura & Projetos' : 'Painel de Engenharia & ExecuÃ§Ã£o'}

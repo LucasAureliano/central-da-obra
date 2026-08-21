@@ -161,7 +161,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B' }}>Prestador de Serviços</span>
                 <span style={{ fontSize: 10, backgroundColor: 'rgba(245, 158, 11, 0.2)', color: '#F59E0B', padding: '1px 6px', borderRadius: 6, fontWeight: 800 }}>
-                  Conta Pro
+                  {profile?.plan === 'pro' ? 'Conta Pro' : profile?.plan === 'business' ? 'Conta Business' : 'Conta Grátis'}
                 </span>
               </div>
             </div>
@@ -359,6 +359,7 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
           title: 'Configurações',
           items: [
             { icon: <User size={20} />, label: 'Perfil Profissional', color: '#6B7280', action: () => onMenuSelect('Meu Perfil') },
+            { icon: <Wrench size={20} />, label: 'Alterar Especialidade', color: '#10B981', action: () => setShowSpecialtyModal(true) },
             { icon: <Crown size={20} />, label: 'Meu Plano', color: '#F59E0B', action: () => onMenuSelect('planos') },
             { icon: <Shield size={20} />, label: 'Alterar Perfil de Uso', color: '#3B82F6', action: () => setShowRoleModal(true) },
             { icon: theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />, label: theme === 'dark' ? 'Modo Claro' : 'Modo Escuro', color: '#6B7280', action: onToggleTheme },
@@ -676,8 +677,8 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
                   <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8, textAlign: 'center' }}>
                     Qual a sua especialidade?
                   </h2>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12, marginTop: 24 }}>
-                    {['Pedreiro', 'Eletricista', 'Encanador', 'Marceneiro', 'Pintor', 'Gesseiro', 'Mestre de Obras'].map(spec => (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12, marginTop: 24, maxHeight: '60vh', overflowY: 'auto' }}>
+                    {['Pedreiro', 'Pintor', 'Eletricista', 'Encanador', 'Gesseiro', 'Marceneiro', 'Azulejista', 'Mestre de Obras', 'Carpinteiro', 'Serralheiro', 'Telhadista', 'Drywall', 'Piso Laminado', 'Piso Vinílico', 'Outro'].map(spec => (
                       <button
                         key={spec}
                         onClick={async () => {

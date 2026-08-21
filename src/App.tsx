@@ -35,12 +35,14 @@ const OwnerConnectDashboard = lazy(() => import('./components/connect/OwnerConne
 const PublicProfileView = lazy(() => import('./components/connect/public/PublicProfileView').then(m => ({ default: m.PublicProfileView })));
 const PublicPortfolioView = lazy(() => import('./components/connect/public/PublicPortfolioView').then(m => ({ default: m.PublicPortfolioView })));
 const PublicBlogView = lazy(() => import('./components/public/PublicBlogView').then(m => ({ default: m.PublicBlogView })));
+const PublicCalculatorsHubView = lazy(() => import('./components/public/PublicCalculatorsHubView').then(m => ({ default: m.PublicCalculatorsHubView })));
 const PublicCalculatorView = lazy(() => import('./components/public/PublicCalculatorView').then(m => ({ default: m.PublicCalculatorView })));
 
 const Finance = lazy(() => import('./components/Finance').then(m => ({ default: m.Finance })));
 const Shopping = lazy(() => import('./components/Shopping').then(m => ({ default: m.Shopping })));
 import { Register } from './components/Register';
 import { RoleSelection } from './components/RoleSelection';
+import { NamePromptModal } from './components/ui/NamePromptModal';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { useWorks } from './contexts/WorksContext';
@@ -128,6 +130,7 @@ function App() {
   const isPreview = urlParams.get('preview');
   const isBlog = urlParams.has('blog');
   const blogPostId = urlParams.get('blog');
+  const isCalculatorsHub = urlParams.has('calculadoras');
   const isFreeCalculator = urlParams.has('calc');
   const calcId = urlParams.get('calc');
 
@@ -226,6 +229,43 @@ function App() {
     return <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-base)' }} />;
   }
 
+  // PUBLIC CALCULATORS HUB (No auth required)
+  if (isCalculatorsHub) {
+    return (
+      <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--bg-base)' }} />}>
+        <PublicCalculatorsHubView theme={theme} />
+        <AnimatePresence>
+          {showAuthModal && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+              zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                style={{ width: '100%', height: '100%', maxWidth: 500, position: 'relative', overflowY: 'auto' }}
+              >
+                <button 
+                  onClick={closeAuthModal}
+                  style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', cursor: 'pointer' }}
+                >
+                  <X size={20} />
+                </button>
+                {authView === 'login' ? (
+                  <Login onGoToRegister={() => setAuthView('register')} theme={theme} />
+                ) : (
+                  <Register onGoToLogin={() => setAuthView('login')} theme={theme} />
+                )}
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </Suspense>
+    );
+  }
+
   // PRE-AUTH FLOW
   if (!user && !isGuest) {
     return (
@@ -301,6 +341,11 @@ function App() {
           }} 
         />
       );
+    }
+    
+    // Check if the user needs to provide a name (only for non-guests)
+    if (!isGuest && !(profile as any).displayName && !user.displayName) {
+      return <NamePromptModal />;
     }
   }
 

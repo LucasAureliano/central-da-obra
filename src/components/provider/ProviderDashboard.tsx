@@ -167,9 +167,6 @@ export function ProviderDashboard({ onNavigate }: { onNavigate: (page: string) =
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Bem-vindo ao seu painel.</span>
-            <span style={{ fontSize: 11, padding: '2px 8px', background: 'var(--color-primary-alpha)', color: 'var(--color-primary)', borderRadius: 12, fontWeight: 800 }}>
-              {(profile as any)?.specialty || localStorage.getItem('pendingSpecialty') || 'Prestador de Serviço'}
-            </span>
           </div>
         </div>
       </div>

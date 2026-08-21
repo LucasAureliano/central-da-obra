@@ -434,14 +434,17 @@ export async function generateCommercialQuotePDF({
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(17, 24, 39);
-  const prestadorName = profile?.companyName || profile?.name || 'CentralObra Pro';
-  doc.text(prestadorName, centerX, currentY, { align: 'center' });
-  
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(107, 114, 128);
-  
-  let prestadorInfo: string[] = [];
+    const prestadorName = profile?.companyName || profile?.displayName || profile?.name || 'Profissional';
+    
+    let prestadorInfo: string[] = [];
+    const specialtyInfo = profile?.specialty || localStorage.getItem('pendingSpecialty');
+    if (specialtyInfo) prestadorInfo.push(`Especialidade: ${specialtyInfo}`);
+    
+    doc.text(prestadorName, centerX, currentY, { align: 'center' });
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(107, 114, 128);
   if (profile?.documentNumber) prestadorInfo.push(`CPF/CNPJ: ${profile.documentNumber}`);
   if (profile?.registry) prestadorInfo.push(`Reg: ${profile.registry}`);
   if (profile?.whatsapp || profile?.phone) prestadorInfo.push(`Tel/Whats: ${profile.whatsapp || profile.phone}`);

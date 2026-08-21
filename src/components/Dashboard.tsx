@@ -214,6 +214,17 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         </motion.div>
       ) : (
         <>
+          <motion.div variants={itemVariants} style={{ marginBottom: 32 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.5px' }}>
+              Olá, {(profile as any)?.displayName || '' || 'Usuário'}
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: 15, marginTop: 4 }}>Acompanhe o andamento das suas obras e tarefas.</p>
+          </motion.div>
+
+          <div style={{ paddingBottom: 24 }}>
+            <SponsoredAd probability={1} location='dashboard_feed' />
+          </div>
+
           {/* Hero Card for Active Work */}
           {activeWork && (
             <motion.div variants={itemVariants} style={{ marginBottom: 32 }}>
