@@ -56,8 +56,11 @@ export const InterstitialAd: React.FC<InterstitialAdProps> = ({ onComplete, trig
     }
   }, [isVisible, countdown, onComplete]);
 
+  const AD_SLOT = "9876543210"; // TODO: Replace with real AdSense slot ID
+  const isDummySlot = AD_SLOT === "9876543210";
+
   useEffect(() => {
-    if (isVisible && shouldShowAds && !Capacitor.isNativePlatform()) {
+    if (isVisible && shouldShowAds && !Capacitor.isNativePlatform() && !isDummySlot) {
       try {
         const w = window as any;
         (w.adsbygoogle = w.adsbygoogle || []).push({});
@@ -65,7 +68,7 @@ export const InterstitialAd: React.FC<InterstitialAdProps> = ({ onComplete, trig
         console.error("AdSense error", e);
       }
     }
-  }, [isVisible, shouldShowAds]);
+  }, [isVisible, shouldShowAds, isDummySlot]);
 
   if (!isVisible || Capacitor.isNativePlatform()) return null;
 
@@ -96,12 +99,19 @@ export const InterstitialAd: React.FC<InterstitialAdProps> = ({ onComplete, trig
             </div>
 
             <div style={{ padding: '48px 16px 24px', minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ins className="adsbygoogle"
+              {isDummySlot ? (
+                 <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                   <p style={{ margin: 0, fontWeight: 600 }}>Anúncio Intersticial</p>
+                   <p style={{ margin: 0, opacity: 0.7, fontSize: 14 }}>Insira seu data-ad-slot real</p>
+                 </div>
+              ) : (
+                 <ins className="adsbygoogle"
                    style={{ display: 'block', width: '100%', height: 250 }}
                    data-ad-client="ca-pub-5169145738145346"
-                   data-ad-slot="9876543210"
+                   data-ad-slot={AD_SLOT}
                    data-ad-format="auto"
                    data-full-width-responsive="true"></ins>
+              )}
             </div>
           </motion.div>
         </div>

@@ -32,7 +32,7 @@ export function GlobalHeader({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="mobile-header glass-panel"
-        style={{ display: 'flex', padding: 'env(safe-area-inset-top, 0px) 20px 0 20px', height: 'calc(72px + env(safe-area-inset-top, 0px))', zIndex: 40 }}
+        style={{ padding: 'env(safe-area-inset-top, 0px) 20px 0 20px', height: 'calc(72px + env(safe-area-inset-top, 0px))', zIndex: 40 }}
       >
         <motion.div 
           style={{ display: 'flex', alignItems: 'center', flex: 1, cursor: 'pointer' }} 

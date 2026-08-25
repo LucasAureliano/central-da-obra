@@ -33,8 +33,11 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
     setIsVisible(shouldShow);
   }, [shouldShowAds, probability]);
 
+  const AD_SLOT = "1234567890"; // TODO: Replace with your real AdSense Slot ID
+  const isDummySlot = AD_SLOT === "1234567890";
+
   useEffect(() => {
-    if (isVisible && shouldShowAds && !Capacitor.isNativePlatform()) {
+    if (isVisible && shouldShowAds && !Capacitor.isNativePlatform() && !isDummySlot) {
       try {
         const w = window as any;
         (w.adsbygoogle = w.adsbygoogle || []).push({});
@@ -42,7 +45,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
         console.error("AdSense error", e);
       }
     }
-  }, [isVisible, shouldShowAds]);
+  }, [isVisible, shouldShowAds, isDummySlot]);
 
   if (!isVisible || !shouldShowAds || Capacitor.isNativePlatform()) return null;
 
@@ -76,12 +79,19 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
           </div>
 
           <div style={{ minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-surface)', borderRadius: 8, overflow: 'hidden' }}>
-            <ins className="adsbygoogle"
+            {isDummySlot ? (
+               <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+                 <p style={{ margin: 0, fontWeight: 600 }}>Bloco de Anúncio</p>
+                 <p style={{ margin: 0, opacity: 0.7 }}>Insira seu data-ad-slot real para exibir anúncios</p>
+               </div>
+            ) : (
+               <ins className="adsbygoogle"
                  style={{ display: 'block', width: '100%', height: 90 }}
                  data-ad-client="ca-pub-5169145738145346"
-                 data-ad-slot="1234567890"
+                 data-ad-slot={AD_SLOT}
                  data-ad-format="horizontal"
                  data-full-width-responsive="true"></ins>
+            )}
           </div>
         </motion.div>
       )}
