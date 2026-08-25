@@ -154,6 +154,10 @@ function App() {
     }
   }, [user, isGuest, showAuthModal, closeAuthModal]);
 
+  useEffect(() => {
+    AdMobService.initialize();
+  }, []);
+
   if (hash.startsWith('#/avaliar/')) {
     const providerId = hash.split('#/avaliar/')[1];
     if (providerId) {

@@ -18,11 +18,35 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
   const { title, component } = getCalcData();
 
   return (
-    <div className="app-container" data-theme={theme} style={{ minHeight: '100vh', backgroundColor: 'var(--bg-main)', display: 'flex', flexDirection: 'column' }}>
+    <div data-theme={theme} style={{ minHeight: '100vh', backgroundColor: 'var(--bg-base)', display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
       <Helmet>
         <title>{title} | CentralObra</title>
         <meta name="description" content={`Use nossa ${title} sem precisar de cadastro. Calcule a quantidade exata de material para evitar desperdício.`} />
       </Helmet>
+
+      <header style={{ 
+        padding: '12px 20px', 
+        background: 'var(--bg-surface)',
+        borderBottom: '1px solid var(--border-subtle)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <a href="/?calculadoras=true" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', fontSize: 14, fontWeight: 600 }}>
+          ← Calculadoras
+        </a>
+        <a href="/" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>
+          CentralObra
+        </a>
+        <button onClick={() => window.location.href = '/'} className="btn-primary" style={{ padding: '8px 14px', fontSize: 13, borderRadius: 8 }}>
+          Cadastrar Grátis
+        </button>
+      </header>
 
       <div style={{ padding: '16px 16px 0', maxWidth: 768, margin: '0 auto', width: '100%' }}>
         <SponsoredAd probability={1} location="calc_top" />
