@@ -1,5 +1,6 @@
 import React from 'react';
 import { Logo } from '../ui/Logo';
+import { ThemeToggle } from '../ThemeToggle';
 
 interface LandingNavbarProps {
   theme: 'light' | 'dark';
@@ -22,10 +23,18 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
   return (
     <nav className={`landing-navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="landing-nav-container">
-        <div className="nav-left">
+        <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <a href="/" className="logo-link">
             <Logo variant="horizontal" theme={theme} />
           </a>
+          <div className="desktop-only">
+             <ThemeToggle theme={theme} toggleTheme={() => {
+                const newTheme = theme === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                window.dispatchEvent(new Event('storage'));
+             }} />
+          </div>
         </div>
         
         <div className="nav-center mobile-hidden">
