@@ -1,6 +1,6 @@
 import React from 'react';
 import { Logo } from '../ui/Logo';
-import { ThemeToggle } from '../ThemeToggle';
+import { Sun, Moon } from 'lucide-react';
 
 interface LandingNavbarProps {
   theme: 'light' | 'dark';
@@ -28,12 +28,14 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
             <Logo variant="horizontal" theme={theme} />
           </a>
           <div className="desktop-only">
-             <ThemeToggle theme={theme} toggleTheme={() => {
+             <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)' }} onClick={() => {
                 const newTheme = theme === 'light' ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
                 window.dispatchEvent(new Event('storage'));
-             }} />
+             }}>
+               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+             </button>
           </div>
         </div>
         
@@ -51,12 +53,14 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
         </div>
         
         <div className="nav-mobile-only" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <ThemeToggle theme={theme} toggleTheme={() => {
+          <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)' }} onClick={() => {
              const newTheme = theme === 'light' ? 'dark' : 'light';
              document.documentElement.setAttribute('data-theme', newTheme);
              localStorage.setItem('theme', newTheme);
              window.dispatchEvent(new Event('storage'));
-          }} />
+          }}>
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
           <button onClick={onLogin} className="btn-landing-primary btn-3d" style={{ height: 40, padding: '0 16px', fontSize: 14 }}>Entrar</button>
         </div>
       </div>

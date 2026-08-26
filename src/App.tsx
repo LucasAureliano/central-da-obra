@@ -5,6 +5,7 @@
  */
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Capacitor } from '@capacitor/core';
 const DashboardRouter = lazy(() => import('./components/DashboardRouter').then(m => ({ default: m.DashboardRouter })));
 const Works = lazy(() => import('./components/Works').then(m => ({ default: m.Works })));
 const WorkDetails = lazy(() => import('./components/WorkDetails').then(m => ({ default: m.WorkDetails })));
