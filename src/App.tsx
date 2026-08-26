@@ -156,6 +156,14 @@ function App() {
 
   useEffect(() => {
     AdMobService.initialize();
+
+    // Show ONE interstitial ad after 60 seconds of app usage (Native only)
+    if (Capacitor.isNativePlatform()) {
+      const timer = setTimeout(() => {
+        AdMobService.showInterstitial();
+      }, 60000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   if (hash.startsWith('#/avaliar/')) {
