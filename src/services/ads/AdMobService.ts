@@ -17,9 +17,13 @@ export class AdMobService {
           initializeForTesting: true,
         });
         
-        const consentInfo = await AdMob.requestConsentInfo();
-        if (consentInfo.status === AdmobConsentStatus.REQUIRED) {
-          await AdMob.showConsentForm();
+        try {
+          const consentInfo = await AdMob.requestConsentInfo();
+          if (consentInfo.status === AdmobConsentStatus.REQUIRED) {
+            await AdMob.showConsentForm();
+          }
+        } catch (consentError) {
+          console.warn('AdMob Consent warning:', consentError);
         }
         
         this.isInitialized = true;

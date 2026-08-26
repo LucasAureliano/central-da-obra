@@ -2,11 +2,19 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Calculator, ArrowRight, Grid, HardHat, Ruler, Wrench } from 'lucide-react';
 import { SponsoredAd } from '../shared/SponsoredAd';
-import { Logo } from '../ui/Logo';
+import { LandingNavbar } from '../landing/LandingNavbar';
+import { InstitutionalFooter } from '../landing/InstitutionalFooter';
 
 export function PublicCalculatorsHubView({ theme }: { theme: string }) {
+  const handleAuth = () => {
+    window.location.href = '/';
+  };
+  const handleNavigate = (page: string) => {
+    window.location.href = `/#${page}`;
+  };
+
   return (
-    <div data-theme={theme} style={{ minHeight: '100vh', backgroundColor: 'var(--bg-base)', fontFamily: 'Inter, sans-serif', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ minHeight: '100vh', backgroundColor: 'var(--bg-base)', fontFamily: 'Inter, sans-serif', overflowX: 'hidden' }}>
       <Helmet>
         <title>Calculadoras de Construção Civil Grátis | CentralObra</title>
         <meta name="description" content="Acesse diversas calculadoras gratuitas para construção civil. Calcule cimento, areia, brita, argamassa, tijolos, tintas e pisos com precisão." />
@@ -35,32 +43,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
         </script>
       </Helmet>
 
-      {/* Header */}
-      <header style={{ 
-        padding: '16px 20px', 
-        background: 'var(--bg-surface)',
-        borderBottom: '1px solid var(--border-subtle)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        width: '100%',
-        boxSizing: 'border-box'
-      }}>
-        <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <Logo variant="horizontal" theme={theme as 'light' | 'dark'} />
-        </a>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button onClick={() => window.location.href = '/'} className="btn-ghost desktop-only" style={{ padding: '8px 16px', fontSize: 13, borderRadius: 8, flexShrink: 0, color: 'var(--text-main)', fontWeight: 600 }}>
-            Entrar
-          </button>
-          <button onClick={() => window.location.href = '/'} className="btn-primary" style={{ padding: '8px 16px', fontSize: 13, borderRadius: 8, flexShrink: 0 }}>
-            Começar Grátis
-          </button>
-        </div>
-      </header>
+      {/* Cabeçalho removido em favor do LandingNavbar */}
 
       <main style={{ maxWidth: 960, margin: '0 auto', padding: '40px 20px', boxSizing: 'border-box', width: '100%' }}>
         
@@ -141,11 +124,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
 
       </main>
       
-      {/* Footer */}
-      <footer style={{ textAlign: 'center', padding: '40px 20px', borderTop: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
-        <p>&copy; {new Date().getFullYear()} CentralObra. Todos os direitos reservados.</p>
-        <p style={{ fontSize: 12, marginTop: 8 }}>Esta ferramenta é informativa e não substitui o projeto elaborado por um engenheiro ou arquiteto.</p>
-      </footer>
+      <InstitutionalFooter theme={theme as 'light'|'dark'} onLogin={handleAuth} onNavigate={handleNavigate} />
     </div>
   );
 }

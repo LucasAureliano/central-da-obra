@@ -10,6 +10,7 @@ import { FaqSection } from './landing/FaqSection';
 import { InstitutionalFooter } from './landing/InstitutionalFooter';
 import { GenericInfoPage } from './landing/GenericInfoPage';
 import { SponsoredAd } from './shared/SponsoredAd';
+import { LandingNavbar } from './landing/LandingNavbar';
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -99,34 +100,13 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
         </div>
       </div>
 
-      {/* Navbar Premium */}
-      <nav className={`landing-navbar ${scrolled ? 'scrolled' : ''}`}>
-        <div className="landing-nav-container">
-          <div className="nav-left">
-            <a href="#" className="logo-link" onClick={(e) => { e.preventDefault(); document.querySelector('.landing-body')?.scrollTo({top:0, behavior:'smooth'}) }}>
-              <Logo variant="horizontal" theme={theme} />
-            </a>
-          </div>
-          
-          <div className="nav-center mobile-hidden">
-            <a href="#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
-            <a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
-            <a href="/?calculadoras=true" className="landing-nav-link animated-link">Calculadoras</a>
-            <a href="#planos" onClick={(e) => handleScrollTo(e, 'planos')} className="landing-nav-link animated-link">Planos</a>
-            <a href="#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
-          </div>
-
-          <div className="nav-right mobile-hidden">
-            <button onClick={onLogin} className="landing-nav-link btn-3d" style={{ fontWeight: 600 }}>Entrar</button>
-            <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
-          </div>
-          
-          {/* Mobile Only Button */}
-          <div className="nav-mobile-only">
-            <button onClick={onLogin} className="btn-landing-primary btn-3d" style={{ height: 40, padding: '0 16px', fontSize: 14 }}>Entrar</button>
-          </div>
-        </div>
-      </nav>
+      <LandingNavbar 
+        theme={theme} 
+        onLogin={onLogin} 
+        onRegister={onRegister} 
+        scrolled={scrolled} 
+        onNavigate={(id) => handleScrollTo({ preventDefault: () => {} } as any, id)}
+      />
       
       <HeroSection onLogin={onLogin} onRegister={onRegister} />
       
@@ -134,36 +114,14 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
         <ProfilesSection />
       </div>
       
-      <div id="calculadoras" style={{ padding: '60px 20px', backgroundColor: 'var(--bg-surface)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
-        <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Precisando calcular materiais?</h2>
-        <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 48px' }}>Acesse nossa biblioteca com dezenas de calculadoras gratuitas para estimar cimento, tijolos, tintas e pisos com precisão milimétrica.</p>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, maxWidth: 960, margin: '0 auto 48px', textAlign: 'left' }}>
-          <a href="/?calc=concreto" className="feature-card" style={{ textDecoration: 'none', background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Concreto</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Calcule areia, brita, água e cimento.</p>
+      <div id="calculadoras" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-surface)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ maxWidth: 600, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Calculadoras Gratuitas</h2>
+          <p style={{ fontSize: 18, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>Acesse nossa biblioteca completa com dezenas de calculadoras para estimar cimento, tijolos, tintas e pisos com precisão milimétrica. Pare de desperdiçar material!</p>
+          <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', padding: '16px 32px', fontSize: 18, textDecoration: 'none' }}>
+            Acessar Calculadoras
           </a>
-          <a href="/?calc=pisos" className="feature-card" style={{ textDecoration: 'none', background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Pisos e Revestimentos</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>M² de piso e argamassa exatos.</p>
-          </a>
-          <a href="/?calc=tinta" className="feature-card" style={{ textDecoration: 'none', background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Tinta</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Galões de tinta para suas paredes.</p>
-          </a>
-          <div className="feature-card" style={{ opacity: 0.6, background: 'var(--bg-panel)', padding: 24, borderRadius: 20, border: '1px dashed var(--border-subtle)' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Alvenaria (Em Breve)</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Cálculo de tijolos e argamassa.</p>
-          </div>
         </div>
-
-        <div style={{ maxWidth: 960, margin: '0 auto 48px' }}>
-          <SponsoredAd probability={1} location="landing_calc" />
-        </div>
-
-        <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', padding: '16px 32px', fontSize: 18, textDecoration: 'none' }}>
-          Acessar Hub Completo
-        </a>
       </div>
       
       <div id="recursos">
