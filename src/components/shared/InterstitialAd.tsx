@@ -56,8 +56,8 @@ export const InterstitialAd: React.FC<InterstitialAdProps> = ({ onComplete, trig
     }
   }, [isVisible, countdown, onComplete]);
 
-  const AD_SLOT = "9876543210"; // TODO: Replace with real AdSense slot ID
-  const isDummySlot = AD_SLOT === "9876543210";
+  const AD_SLOT = "1433200813";
+  const isDummySlot = false;
 
   useEffect(() => {
     if (isVisible && shouldShowAds && !Capacitor.isNativePlatform() && !isDummySlot) {

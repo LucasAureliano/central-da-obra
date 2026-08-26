@@ -33,8 +33,8 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
     setIsVisible(shouldShow);
   }, [shouldShowAds, probability]);
 
-  const AD_SLOT = "1234567890"; // TODO: Replace with your real AdSense Slot ID
-  const isDummySlot = AD_SLOT === "1234567890";
+  const AD_SLOT = "1433200813";
+  const isDummySlot = false; // Real slot provided
 
   useEffect(() => {
     if (isVisible && shouldShowAds && !Capacitor.isNativePlatform() && !isDummySlot) {
