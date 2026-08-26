@@ -50,7 +50,13 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
           <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
         </div>
         
-        <div className="nav-mobile-only">
+        <div className="nav-mobile-only" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <ThemeToggle theme={theme} toggleTheme={() => {
+             const newTheme = theme === 'light' ? 'dark' : 'light';
+             document.documentElement.setAttribute('data-theme', newTheme);
+             localStorage.setItem('theme', newTheme);
+             window.dispatchEvent(new Event('storage'));
+          }} />
           <button onClick={onLogin} className="btn-landing-primary btn-3d" style={{ height: 40, padding: '0 16px', fontSize: 14 }}>Entrar</button>
         </div>
       </div>
