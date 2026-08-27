@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HardHat, Grid as LucideGrid, Wrench, Ruler } from 'lucide-react';
 import { Logo } from './ui/Logo';
 
 
@@ -114,12 +115,46 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
         <ProfilesSection />
       </div>
       
-      <div id="calculadoras" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-surface)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
-        <div style={{ maxWidth: 600, margin: '0 auto' }}>
+      <div id="calculadoras" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-base)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Calculadoras Gratuitas</h2>
-          <p style={{ fontSize: 18, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>Acesse nossa biblioteca completa com dezenas de calculadoras para estimar cimento, tijolos, tintas e pisos com precisão milimétrica. Pare de desperdiçar material!</p>
-          <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', padding: '16px 32px', fontSize: 18, textDecoration: 'none' }}>
-            Acessar Calculadoras
+          <p style={{ fontSize: 18, color: 'var(--text-muted)', marginBottom: 48, lineHeight: 1.6, maxWidth: 600, margin: '0 auto 48px' }}>
+            Acesse nossa biblioteca completa com dezenas de calculadoras para estimar cimento, tijolos, tintas e pisos com precisão milimétrica.
+          </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))', gap: 20, marginBottom: 48, textAlign: 'left' }}>
+            <a href="/?calc=concreto" className="calc-hover-card" style={{ display: 'block', padding: 24, backgroundColor: 'var(--bg-surface)', borderRadius: 20, border: '1px solid var(--border-subtle)', textDecoration: 'none', transition: 'all 0.2s ease', boxSizing: 'border-box' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: 16 }}>
+                <HardHat />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Concreto</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>Cimento, areia e brita para lajes e pisos.</p>
+            </a>
+            <a href="/?calc=pisos" className="calc-hover-card" style={{ display: 'block', padding: 24, backgroundColor: 'var(--bg-surface)', borderRadius: 20, border: '1px solid var(--border-subtle)', textDecoration: 'none', transition: 'all 0.2s ease', boxSizing: 'border-box' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: 16 }}>
+                <LucideGrid />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Pisos e Azulejos</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>Metragem e quantidade de argamassa.</p>
+            </a>
+            <a href="/?calc=tinta" className="calc-hover-card" style={{ display: 'block', padding: 24, backgroundColor: 'var(--bg-surface)', borderRadius: 20, border: '1px solid var(--border-subtle)', textDecoration: 'none', transition: 'all 0.2s ease', boxSizing: 'border-box' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: 16 }}>
+                <Wrench />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Tintas</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>Rendimento de galões para pintura.</p>
+            </a>
+            <a href="/?calc=tijolos" className="calc-hover-card" style={{ display: 'block', padding: 24, backgroundColor: 'var(--bg-surface)', borderRadius: 20, border: '1px solid var(--border-subtle)', textDecoration: 'none', transition: 'all 0.2s ease', boxSizing: 'border-box' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: 16 }}>
+                <Ruler />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Alvenaria</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>Tijolos e blocos para subir paredes.</p>
+            </a>
+          </div>
+
+          <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', padding: '16px 32px', fontSize: 16, textDecoration: 'none' }}>
+            Ver Todas as Calculadoras
           </a>
         </div>
       </div>
