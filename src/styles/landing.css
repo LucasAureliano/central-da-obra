@@ -1,19 +1,21 @@
 .landing-body {
   color: var(--text-main);
+  background: var(--bg-base);
+  flex: 1;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme='dark'] .landing-body {
   background: linear-gradient(135deg, #1e1e2d 0%, #08080b 100%), 
               radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
               radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.15), transparent 40%) !important;
   background-size: 200% 200% !important;
   animation: bgGradientMove 15s ease infinite alternate;
   background-attachment: fixed !important;
-  flex: 1;
-  height: 100%;
-  width: 100%;
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 
 @keyframes bgGradientMove {

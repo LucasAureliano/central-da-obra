@@ -90,7 +90,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
   }
 
   return (
-    <div className="landing-body" onScroll={(e) => setScrolled((e.target as HTMLElement).scrollTop > 50)} style={{ height: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" onScroll={(e) => setScrolled((e.target as HTMLElement).scrollTop > 50)} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       {/* Background Elements */}
       <div className="landing-bg">
         {/* Dark mesh gradient background for professional look */}
