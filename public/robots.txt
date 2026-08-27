@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Allow: /?calculadoras=true
+Allow: /?calc=
+Allow: /?blog=true
 
-Sitemap: https://centralobra.com.br/sitemap.xml
+Sitemap: https://centralobra.com/sitemap.xml
