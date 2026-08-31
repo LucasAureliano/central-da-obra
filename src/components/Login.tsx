@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from './ui/Logo';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import toast from 'react-hot-toast';
 
 interface LoginProps {
   onGoToRegister: () => void;
@@ -16,6 +17,28 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError('Digite seu email para recuperar a senha.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.');
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === 'auth/user-not-found') {
+        setError('Nenhuma conta encontrada com este email.');
+      } else {
+        setError('Erro ao enviar email de recuperação.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +124,12 @@ export function Login({ onGoToRegister, theme = 'dark' }: LoginProps) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-primary)', cursor: 'pointer' }}>Esqueceu a senha?</span>
+            <span 
+              onClick={handleResetPassword}
+              style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-primary)', cursor: 'pointer' }}
+            >
+              Esqueceu a senha?
+            </span>
           </div>
 
           <button type="submit" className="btn-primary card-premium-interactive" style={{ marginTop: 8 }} disabled={loading}>
