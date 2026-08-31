@@ -43,9 +43,15 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
         </script>
       </Helmet>
 
-      {/* Cabeçalho removido em favor do LandingNavbar */}
+      <LandingNavbar 
+        theme={theme as 'light' | 'dark'} 
+        onLogin={handleAuth} 
+        onRegister={handleAuth} 
+        scrolled={true} 
+        onNavigate={handleNavigate}
+      />
 
-      <main style={{ maxWidth: 960, margin: '0 auto', padding: '40px 20px', boxSizing: 'border-box', width: '100%' }}>
+      <main style={{ maxWidth: 960, margin: '0 auto', padding: '120px 20px 40px', boxSizing: 'border-box', width: '100%', position: 'relative', zIndex: 10 }}>
         
         {/* Hero Section */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>

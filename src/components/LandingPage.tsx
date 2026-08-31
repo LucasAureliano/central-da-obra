@@ -115,7 +115,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
         <ProfilesSection />
       </div>
       
-      <div id="calculadoras" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-base)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+      <div id="calculadoras" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-base)', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: 'var(--text-main)', marginBottom: 16 }}>Calculadoras Gratuitas</h2>
           <p style={{ fontSize: 18, color: 'var(--text-muted)', marginBottom: 48, lineHeight: 1.6, maxWidth: 600, margin: '0 auto 48px' }}>
