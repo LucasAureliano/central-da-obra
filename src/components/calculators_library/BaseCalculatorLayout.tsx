@@ -10,7 +10,7 @@ import { db } from '../../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { SelectWorkModal } from './SelectWorkModal';
 import { useWorks } from '../../contexts/WorksContext';
-import { drawHeader, drawFooter, applyGlobalWatermark } from '../../utils/pdfGenerator';
+import { generateCalculationPDF } from '../../utils/pdfGenerator';
 import { materialPriceService } from '../../services/materials/MaterialPriceService';
 import { formatDate } from '../../utils/formatters';
 
@@ -227,92 +227,25 @@ export function BaseCalculatorLayout({
     }
   };
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     if (!results) return;
     setIsGeneratingPDF(true);
-    setTimeout(() => {
-      try {
-        const doc = new jsPDF('p', 'pt', 'a4');
-        drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork?.name || '');
-        
-        doc.setFontSize(20);
-        doc.setTextColor(30, 30, 30);
-        doc.text(`Calculadora: ${title}`, 40, 110);
-        
-        let currentY = 140;
-
-        // Main Metrics Table
-        if (results.mainMetrics && results.mainMetrics.length > 0) {
-          doc.setFontSize(14);
-          doc.text('Resultados Principais', 40, currentY);
-          currentY += 15;
-
-          const metricsData = results.mainMetrics.map(m => [
-            m.label,
-            `${m.value} ${m.unit || ''}`
-          ]);
-
-          autoTable(doc, {
-            startY: currentY,
-            head: [['Métrica', 'Valor']],
-            body: metricsData,
-            theme: 'grid',
-            headStyles: { fillColor: [255, 107, 0], textColor: [255, 255, 255] },
-            margin: { left: 40, right: 40 }
-          });
-          currentY = (doc as any).lastAutoTable.finalY + 30;
-        }
-
-        // Materials Table
-        if (results.materials && results.materials.length > 0) {
-          doc.setFontSize(14);
-          doc.setTextColor(30, 30, 30);
-          doc.text('Lista de Materiais', 40, currentY);
-          currentY += 15;
-
-          const materialsData = results.materials.map(m => [
-            m.name,
-            `${m.quantity} ${m.unit}`,
-            prices[m.name]?.price ? `R$ ${Number(prices[m.name].price).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '-'
-          ]);
-
-          autoTable(doc, {
-            startY: currentY,
-            head: [['Material', 'Quantidade Estimada', 'Preço Unit. (Informado)']],
-            body: materialsData,
-            theme: 'grid',
-            headStyles: { fillColor: [139, 92, 246], textColor: [255, 255, 255] },
-            margin: { left: 40, right: 40 }
-          });
-          currentY = (doc as any).lastAutoTable.finalY + 30;
-        }
-
-        // Observations
-        if (results.observations && results.observations.length > 0) {
-          doc.setFontSize(14);
-          doc.text('Observações', 40, currentY);
-          currentY += 15;
-          doc.setFontSize(10);
-          doc.setTextColor(80, 80, 80);
-          results.observations.forEach(obs => {
-            doc.text(`• ${obs}`, 40, currentY);
-            currentY += 12;
-          });
-        }
-
-        drawFooter(doc);
-        applyGlobalWatermark(doc);
-        doc.save(`Calculo_${title.replace(/\s+/g, '_')}.pdf`);
-        
-        setPdfSuccess(true);
-        setTimeout(() => setPdfSuccess(false), 2000);
-      } catch (error) {
-        console.error('Error generating PDF', error);
-        alert('Ocorreu um erro ao gerar o PDF. Verifique se há algum dado inválido.');
-      } finally {
-        setIsGeneratingPDF(false);
-      }
-    }, 100);
+    try {
+      await generateCalculationPDF({
+        title,
+        results,
+        prices,
+        workName: activeWork?.name,
+        userName: user?.displayName || 'Usuário'
+      });
+      setPdfSuccess(true);
+      setTimeout(() => setPdfSuccess(false), 3000);
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      alert('Erro ao gerar PDF. Tente novamente.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
