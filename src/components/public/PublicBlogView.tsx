@@ -37,7 +37,7 @@ export function PublicBlogView({ theme, postId }: { theme: string, postId: strin
     const post = MOCK_POSTS.find(p => p.id === postId) || MOCK_POSTS[0];
     
     return (
-      <div className="landing-body" data-theme={theme} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
+      <div className="landing-body" data-theme={theme} style={{ minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
         <Helmet>
           <title>{post.title} | Blog CentralObra</title>
           <meta name="description" content={post.excerpt} />
@@ -53,7 +53,7 @@ export function PublicBlogView({ theme, postId }: { theme: string, postId: strin
           scrolled={true} 
         />
 
-        <main style={{ maxWidth: 800, margin: '0 auto', padding: '120px 20px 80px', boxSizing: 'border-box', width: '100%' }}>
+        <main style={{ maxWidth: 800, margin: '0 auto', padding: '120px 20px 80px', boxSizing: 'border-box', width: '100%', flex: 1 }}>
           <button onClick={() => window.history.back()} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600, marginBottom: 24, padding: 0 }}>
             <ChevronLeft size={20} /> Voltar para o Blog
           </button>
@@ -114,7 +114,7 @@ export function PublicBlogView({ theme, postId }: { theme: string, postId: strin
 
   // Blog Listing
   return (
-    <div className="landing-body" data-theme={theme} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
+    <div className="landing-body" data-theme={theme} style={{ minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
       <Helmet>
         <title>Blog de Engenharia e Gestão de Obras | CentralObra</title>
         <meta name="description" content="Artigos, dicas e guias completos sobre construção civil, gestão de obras, orçamentos e materiais." />
@@ -127,7 +127,7 @@ export function PublicBlogView({ theme, postId }: { theme: string, postId: strin
         scrolled={true} 
       />
 
-      <main style={{ maxWidth: 960, margin: '0 auto', padding: '120px 20px 80px', boxSizing: 'border-box', width: '100%' }}>
+      <main style={{ maxWidth: 960, margin: '0 auto', padding: '120px 20px 80px', boxSizing: 'border-box', width: '100%', flex: 1 }}>
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <div style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: 'var(--color-primary-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

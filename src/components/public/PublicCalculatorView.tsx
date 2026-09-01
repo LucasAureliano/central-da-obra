@@ -40,7 +40,7 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
   };
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       <Helmet>
         <title>{title} | CentralObra</title>
         <meta name="description" content={description} />
@@ -70,7 +70,7 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
         <SponsoredAd probability={1} location="calc_top" />
       </div>
 
-      <main style={{ position: 'relative', width: '100%', maxWidth: 768, margin: '0 auto', display: 'flex', flexDirection: 'column', paddingBottom: 60 }}>
+      <main style={{ position: 'relative', width: '100%', maxWidth: 768, margin: '0 auto', display: 'flex', flexDirection: 'column', paddingBottom: 60, flex: 1 }}>
         
         {/* Container da Calculadora */}
         <div style={{ position: 'relative', marginTop: 24, padding: '0 16px' }}>

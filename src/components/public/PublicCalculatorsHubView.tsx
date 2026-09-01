@@ -14,7 +14,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
   };
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       <Helmet>
         <title>Calculadoras de Construção Civil Grátis | CentralObra</title>
         <meta name="description" content="Acesse diversas calculadoras gratuitas para construção civil. Calcule cimento, areia, brita, argamassa, tijolos, tintas e pisos com precisão." />
@@ -51,7 +51,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
         onNavigate={handleNavigate}
       />
 
-      <main style={{ maxWidth: 960, margin: '0 auto', padding: '120px 20px 40px', boxSizing: 'border-box', width: '100%', position: 'relative', zIndex: 10 }}>
+      <main style={{ maxWidth: 960, margin: '0 auto', padding: '120px 20px 40px', boxSizing: 'border-box', width: '100%', position: 'relative', zIndex: 10, flex: 1 }}>
         
         {/* Hero Section */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
