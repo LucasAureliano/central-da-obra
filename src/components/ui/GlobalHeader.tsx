@@ -35,8 +35,9 @@ export function GlobalHeader({
         style={{ padding: 'env(safe-area-inset-top, 0px) 20px 0 20px', height: 'calc(72px + env(safe-area-inset-top, 0px))', zIndex: 40 }}
       >
         <motion.div 
-          style={{ display: 'flex', alignItems: 'center', flex: 1, cursor: 'pointer' }} 
           onClick={handleHomeClick}
+          className="hide-on-desktop"
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -44,7 +45,7 @@ export function GlobalHeader({
           <CustomLogo theme={theme} variant="horizontal" size={32} />
         </motion.div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto' }}>
           <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20 }} onClick={toggleTheme}>
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>

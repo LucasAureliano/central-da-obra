@@ -52,7 +52,7 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
           <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
         </div>
         
-        <div className="nav-mobile-only" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div className="nav-mobile-only" style={{ alignItems: 'center', gap: 12 }}>
           <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)' }} onClick={() => {
              const newTheme = theme === 'light' ? 'dark' : 'light';
              document.documentElement.setAttribute('data-theme', newTheme);

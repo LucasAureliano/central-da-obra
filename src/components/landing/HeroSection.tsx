@@ -21,7 +21,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
   };
 
   return (
-    <section className="landing-section" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '80px', paddingBottom: '80px', position: 'relative', overflow: 'hidden' }}>
+    <section className="landing-section" style={{ minHeight: '100dvh', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '100px', paddingBottom: '100px', position: 'relative', overflow: 'hidden' }}>
       {/* Ambient glow signature */}
       <div style={{
         position: 'absolute',

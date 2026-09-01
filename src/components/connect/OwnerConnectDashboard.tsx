@@ -10,7 +10,7 @@ export function OwnerConnectDashboard({ onNavigate }: { onNavigate: (tab: string
   ];
 
   return (
-    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="screen-content animate-fade-in" style={{ padding: '24px 20px 100px' }}>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-main)', marginBottom: 8, letterSpacing: '-0.02em' }}>
           CentralObra <span style={{ color: '#3B82F6' }}>Connect</span>
