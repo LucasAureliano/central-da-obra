@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HardHat, Grid as LucideGrid, Wrench, Ruler } from 'lucide-react';
+import { HardHat, Grid as LucideGrid, Wrench, Ruler, ArrowRight } from 'lucide-react';
 import { Logo } from './ui/Logo';
 
 

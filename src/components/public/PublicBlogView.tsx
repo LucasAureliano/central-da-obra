@@ -1,6 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { BookOpen, ArrowRight, Home, ChevronLeft } from 'lucide-react';
+import { LandingNavbar } from '../landing/LandingNavbar';
+import { InstitutionalFooter } from '../landing/InstitutionalFooter';
 
 const MOCK_POSTS = [
   {
