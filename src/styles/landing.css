@@ -1,4 +1,4 @@
-﻿
+﻿.landing-body {
   color: var(--text-main);
   background: var(--bg-base);
   flex: 1;
@@ -12,7 +12,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-[data-theme='dark'] 
+[data-theme='dark'] .landing-body {
   background: linear-gradient(135deg, #1e1e2d 0%, #08080b 100%), 
               radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
               radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.15), transparent 40%) !important;
@@ -27,7 +27,7 @@
   100% { background-position: 0% 50%; }
 }
 
-
+.landing-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -37,14 +37,14 @@
 }
 
 /* Sections */
-
+.landing-section {
   position: relative;
   z-index: 2;
   padding: 96px 0; /* Standard padding for all sections */
 }
 
 @media (max-width: 768px) {
-  
+  .landing-section {
     padding: 64px 0;
   }
 }
@@ -64,7 +64,7 @@
   }
 }
 
-
+.landing-section-title {
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -78,7 +78,7 @@
   overflow: visible;
 }
 
-
+.landing-section-subtitle {
   font-size: clamp(16px, 2vw, 18px);
   color: var(--text-muted);
   max-width: 600px;
@@ -93,7 +93,7 @@
 }
 
 /* Premium Navbar */
-
+.landing-navbar {
   position: fixed;
   top: 0;
   left: 0;
@@ -107,17 +107,17 @@
   padding: 0;
 }
 
-
+.landing-navbar.scrolled {
   background-color: #000000;
   border-bottom: 1px solid var(--border-subtle);
   height: 70px;
 }
 
-[data-theme='light'] 
+[data-theme='light'] .landing-navbar.scrolled {
   background-color: rgba(255, 255, 255, 0.85);
 }
 
-
+.landing-nav-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -234,7 +234,7 @@
 }
 
 /* Base Cards */
-
+.landing-card {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -250,13 +250,13 @@
 }
 
 @media (max-width: 768px) {
-  
+  .landing-card {
     padding: 24px;
     border-radius: 20px;
   }
 }
 
-
+.landing-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   border-color: var(--color-primary-alpha);
@@ -472,7 +472,7 @@
 }
 
 /* Institutional Footer */
-
+.landing-footer {
   border-top: 1px solid var(--border-subtle);
   background: #000000 !important;
   padding: 80px 0 40px;
@@ -571,7 +571,7 @@
 }
 
 @media (max-width: 768px) {
-  
+  .landing-footer { background: #000000 !important; border-top: 1px solid var(--border-subtle); padding: 64px 0 32px 0; }
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -579,7 +579,7 @@
 }
 
 /* Background Effects (Shader) */
-
+.landing-bg {
   position: fixed;
   top: 0;
   left: 0;
@@ -778,9 +778,5 @@
   transition: all 0.3s;
 }
 .testimonial-dot.active { background-color: var(--color-primary); width: 24px; }
-
-
-
-
 
 .landing-nav-link { white-space: nowrap; }
