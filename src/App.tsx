@@ -684,7 +684,7 @@ function App() {
       case 'connect':
         if (activeRole === 'owner') return <OwnerConnectDashboard key="connect" onNavigate={handleNavigate} />;
         return <ProfessionalConnectDashboard key="connect" onNavigate={handleNavigate} />;
-      case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} />;
+      case 'ajustes': return <AppSettings key="ajustes" onBack={() => handleNavigate('menu')} onNavigate={handleNavigate} />;
       case 'planos': return <SubscriptionPlans key="planos" onBack={() => handleNavigate('menu')} />;
       case 'dicas': return <div key="dicas" className="screen-content" style={{ padding: '24px 20px' }}><TipsWidget onNavigate={handleNavigate} /></div>;
       case 'indicadores-bi': return <CorporateBI key="indicadores-bi" onBack={() => handleNavigate('inicio')} />;
