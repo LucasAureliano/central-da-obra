@@ -153,7 +153,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
             </a>
           </div>
 
-          <a href="/?calculadoras=true" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 32px', fontSize: 16, textDecoration: 'none' }}>
+          <a href="/calculadoras" className="btn-landing-primary btn-3d" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 32px', fontSize: 16, textDecoration: 'none' }}>
             Ver Todas as Calculadoras
             <ArrowRight size={20} />
           </a>

@@ -42,13 +42,13 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
         <div className="nav-center mobile-hidden">
           <a href="/#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
           <a href="/#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
-          <a href="/?calculadoras=true" className="landing-nav-link animated-link">Calculadoras</a>
+          <a href="/calculadoras" className="landing-nav-link animated-link">Calculadoras</a>
           <a href="/#planos" onClick={(e) => handleScrollTo(e, 'planos')} className="landing-nav-link animated-link">Planos</a>
           <a href="/#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
         </div>
 
         <div className="nav-right mobile-hidden">
-          <button onClick={onLogin} className="landing-nav-link btn-3d" style={{ fontWeight: 600 }}>Entrar</button>
+          <button onClick={onLogin} className="landing-nav-link" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }} style={{ fontWeight: 600 }}>Entrar</button>
           <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
         </div>
         

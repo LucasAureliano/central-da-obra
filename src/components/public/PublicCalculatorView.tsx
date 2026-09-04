@@ -14,17 +14,17 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
       case 'concreto': return { 
         title: 'Calculadora de Concreto Grátis', 
         description: 'Calcule a quantidade exata de cimento, areia, brita e água para sua laje, piso ou pilar.',
-        component: <ConcreteVolumeCalc onBack={() => window.location.href = '/?calculadoras=true'} /> 
+        component: <ConcreteVolumeCalc onBack={() => window.location.href = '/calculadoras'} /> 
       };
       case 'tinta': return { 
         title: 'Calculadora de Tinta Grátis', 
         description: 'Estime quantos galões de tinta são necessários para pintar as paredes da sua obra, com ou sem demãos.',
-        component: <PaintCalc onBack={() => window.location.href = '/?calculadoras=true'} /> 
+        component: <PaintCalc onBack={() => window.location.href = '/calculadoras'} /> 
       };
       default: return { 
         title: 'Calculadora de Pisos e Revestimentos Grátis', 
         description: 'Saiba exatamente quantos metros quadrados de piso e sacos de argamassa comprar.',
-        component: <TileCalc onBack={() => window.location.href = '/?calculadoras=true'} /> 
+        component: <TileCalc onBack={() => window.location.href = '/calculadoras'} /> 
       };
     }
   };
@@ -40,7 +40,7 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
   };
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       <Helmet>
         <title>{title} | CentralObra</title>
         <meta name="description" content={description} />

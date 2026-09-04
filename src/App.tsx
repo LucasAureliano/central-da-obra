@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2026 CentralObra. All rights reserved.
  * PROPRIETARY AND CONFIDENTIAL
  * This software and its documentation are proprietary to CentralObra.
@@ -13,9 +13,10 @@ import { Menu as MenuIcon, Home, Briefcase, LogIn, X, Loader2 } from 'lucide-rea
 import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
 import { SubscriptionPlans } from './components/SubscriptionPlans';
-import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
+import { InteractiveTour } from './components/onboarding/InteractiveTour';
 import { Menu } from './components/Menu';
 import { InterstitialAd } from './components/shared/InterstitialAd';
+import { GenericInfoPage } from './components/landing/GenericInfoPage';
 import { PlansUpsellPopup } from './components/shared/PlansUpsellPopup';
 import { AdMobService } from './services/ads/AdMobService';
 
@@ -130,9 +131,11 @@ function App() {
   const connectProfileId = urlParams.get('connect');
   const portfolioItemId = urlParams.get('portfolio');
   const isPreview = urlParams.get('preview');
-  const isBlog = urlParams.has('blog');
+  const isBlog = urlParams.has('blog') || window.location.pathname === '/blog';
+  const isPrivacy = urlParams.has('privacy') || window.location.pathname === '/privacidade';
+  const isTerms = urlParams.has('terms') || window.location.pathname === '/termos';
   const blogPostId = urlParams.get('blog');
-  const isCalculatorsHub = urlParams.has('calculadoras');
+  const isCalculatorsHub = urlParams.has('calculadoras') || window.location.pathname === '/calculadoras';
   const isFreeCalculator = urlParams.has('calc');
   const calcId = urlParams.get('calc');
 
@@ -198,8 +201,8 @@ function App() {
         <div style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         </div>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Pagamento Não Concluído</h1>
-        <p style={{ color: 'var(--text-muted)', marginBottom: 32, maxWidth: 400 }}>Não foi possível confirmar o pagamento ou ele está pendente. Verifique com a operadora do seu cartão.</p>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Pagamento NÃ£o ConcluÃ­do</h1>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 32, maxWidth: 400 }}>NÃ£o foi possÃ­vel confirmar o pagamento ou ele estÃ¡ pendente. Verifique com a operadora do seu cartÃ£o.</p>
         <button 
           onClick={() => { window.location.hash = ''; window.location.reload(); }}
           className="btn-primary"
@@ -228,6 +231,14 @@ function App() {
 
     if (isBlog) {
       return <PublicBlogView theme={theme} postId={blogPostId && blogPostId !== 'true' ? blogPostId : null} />;
+    }
+
+    if (isPrivacy) {
+      return <GenericInfoPage pageId="privacy" onBack={() => window.location.href = '/'} onLogin={() => window.location.href = '/?login=true'} onNavigate={(page) => window.location.href = '/' + (page === 'terms' ? 'termos' : page === 'privacy' ? 'privacidade' : '')} theme={theme} />;
+    }
+
+    if (isTerms) {
+      return <GenericInfoPage pageId="terms" onBack={() => window.location.href = '/'} onLogin={() => window.location.href = '/?login=true'} onNavigate={(page) => window.location.href = '/' + (page === 'terms' ? 'termos' : page === 'privacy' ? 'privacidade' : '')} theme={theme} />;
     }
 
     if (isPreview === 'true') {
@@ -342,18 +353,7 @@ function App() {
     
     if (!profile.hasSeenWelcome || forceOnboarding) {
       return (
-        <OnboardingEngine 
-          role={profile.role} 
-          onComplete={() => {
-            if (isGuest) {
-              sessionStorage.setItem('guestHasSeenWelcome', 'true');
-              // Force reload or state update to reflect new sessionStorage
-              window.location.reload();
-            } else {
-              setForceOnboarding(false);
-            }
-          }} 
-        />
+        <InteractiveTour onComplete={async () => { if (isGuest) { sessionStorage.setItem('guestHasSeenWelcome', 'true'); window.location.reload(); } else { setForceOnboarding(false); try { const { doc, updateDoc } = await import('firebase/firestore'); const { db } = await import('./lib/firebase'); const userRef = doc(db, 'users', user.uid); await updateDoc(userRef, { hasSeenWelcome: true }); } catch (e) { console.error('Error saving welcome state:', e); } } }} />
       );
     }
     
@@ -395,11 +395,11 @@ function App() {
       }
       return;
     }
-    if (title === 'Cálculos' || title === 'Central de Cálculos' || title === 'Calculadoras' || title === 'Calculadoras Técnicas') {
+    if (title === 'CÃ¡lculos' || title === 'Central de CÃ¡lculos' || title === 'Calculadoras' || title === 'Calculadoras TÃ©cnicas') {
       setActiveTab('calculos');
       return;
     }
-    if (title === 'Relatórios' || title === 'Relatórios Técnicos PDF' || title === 'Relatórios Executivos PDF') {
+    if (title === 'RelatÃ³rios' || title === 'RelatÃ³rios TÃ©cnicos PDF' || title === 'RelatÃ³rios Executivos PDF') {
       setActiveTab('relatorios');
       return;
     }
@@ -423,24 +423,24 @@ function App() {
       setActiveTab('financeiro-profissional');
       return;
     }
-    if (title === 'Biblioteca & Normas' || title === 'Biblioteca Técnica' || title === 'Biblioteca & Normas NBR' || title === 'Índices da Construção') {
+    if (title === 'Biblioteca & Normas' || title === 'Biblioteca TÃ©cnica' || title === 'Biblioteca & Normas NBR' || title === 'Ãndices da ConstruÃ§Ã£o') {
       setActiveTab('central-tecnica');
       return;
     }
 
-    if (title === 'Tendências' || title === 'Studio de Interiores') {
+    if (title === 'TendÃªncias' || title === 'Studio de Interiores') {
       setActiveTab('studio-interiores');
       return;
     }
-      if (title === 'Projeto Elétrico') {
+      if (title === 'Projeto ElÃ©trico') {
         setActiveTab('projeto-eletrico');
         return;
       }
-      if (title === 'Projeto Hidráulico') {
+      if (title === 'Projeto HidrÃ¡ulico') {
         setActiveTab('projeto-hidraulico');
         return;
       }
-      if (title === 'Projeto Automação') {
+      if (title === 'Projeto AutomaÃ§Ã£o') {
         setActiveTab('projeto-automacao');
         return;
       }
@@ -448,7 +448,7 @@ function App() {
       setActiveTab('nova-despesa');
       return;
     }
-    if (title === 'Projeto Luminotécnico') {
+    if (title === 'Projeto LuminotÃ©cnico') {
       setActiveTab('projeto-luminotecnico');
       return;
     }
@@ -472,35 +472,35 @@ function App() {
       setActiveTab('clientes');
       return;
     }
-    if (title === 'Orçamentos' || title === 'Cotações de Prestadores' || title === 'Orcamentos') {
+    if (title === 'OrÃ§amentos' || title === 'CotaÃ§Ãµes de Prestadores' || title === 'Orcamentos') {
       setActiveTab('orcamentos');
       return;
     }
-    if (title === 'Agenda' || title === 'Agenda de Serviços' || title === 'Agenda Técnica') {
+    if (title === 'Agenda' || title === 'Agenda de ServiÃ§os' || title === 'Agenda TÃ©cnica') {
       setActiveTab('agenda-completa');
       return;
     }
-    if (title === 'Diário Técnico' || title === 'Diário Técnico de Obra') {
+    if (title === 'DiÃ¡rio TÃ©cnico' || title === 'DiÃ¡rio TÃ©cnico de Obra') {
       setActiveTab('diario-tecnico');
       return;
     }
-    if (title === 'Vistorias' || title === 'Vistorias Técnicas') {
+    if (title === 'Vistorias' || title === 'Vistorias TÃ©cnicas') {
       setActiveTab('vistorias');
       return;
     }
-    if (title === 'Documentos Técnicos') {
+    if (title === 'Documentos TÃ©cnicos') {
       setActiveTab('documentos-tecnicos');
       return;
     }
-    if (title === 'Cronograma e Medições') {
+    if (title === 'Cronograma e MediÃ§Ãµes') {
       setActiveTab('cronograma-medicoes');
       return;
     }
-    if (title === 'Pendências Técnicas') {
+    if (title === 'PendÃªncias TÃ©cnicas') {
       setActiveTab('pendencias-tecnicas');
       return;
     }
-    if (title === 'Centro de Operações') {
+    if (title === 'Centro de OperaÃ§Ãµes') {
       setActiveTab('centro-operacoes');
       return;
     }
@@ -508,15 +508,15 @@ function App() {
       setActiveTab('cronograma-geral');
       return;
     }
-    if (title === 'Equipamentos' || title === 'Equipamentos & Patrimônio') {
+    if (title === 'Equipamentos' || title === 'Equipamentos & PatrimÃ´nio') {
       setActiveTab('equipamentos');
       return;
     }
-    if (title === 'Produtividade & RH' || title === 'Equipes & Mão de Obra') {
+    if (title === 'Produtividade & RH' || title === 'Equipes & MÃ£o de Obra') {
       setActiveTab('rh-produtividade');
       return;
     }
-    if (title === 'Novo Orçamento') {
+    if (title === 'Novo OrÃ§amento') {
       setActiveTab('novo-orcamento');
       return;
     }
@@ -524,7 +524,7 @@ function App() {
       setActiveTab('recebimentos');
       return;
     }
-    if (title === 'Meu Catálogo' || title === 'Catálogo de Serviços') {
+    if (title === 'Meu CatÃ¡logo' || title === 'CatÃ¡logo de ServiÃ§os') {
       setActiveTab('meus-servicos');
       return;
     }
@@ -540,11 +540,11 @@ function App() {
       setActiveTab('dicas');
       return;
     }
-    if (title === 'Administração') {
+    if (title === 'AdministraÃ§Ã£o') {
       setActiveTab('admin');
       return;
     }
-    if (title === 'Funil de Negócios' || title === 'Funil de Negócios (CRM)' || title === 'crm' || title === 'CRM' || title === 'Clientes & CRM' || title === 'CRM de Vendas') {
+    if (title === 'Funil de NegÃ³cios' || title === 'Funil de NegÃ³cios (CRM)' || title === 'crm' || title === 'CRM' || title === 'Clientes & CRM' || title === 'CRM de Vendas') {
       setActiveTab('clientes');
       return;
     }
@@ -556,7 +556,7 @@ function App() {
       setActiveTab('portal-cliente');
       return;
     }
-    if (title === 'Imóveis' || title === 'Portfólio de Imóveis') {
+    if (title === 'ImÃ³veis' || title === 'PortfÃ³lio de ImÃ³veis') {
       setActiveTab('imoveis');
       return;
     }
@@ -625,10 +625,10 @@ function App() {
       case 'agenda-completa': return <Agenda key="agenda" />;
       case 'controle-projetos': return <ProjectControl key="projetos" />;
       case 'studio-interiores': return <RequireWorkSelection featureName="Studio de Interiores" onBack={() => handleNavigate('inicio')}><InteriorDesignStudio key="studio-interiores" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
-      case 'projeto-luminotecnico': return <RequireWorkSelection featureName="Projeto Luminotécnico" onBack={() => handleNavigate('inicio')}><LightingDesignEngine key="luminotecnico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
-      case 'projeto-eletrico': return <RequireWorkSelection featureName="Projeto Elétrico" onBack={() => handleNavigate('inicio')}><ElectricalDesignStudio key="eletrico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
-      case 'projeto-hidraulico': return <RequireWorkSelection featureName="Projeto Hidráulico" onBack={() => handleNavigate('inicio')}><PlumbingDesignStudio key="hidraulico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
-      case 'projeto-automacao': return <RequireWorkSelection featureName="Projeto de Automação" onBack={() => handleNavigate('inicio')}><AutomationDesignStudio key="automacao" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
+      case 'projeto-luminotecnico': return <RequireWorkSelection featureName="Projeto LuminotÃ©cnico" onBack={() => handleNavigate('inicio')}><LightingDesignEngine key="luminotecnico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
+      case 'projeto-eletrico': return <RequireWorkSelection featureName="Projeto ElÃ©trico" onBack={() => handleNavigate('inicio')}><ElectricalDesignStudio key="eletrico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
+      case 'projeto-hidraulico': return <RequireWorkSelection featureName="Projeto HidrÃ¡ulico" onBack={() => handleNavigate('inicio')}><PlumbingDesignStudio key="hidraulico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
+      case 'projeto-automacao': return <RequireWorkSelection featureName="Projeto de AutomaÃ§Ã£o" onBack={() => handleNavigate('inicio')}><AutomationDesignStudio key="automacao" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
       case 'projeto-marcenaria': return <RequireWorkSelection featureName="Projeto de Marcenaria" onBack={() => handleNavigate('inicio')}><WoodworkingDesignStudio key="marcenaria" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
       case 'acompanhamento-obras': return <SiteVisitsManager key="acompanhamento" onBack={() => handleNavigate('inicio')} />;
       case 'compatibilizacao': return <ProjectCoordination key="compatibilizacao" onBack={() => handleNavigate('inicio')} />;
@@ -719,3 +719,4 @@ function App() {
 }
 
 export default App;
+

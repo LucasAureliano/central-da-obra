@@ -1,7 +1,25 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 import { ArrowLeft, Bell, Shield, Database, Smartphone, Info, ChevronRight, Check } from 'lucide-react';
 
-export function AppSettings({ onBack }: { onBack: () => void }) {
+export function AppSettings({ onBack, onNavigate }: { onBack: () => void, onNavigate: (page: string) => void }) {
+  const { user, profile } = useAuth();
+  const exportUserData = () => {
+    if (!profile) return;
+    const csvContent = 'data:text/csv;charset=utf-8,' 
+      + 'Nome,Email,Telefone,Cargo,Data de Cadastro\n'
+      + `${profile.name || ''},${user?.email || ''},${profile.phone || ''},${profile.role || ''},${new Date().toLocaleDateString('pt-BR')}`;
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'meus_dados_centralobra.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    try { toast.success('Dados exportados com sucesso!'); } catch(e) {}
+  }; onBack }: { onBack: () => void }) {
   const [notifications, setNotifications] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
 

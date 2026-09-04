@@ -14,12 +14,12 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
   };
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       <Helmet>
         <title>Calculadoras de Construção Civil Grátis | CentralObra</title>
         <meta name="description" content="Acesse diversas calculadoras gratuitas para construção civil. Calcule cimento, areia, brita, argamassa, tijolos, tintas e pisos com precisão." />
         <meta name="keywords" content="calculadora de construção, calculadora de materiais, obra, reforma, cálculo de cimento, cálculo de argamassa, cálculo de tijolos" />
-        <link rel="canonical" href="https://centralobra.com/?calculadoras=true" />
+        <link rel="canonical" href="https://centralobra.com/calculadoras" />
         <meta property="og:title" content="Calculadoras de Construção Civil Grátis | CentralObra" />
         <meta property="og:description" content="Evite desperdício na sua obra. Calcule a quantidade exata de materiais gratuitamente." />
         <meta property="og:type" content="website" />
@@ -29,7 +29,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
             "@type": "WebPage",
             "name": "Calculadoras de Construção Civil Grátis | CentralObra",
             "description": "Acesse diversas calculadoras gratuitas para construção civil. Calcule cimento, areia, brita, argamassa, tijolos, tintas e pisos com precisão.",
-            "url": "https://centralobra.com/?calculadoras=true",
+            "url": "https://centralobra.com/calculadoras",
             "publisher": {
               "@type": "Organization",
               "name": "CentralObra",

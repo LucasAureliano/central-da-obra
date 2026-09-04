@@ -86,7 +86,7 @@ export function CalculatorLandingSection() {
           style={{ display: 'flex', justifyContent: 'center', marginTop: '48px' }}
         >
           <button 
-            onClick={() => window.location.href = '/?calculadoras=true'}
+            onClick={() => window.location.href = '/calculadoras'}
             className="btn-primary" 
             style={{ padding: '16px 32px', fontSize: '18px', fontWeight: 700, borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
           >

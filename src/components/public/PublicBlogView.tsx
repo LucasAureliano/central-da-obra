@@ -62,7 +62,7 @@ export function PublicBlogView({ theme, postId }: { theme: string, postId: strin
     const post = MOCK_POSTS.find(p => p.id === postId) || MOCK_POSTS[0];
     
     return (
-      <div className="landing-body" data-theme={theme} style={{ minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
+      <div className="landing-body" data-theme={theme} style={{ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
         <Helmet>
           <title>{post.title} | Blog CentralObra</title>
           <meta name="description" content={post.excerpt} />
@@ -131,7 +131,7 @@ export function PublicBlogView({ theme, postId }: { theme: string, postId: strin
   }
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
+    <div className="landing-body" data-theme={theme} style={{ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', backgroundColor: 'var(--bg-base)' }}>
       <Helmet>
         <title>Blog de Engenharia e Gestão de Obras | CentralObra</title>
         <meta name="description" content="Artigos, dicas e calculadoras para facilitar o seu dia a dia no canteiro de obras." />

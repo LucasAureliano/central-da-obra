@@ -26,6 +26,9 @@ interface Expense {
   workName?: string;
 }
 
+const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
+const itemVariants = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } } };
+
 export function Finance({ initialShowAddModal = false, onBack, workId, embedded, parentCollection = 'works' }: { initialShowAddModal?: boolean; onBack?: () => void; workId?: string; embedded?: boolean; parentCollection?: 'works' | 'projects' }) {
   const { user, isGuest, profile } = useAuth();
   const { works, activeWork, primaryWork } = useWorks();
@@ -358,40 +361,39 @@ export function Finance({ initialShowAddModal = false, onBack, workId, embedded,
           return (
             <div key={group} style={{ marginBottom: 24 }}>
               <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 }}>{group}</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {groupExpenses.map(exp => (
-                  <div key={exp.id} className="glass-panel" style={{ padding: 16, borderRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: exp.status === 'Pago' ? 'var(--color-success-bg)' : exp.status === 'Pendente' ? 'var(--color-warning-bg)' : 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: exp.status === 'Pago' ? 'var(--color-success)' : exp.status === 'Pendente' ? 'var(--color-warning)' : 'var(--text-muted)' }}>
-                        {exp.status === 'Pago' ? <CheckCircle2 size={24} /> : exp.status === 'Pendente' ? <Clock size={24} /> : <X size={24} />}
-                      </div>
-                      <div>
-                        <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{exp.title}</h4>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{exp.category}</span>
-                          {isGlobal && exp.workName && (
-                            <>
-                              <span style={{ fontSize: 10, color: 'var(--border-strong)' }}>•</span>
-                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-primary)' }}>{exp.workName}</span>
-                            </>
-                          )}
+              <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {groupExpenses.map(exp => (
+                    <motion.div variants={itemVariants} key={exp.id} className="glass-panel" style={{ padding: 16, borderRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: exp.status === 'Pago' ? 'var(--color-success-bg)' : exp.status === 'Pendente' ? 'var(--color-warning-bg)' : 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: exp.status === 'Pago' ? 'var(--color-success)' : exp.status === 'Pendente' ? 'var(--color-warning)' : 'var(--text-muted)' }}>
+                          {exp.status === 'Pago' ? <CheckCircle2 size={24} /> : exp.status === 'Pendente' ? <Clock size={24} /> : <X size={24} />}
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{exp.title}</h4>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{exp.category}</span>
+                            {isGlobal && exp.workName && (
+                              <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, backgroundColor: 'var(--bg-elevated)', color: 'var(--text-muted)' }}>{exp.workName}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: exp.status === 'Pago' ? '#EF4444' : 'var(--text-main)' }}>
-                        - {formatCurrency(exp.amount)}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 12, color: exp.status === 'Pago' ? 'var(--color-success)' : 'var(--color-warning)', fontWeight: 600, marginTop: 4 }}>
-                        {exp.status}
-                      </p>
-                    </div>
-                    <button onClick={() => handleDeleteExpense(exp)} style={{ background: 'none', border: 'none', padding: 8, color: 'var(--text-muted)', cursor: 'pointer' }}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(exp.amount)}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 12, color: exp.status === 'Pago' ? 'var(--color-success)' : 'var(--color-warning)', fontWeight: 600, marginTop: 4 }}>
+                            {exp.status}
+                          </p>
+                        </div>
+                        <button onClick={() => handleDeleteExpense(exp)} style={{ background: 'none', border: 'none', padding: 8, color: 'var(--text-muted)', cursor: 'pointer' }}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
             </div>
           );
         })}

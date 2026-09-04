@@ -11,7 +11,7 @@ interface InstitutionalFooterProps {
 export function InstitutionalFooter({ theme, onLogin, onNavigate }: InstitutionalFooterProps) {
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, id: string) => {
     e.preventDefault();
-    if (window.location.pathname !== '/' || window.location.search.includes('calculadoras') || window.location.search.includes('calc')) {
+    if (window.location.pathname !== '/' || window.location.search !== '') {
       window.location.href = '/#' + id;
     } else {
       const element = document.getElementById(id);
@@ -24,7 +24,7 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="landing-footer" style={{ backgroundColor: '#000000', borderTop: '1px solid #1f1f1f', position: 'relative', zIndex: 10 }} data-theme="dark">
+    <footer className="landing-footer" style={{ position: 'relative', zIndex: 10 }} >
       <div className="landing-container">
         <div className="footer-grid">
           {/* Col 1: Brand */}
@@ -60,8 +60,8 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
           <div>
             <h4 className="footer-col-title">Produto</h4>
             <ul className="footer-links">
-              <li><a href="/?calculadoras=true" className="footer-link" style={{ color: 'var(--color-primary)' }}>Calculadoras Gratuitas</a></li>
-              <li><a href="/?blog=true" className="footer-link" style={{ color: 'var(--color-primary)' }}>Blog de Engenharia</a></li>
+              <li><a href="/calculadoras" className="footer-link" style={{ color: 'var(--color-primary)' }}>Calculadoras Gratuitas</a></li>
+              <li><a href="/blog" className="footer-link" style={{ color: 'var(--color-primary)' }}>Blog de Engenharia</a></li>
               <li><a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="footer-link">Gestão Financeira</a></li>
               <li><a href="#biblioteca" onClick={(e) => handleScrollTo(e, 'biblioteca')} className="footer-link">Biblioteca Técnica</a></li>
               <li><a href="#demonstracao" onClick={(e) => handleScrollTo(e, 'demonstracao')} className="footer-link">Demonstração</a></li>

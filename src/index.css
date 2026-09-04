@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 @import './styles/landing.css';
 
 
@@ -913,6 +913,8 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
 }
 
 .modal-content-scroll {
@@ -1019,4 +1021,6 @@ h3, h4 {
 [data-theme='light'] .menu-bar, [data-theme='light'] .bottom-nav {
   background-color: rgba(255, 255, 255, 0.75) !important;
 }
+
+
 
