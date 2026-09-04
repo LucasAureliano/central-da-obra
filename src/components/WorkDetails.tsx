@@ -62,11 +62,13 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
     setIsSubmitting(true);
     try {
       const amount = parseFloat(expenseAmount.replace(/\D/g, '')) / 100;
-      await addDoc(collection(db, `works/${workId}/calculations`), {
-        calcType: expenseTitle,
-        totalCost: amount,
-        savedAt: serverTimestamp(),
-        resultData: { materials: [] }
+      await addDoc(collection(db, `works/${workId}/expenses`), {
+        title: expenseTitle,
+        amount: amount,
+        category: 'Outros',
+        status: 'Pago',
+        date: new Date().toISOString().split('T')[0],
+        createdAt: serverTimestamp()
       });
       toast.success('Despesa adicionada com sucesso!');
       setIsExpenseModalOpen(false);

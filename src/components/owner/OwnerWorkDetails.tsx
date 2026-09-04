@@ -44,23 +44,18 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
       }
     });
 
-    // Listen to calculations (expenses)
-    const calcsQuery = collection(db, 'works', workId, 'calculations');
-    const unsubscribeCalcs = onSnapshot(calcsQuery, (snap) => {
-      const calcs: any[] = [];
-      let spent = 0;
-      snap.forEach(c => {
-        const data = c.data();
-        calcs.push({ id: c.id, ...data });
-        if (data.totalCost) spent += data.totalCost;
+    // Listen to real expenses instead of calculations
+      const expensesQuery = collection(db, 'works', workId, 'expenses');
+      const unsubscribeExpenses = onSnapshot(expensesQuery, (snap) => {
+        let spent = 0;
+        snap.forEach(c => {
+          const data = c.data();
+          if (data.status !== 'Cancelado' && data.amount) {
+            spent += Number(data.amount);
+          }
+        });
+        setTotalSpent(spent);
       });
-      calcs.sort((a, b) => {
-        const dateA = a.savedAt?.toDate ? a.savedAt.toDate() : new Date();
-        const dateB = b.savedAt?.toDate ? b.savedAt.toDate() : new Date();
-        return dateB.getTime() - dateA.getTime();
-      });
-      setTotalSpent(spent);
-    });
 
     // Listen to stages
     const stagesQuery = collection(db, `works/${workId}/schedule_stages`);
@@ -85,10 +80,10 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
         snap.forEach(doc => { if (doc.data().isPurchased) d++; else p++; });
         setShoppingInfo({ pending: p, purchased: d });
       });
-      return () => { unsubscribe(); unsubscribeCalcs(); unsubscribeStages(); unsubShop(); };
+      return () => { unsubscribe(); unsubscribeExpenses(); unsubscribeStages(); unsubShop(); };
     }
 
-    return () => { unsubscribe(); unsubscribeCalcs(); unsubscribeStages(); };
+    return () => { unsubscribe(); unsubscribeExpenses(); unsubscribeStages(); };
   }, [workId, user]);
 
   if (!work) {

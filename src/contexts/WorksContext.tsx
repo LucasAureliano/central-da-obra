@@ -165,7 +165,7 @@ export function WorksProvider({ children }: { children: React.ReactNode }) {
         calcSpent += (d.data().totalCost || 0);
       });
       setPrimaryWorkStats(prev => ({
-        totalSpent: calcSpent + (prev?.totalSpentExpenses || 0),
+        totalSpent: prev?.totalSpentExpenses || 0,
         totalSpentCalcs: calcSpent,
         totalSpentExpenses: prev?.totalSpentExpenses || 0,
         upcomingTasks: prev?.upcomingTasks || [],
@@ -183,7 +183,7 @@ export function WorksProvider({ children }: { children: React.ReactNode }) {
         }
       });
       setPrimaryWorkStats(prev => ({
-        totalSpent: expSpent + (prev?.totalSpentCalcs || 0),
+        totalSpent: expSpent,
         totalSpentCalcs: prev?.totalSpentCalcs || 0,
         totalSpentExpenses: expSpent,
         upcomingTasks: prev?.upcomingTasks || [],
