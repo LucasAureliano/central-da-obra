@@ -317,9 +317,14 @@ export function Works({ onWorkSelect }: WorksProps) {
                       {work.address || 'Endereço não informado'}
                     </p>
                     {/* Only show client for non-owner profiles */}
-                    {!isOwner && work.client && (
+                    {(!isOwner && work.client) && (
                       <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
-                        {work.client}
+                        <HardHat size={14} /> Cliente: {work.client}
+                      </p>
+                    )}
+                    {(isOwner && (work.providerName || work.client)) && (
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                        <HardHat size={14} /> Prestador: {work.providerName || work.client}
                       </p>
                     )}
 

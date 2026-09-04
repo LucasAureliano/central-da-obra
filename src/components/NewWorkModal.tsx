@@ -75,10 +75,15 @@ export function NewWorkModal({ isOpen, onClose }: NewWorkModalProps) {
       
       const numericBudget = budgetInput ? parseInt(budgetInput.replace(/\D/g, '')) / 100 : 0;
 
+      const isOwner = profile?.role === 'owner' || !profile?.role;
+      const actualClient = isOwner ? (profile?.name || user?.displayName || 'Proprietário') : client;
+      const actualProvider = isOwner ? client : (profile?.name || user?.displayName || 'Construtor');
+
       const newWorkRef = await addDoc(collection(db, 'works'), {
         userId: user.uid,
         name,
-        client,
+        client: actualClient,
+        providerName: actualProvider,
         address,
         budget: numericBudget,
         deadline: deadline || 'N/A',
