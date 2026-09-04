@@ -24,7 +24,7 @@ export const PlansUpsellPopup: React.FC<PlansUpsellPopupProps> = ({ onGoToPlans 
     const timer = setTimeout(() => {
       setIsVisible(true);
       sessionStorage.setItem('plans_popup_shown', 'true');
-    }, 2000);
+    }, 20000);
 
     return () => clearTimeout(timer);
   }, [isPaidPlan]);

@@ -1024,3 +1024,36 @@ h3, h4 {
 
 
 
+
+
+/* Premium Tour Popover */
+.premium-tour-popover {
+  background: var(--bg-surface-solid) !important;
+  color: var(--text-main) !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.premium-tour-popover .driver-popover-title {
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+  font-size: 18px !important;
+}
+.premium-tour-popover .driver-popover-description {
+  color: var(--text-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+.premium-tour-popover .driver-popover-next-btn, .premium-tour-popover .driver-popover-prev-btn {
+  border-radius: 8px !important;
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  text-shadow: none !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+.premium-tour-popover .driver-popover-prev-btn {
+  background: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+}

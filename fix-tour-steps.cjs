@@ -1,39 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { driver } from 'driver.js';
-import 'driver.js/dist/driver.css';
+﻿const fs = require('fs');
 
-interface InteractiveTourProps {
-  onComplete: () => void;
-  role?: string;
-}
+let tour = fs.readFileSync('src/components/onboarding/InteractiveTour.tsx', 'utf8');
 
-export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
-  const isRunning = useRef(false);
-
-  useEffect(() => {
-    if (isRunning.current) return;
-    isRunning.current = true;
-
-    setTimeout(() => {
-      const isDesktop = window.innerWidth > 1024;
-      
-      const tour = driver({
-        showProgress: true,
-        animate: true,
-        smoothScroll: true,
-        overlayColor: 'rgba(0,0,0,0.7)',
-        stagePadding: 8,
-        stageRadius: 16,
-        popoverClass: 'premium-tour-popover',
-        allowClose: false,
-        doneBtnText: 'Começar',
-        nextBtnText: 'Avançar',
-        prevBtnText: 'Voltar',
-        progressText: '{{current}} de {{total}}',
-        onDestroyed: () => {
-          onComplete();
-        },
-        steps: [
+const stepsObj = `steps: [
           {
             element: document.querySelector('.tour-inicio') || undefined,
             popover: {
@@ -76,15 +45,10 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
               description: 'Você está preparado para usar a plataforma. Explore as ferramentas e ganhe produtividade!',
             }
           }
-        ]
-      });
-      tour.drive();
-    }, 800);
+        ]`;
 
-    return () => {
-      // Unmount cleanup handled by internal driver instance if needed
-    };
-  }, [onComplete]);
+tour = tour.replace(/steps: \[[\s\S]*?\]/, stepsObj);
+tour = tour.replace(/doneBtnText: '.*?'/, "doneBtnText: 'Começar'");
+tour = tour.replace(/nextBtnText: '.*?'/, "nextBtnText: 'Avançar'");
 
-  return null;
-}
+fs.writeFileSync('src/components/onboarding/InteractiveTour.tsx', tour, 'utf8');
