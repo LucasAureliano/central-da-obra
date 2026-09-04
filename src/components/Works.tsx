@@ -5,7 +5,8 @@ import {
 import { NewWorkModal } from './NewWorkModal';
 import { useWorks } from '../contexts/WorksContext';
 import { useAuth } from '../contexts/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { useEffect } from 'react';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { toast } from 'react-hot-toast';
@@ -22,6 +23,31 @@ export function Works({ onWorkSelect }: WorksProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
   const [contextMenuWorkId, setContextMenuWorkId] = useState<string | null>(null);
+
+  const [localFilteredWorks, setLocalFilteredWorks] = useState<Work[]>([]);
+  useEffect(() => {
+    const filtered = works.filter(w => {
+      if (filter === 'all') return true;
+      const progress = w.progress || 0;
+      if (filter === 'ongoing') return progress < 100;
+      if (filter === 'completed') return progress === 100;
+      return true;
+    });
+    setLocalFilteredWorks(filtered);
+  }, [works, filter]);
+
+  const handleReorder = async (newOrder: Work[]) => {
+    setLocalFilteredWorks(newOrder);
+    const promises = newOrder.map((w, index) => {
+      return updateDoc(doc(db, 'works', w.id), { order: index });
+    });
+    try {
+      await Promise.all(promises);
+    } catch (e) {
+      console.error(e);
+      toast.error('Erro ao salvar ordem');
+    }
+  };
 
   // Edit Cover Modal
   const [coverWork, setCoverWork] = useState<Work | null>(null);
