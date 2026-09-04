@@ -186,7 +186,7 @@ export function WoodworkingDesignStudio({ onBack }: { onBack?: () => void }) {
             </div>
 
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>DESCRIÇÃO DETALHADA</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>DESCRIÇíO DETALHADA</label>
               <input 
                 type="text" 
                 value={desc}

@@ -38,7 +38,7 @@ export function MasonryWizard({ mode, onBack, onHome }: { mode: AssistantMode, o
 
   let currentTip = null;
   if (step === 2 && data.material.includes('Baiano')) {
-    currentTip = "O Tijolo Baiano (cerâmico) é excelente para vedação térmica e acústica, mas NÃO possui função estrutural. Use-o apenas para fechar vãos.";
+    currentTip = "O Tijolo Baiano (cerâmico) é excelente para vedação térmica e acústica, mas NíO possui função estrutural. Use-o apenas para fechar vãos.";
   } else if (step === 3 && data.height > 3) {
     currentTip = "Paredes com altura superior a 3 metros exigem cinta de amarração intermediária para evitar flambagem e fissuras.";
   } else if (step === 4 && data.hasOpenings) {

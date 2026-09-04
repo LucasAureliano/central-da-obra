@@ -14,7 +14,7 @@ export async function exportToExcel({ filename, sheetName, columns, data, title,
   const worksheet = workbook.addWorksheet(sheetName);
 
   // Add Branding Header / Watermark
-  worksheet.addRow(['CENTRALOBRA - PLATAFORMA DE GESTÃO DA CONSTRUÇÃO CIVIL']);
+  worksheet.addRow(['CENTRALOBRA - PLATAFORMA DE GESTíO DA CONSTRUÇíO CIVIL']);
   worksheet.addRow(['Documento Autenticado CentralObra | www.centralobra.com.br']);
   worksheet.addRow([]);
 

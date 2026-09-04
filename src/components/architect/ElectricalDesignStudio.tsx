@@ -147,7 +147,7 @@ export function ElectricalDesignStudio({ onBack }: { onBack?: () => void }) {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>TENSÃO (V)</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>TENSíO (V)</label>
               <select 
                 value={newVoltage}
                 onChange={e => setNewVoltage(e.target.value)}
@@ -203,7 +203,7 @@ export function ElectricalDesignStudio({ onBack }: { onBack?: () => void }) {
                           <strong style={{ fontSize: 14, color: '#EAB308' }}>{breaker}A</strong>
                         </div>
                         <div style={{ backgroundColor: 'var(--bg-elevated)', padding: 10, borderRadius: 12 }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>FIAÇÃO MÍN.</span>
+                          <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>FIAÇíO MÍN.</span>
                           <strong style={{ fontSize: 14, color: 'var(--text-main)' }}>{wire}</strong>
                         </div>
                         <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: 10, borderRadius: 12 }}>

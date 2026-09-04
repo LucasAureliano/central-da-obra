@@ -64,7 +64,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
       setEntries(data);
     } catch (error) {
       console.error(error);
-      toast.error('Erro ao carregar diÃ¡rio tÃ©cnico.');
+      toast.error('Erro ao carregar diário técnico.');
     } finally {
       setLoading(false);
     }
@@ -108,8 +108,8 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>DiÃ¡rio de Obra TÃ©cnico</h3>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Acompanhamento diÃ¡rio com registros climÃ¡ticos e de equipe.</p>
+          <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>Diário de Obra Técnico</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Acompanhamento diário com registros climáticos e de equipe.</p>
         </div>
         <button className="btn-primary" onClick={() => setIsModalOpen(true)} style={{ padding: '8px 14px', borderRadius: 12, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
           <Plus size={16} /> Novo Registro
@@ -121,7 +121,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
       ) : entries.length === 0 ? (
         <div style={{ padding: 40, textAlign: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 16 }}>
           <BookOpen size={32} color="var(--text-muted)" style={{ marginBottom: 12 }} />
-          <p style={{ color: 'var(--text-muted)', margin: 0 }}>Nenhum registro no diÃ¡rio ainda.</p>
+          <p style={{ color: 'var(--text-muted)', margin: 0 }}>Nenhum registro no diário ainda.</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -133,7 +133,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
                     <Calendar size={16} /> {entry.date}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: 12, backgroundColor: 'rgba(0,0,0,0.05)', padding: '4px 8px', borderRadius: 8 }}>
-                    ManhÃ£: 
+                    Manhã: 
                     {entry.weatherMorning === 'Ensolarado' && <Sun size={14} color="#F59E0B" />}
                     {entry.weatherMorning === 'Chuvoso' && <CloudRain size={14} color="#3B82F6" />}
                     {entry.weatherMorning === 'Nublado' && <Cloud size={14} color="#9CA3AF" />}
@@ -157,7 +157,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
               
               {entry.incidents && (
                 <div style={{ marginTop: 8, padding: 10, backgroundColor: 'rgba(239, 68, 68, 0.05)', borderRadius: 8, borderLeft: '3px solid #EF4444' }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', display: 'block', marginBottom: 2 }}>OcorrÃªncias / Atrasos</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', display: 'block', marginBottom: 2 }}>Ocorrências / Atrasos</span>
                   <p style={{ fontSize: 13, color: 'var(--text-main)', margin: 0 }}>{entry.incidents}</p>
                 </div>
               )}
@@ -192,7 +192,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
         <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: 20 }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: 500, borderRadius: 24, padding: 24, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Novo Registro DiÃ¡rio</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Novo Registro Diário</h2>
               <button className="btn-icon" onClick={() => setIsModalOpen(false)}><X size={20} /></button>
             </div>
 
@@ -203,7 +203,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
                   <input type="date" className="input-field" style={{ padding: '0 16px' }} value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
                 </div>
                 <div className="input-group">
-                  <label>Clima (ManhÃ£)</label>
+                  <label>Clima (Manhã)</label>
                   <select className="select-field" value={formData.weatherMorning} onChange={e => setFormData({...formData, weatherMorning: e.target.value as any})}>
                     <option value="Ensolarado">Ensolarado â˜€ï¸</option>
                     <option value="Nublado">Nublado â˜ï¸</option>
@@ -253,7 +253,7 @@ export function ProjectTechnicalJournal({ projectId }: TechnicalJournalProps) {
               </div>
 
               <div className="input-group">
-                <label>OcorrÃªncias (Opcional)</label>
+                <label>Ocorrências (Opcional)</label>
                 <textarea className="input-field" style={{ padding: '12px 16px', minHeight: 60 }} value={formData.incidents} onChange={e => setFormData({...formData, incidents: e.target.value})} placeholder="Houve algum problema ou atraso?" />
               </div>
             </div>

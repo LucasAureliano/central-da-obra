@@ -247,7 +247,7 @@ export function InteriorDesignStudio({ onBack }: { onBack: () => void }) {
             </motion.div>
           )}
 
-          {/* COMPARAÇÃO */}
+          {/* COMPARAÇíO */}
           {activeTab === 'comparacao' && (
             <motion.div key="comparacao" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               {compareList.length === 0 ? (

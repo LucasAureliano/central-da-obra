@@ -91,7 +91,7 @@ export function drawProfessionalFooter(doc: jsPDF, pageNumber: number, totalPage
   doc.setTextColor(156, 163, 175);
   doc.text('Gerado por CentralObra - centralobra.com', 40, pageHeight - 30);
   
-  doc.text(`PÃ¡gina ${pageNumber} de ${totalPages}`, pageWidth - 40, pageHeight - 30, { align: 'right' });
+  doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth - 40, pageHeight - 30, { align: 'right' });
 }
 
 export function applyGlobalWatermark(doc: jsPDF, isPro: boolean = false) {
@@ -132,7 +132,7 @@ export async function generateCalculationPDF({
   const margin = 40;
   const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-  let currentY = await drawProfessionalHeader(doc, 'CÃ¡lculo de Materiais', `Data: ${dataHoje}`, userName);
+  let currentY = await drawProfessionalHeader(doc, 'Cálculo de Materiais', `Data: ${dataHoje}`, userName);
 
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
@@ -143,7 +143,7 @@ export async function generateCalculationPDF({
   if (results.mainMetrics && results.mainMetrics.length > 0) {
     autoTable(doc, {
       startY: currentY,
-      head: [['MÃ©trica', 'Valor']],
+      head: [['Métrica', 'Valor']],
       body: results.mainMetrics.map((m: any) => [m.label, `${m.value} ${m.unit || ''}`]),
       theme: 'plain',
       headStyles: { fillColor: [243, 244, 246], textColor: [17, 24, 39], fontStyle: 'bold', fontSize: 10 },
@@ -158,7 +158,7 @@ export async function generateCalculationPDF({
   if (results.materials && results.materials.length > 0) {
     autoTable(doc, {
       startY: currentY,
-      head: [['Material', 'Quantidade', 'PreÃ§o Unit. (Informado)']],
+      head: [['Material', 'Quantidade', 'Preço Unit. (Informado)']],
       body: results.materials.map((m: any) => [
         m.name,
         `${m.quantity} ${m.unit}`,
@@ -177,14 +177,14 @@ export async function generateCalculationPDF({
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(17, 24, 39);
-    doc.text('ObservaÃ§Ãµes', margin, currentY);
+    doc.text('Observações', margin, currentY);
     currentY += 15;
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(75, 85, 99);
     results.observations.forEach((obs: any) => {
-      const lines = doc.splitTextToSize(`â€¢ ${obs}`, 500);
+      const lines = doc.splitTextToSize(`• ${obs}`, 500);
       doc.text(lines, margin, currentY);
       currentY += (lines.length * 12) + 4;
     });
@@ -238,7 +238,7 @@ export async function generateCommercialQuotePDF({
 
   let currentY = await drawProfessionalHeader(
     doc, 
-    'OrÃ§amento Comercial', 
+    'Orçamento Comercial', 
     `Data: ${dataHoje} | Validade: ${conditions.validade || '15 dias'}`, 
     profile?.name || 'Profissional',
     docNumber.toString()
@@ -271,7 +271,7 @@ export async function generateCommercialQuotePDF({
   
   doc.setFontSize(11);
   doc.setTextColor(17, 24, 39);
-  doc.text(client.name || 'Cliente NÃ£o Informado', rightX, currentY + 14);
+  doc.text(client.name || 'Cliente Não Informado', rightX, currentY + 14);
   
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
@@ -280,7 +280,7 @@ export async function generateCommercialQuotePDF({
   if (client.phone) { doc.text(`Tel: ${client.phone}`, rightX, cY); cY += 10; }
   if (client.email) { doc.text(client.email, rightX, cY); cY += 10; }
   if (workData?.name) { doc.text(`Obra: ${workData.name}`, rightX, cY); cY += 10; }
-  if (workData?.address) { doc.text(`EndereÃ§o: ${workData.address}`, rightX, cY); }
+  if (workData?.address) { doc.text(`Endereço: ${workData.address}`, rightX, cY); }
 
   currentY += 80;
 
@@ -317,7 +317,7 @@ export async function generateCommercialQuotePDF({
       brlFormatter.format(s.price),
       brlFormatter.format(s.qtd * s.price)
     ]);
-    drawTable('ServiÃ§os Profissionais', [['DescriÃ§Ã£o', 'Qtd', 'V. UnitÃ¡rio', 'Subtotal']], sBody);
+    drawTable('Serviços Profissionais', [['Descrição', 'Qtd', 'V. Unitário', 'Subtotal']], sBody);
   }
 
   if (materials && materials.length > 0) {
@@ -327,20 +327,20 @@ export async function generateCommercialQuotePDF({
       brlFormatter.format(m.price),
       brlFormatter.format(m.qtd * m.price)
     ]);
-    drawTable('Materiais Fornecidos', [['Material', 'Qtd', 'V. UnitÃ¡rio', 'Subtotal']], mBody);
+    drawTable('Materiais Fornecidos', [['Material', 'Qtd', 'V. Unitário', 'Subtotal']], mBody);
   }
 
   if ((totals?.totalLabor > 0) || (totals?.totalCosts > 0)) {
     const extraBody = [];
     if (totals.totalLabor > 0) {
-      extraBody.push(['MÃ£o de Obra Especializada', `${labor.workers} prof. x ${labor.days} dias`, brlFormatter.format(labor.dailyRate), brlFormatter.format(totals.totalLabor)]);
+      extraBody.push(['Mão de Obra Especializada', `${labor.workers} prof. x ${labor.days} dias`, brlFormatter.format(labor.dailyRate), brlFormatter.format(totals.totalLabor)]);
     }
-    if (costs.freight > 0) extraBody.push(['Frete / LogÃ­stica', '-', '-', brlFormatter.format(costs.freight)]);
+    if (costs.freight > 0) extraBody.push(['Frete / Logística', '-', '-', brlFormatter.format(costs.freight)]);
     if (costs.displacement > 0) extraBody.push(['Deslocamento', '-', '-', brlFormatter.format(costs.displacement)]);
-    if (costs.rental > 0) extraBody.push(['LocaÃ§Ã£o de Equipamentos', '-', '-', brlFormatter.format(costs.rental)]);
+    if (costs.rental > 0) extraBody.push(['Locação de Equipamentos', '-', '-', brlFormatter.format(costs.rental)]);
     if (costs.others > 0) extraBody.push(['Outros Custos / Taxas', '-', '-', brlFormatter.format(costs.others)]);
 
-    drawTable('Custos Adicionais', [['DescriÃ§Ã£o', 'Detalhe', 'ReferÃªncia', 'Subtotal']], extraBody);
+    drawTable('Custos Adicionais', [['Descrição', 'Detalhe', 'Referência', 'Subtotal']], extraBody);
   }
 
   if (currentY > pageHeight - 220) {
@@ -388,18 +388,18 @@ export async function generateCommercialQuotePDF({
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(17, 24, 39);
-  doc.text('CondiÃ§Ãµes Comerciais', margin, currentY + 16);
+  doc.text('Condições Comerciais', margin, currentY + 16);
   
   let condY = currentY + 36;
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(75, 85, 99);
   
-  doc.text(`â€¢ Prazo de ExecuÃ§Ã£o: ${conditions?.prazo || 'A combinar'}`, margin, condY); condY += 16;
-  doc.text(`â€¢ Garantia: ${conditions?.garantia || 'PadrÃ£o legal'}`, margin, condY); condY += 16;
-  doc.text(`â€¢ Pagamento: ${conditions?.pagamento || 'A combinar'}`, margin, condY); condY += 16;
+  doc.text(`• Prazo de Execução: ${conditions?.prazo || 'A combinar'}`, margin, condY); condY += 16;
+  doc.text(`• Garantia: ${conditions?.garantia || 'Padrão legal'}`, margin, condY); condY += 16;
+  doc.text(`• Pagamento: ${conditions?.pagamento || 'A combinar'}`, margin, condY); condY += 16;
   if (conditions?.obs) {
-    const lines = doc.splitTextToSize(`â€¢ ObservaÃ§Ãµes: ${conditions.obs}`, boxX - margin - 20);
+    const lines = doc.splitTextToSize(`• Observações: ${conditions.obs}`, boxX - margin - 20);
     doc.text(lines, margin, condY);
   }
 
@@ -447,7 +447,7 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
   
   let currentY = await drawProfessionalHeader(
     doc,
-    'OrÃ§amento de Obra (Interno)',
+    'Orçamento de Obra (Interno)',
     `Data: ${dataHoje}`,
     profile?.name || user?.displayName || 'CentralObra',
     docNumber.toString()
@@ -462,10 +462,10 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(75, 85, 99);
-  doc.text(`Obra: ${work?.name || 'NÃ£o informada'}`, margin, currentY);
+  doc.text(`Obra: ${work?.name || 'Não informada'}`, margin, currentY);
   currentY += 14;
   if (work?.address) {
-    doc.text(`EndereÃ§o: ${work.address}`, margin, currentY);
+    doc.text(`Endereço: ${work.address}`, margin, currentY);
     currentY += 14;
   }
   currentY += 20;
@@ -478,7 +478,7 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
 
   if (validCalcs.length === 0) {
     doc.setFontSize(12);
-    doc.text('Nenhum material encontrado neste orÃ§amento.', margin, currentY);
+    doc.text('Nenhum material encontrado neste orçamento.', margin, currentY);
   } else {
     validCalcs.forEach(calc => {
       // Draw Calculation Header
@@ -490,10 +490,10 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(37, 99, 235);
-      doc.text(`ServiÃ§o/Etapa: ${calc.calcType || 'Geral'}`, margin, currentY);
+      doc.text(`Serviço/Etapa: ${calc.calcType || 'Geral'}`, margin, currentY);
       currentY += 15;
 
-      const head = [['Material', 'Quantidade', 'PreÃ§o Unit.', 'Subtotal']];
+      const head = [['Material', 'Quantidade', 'Preço Unit.', 'Subtotal']];
       const body = calc.resultData.materials.map((mat: any) => {
         const price = mat.price || 0;
         const qty = mat.quantity || 0;
@@ -585,6 +585,6 @@ export async function generateBudgetPDF({ work, user, calculations, profile }: P
   URL.revokeObjectURL(pdfUrl);
 }
 
-export async function drawHeader(doc: jsPDF, userName: string, _userEmail: string, workName?: string, customLogoUrl?: string | null) { await drawProfessionalHeader(doc, 'RelatÃ³rio', workName, userName); return 100; }
+export async function drawHeader(doc: jsPDF, userName: string, _userEmail: string, workName?: string, customLogoUrl?: string | null) { await drawProfessionalHeader(doc, 'Relatório', workName, userName); return 100; }
 export function drawFooter(doc: jsPDF) { drawProfessionalFooter(doc, 1, 1); }
 

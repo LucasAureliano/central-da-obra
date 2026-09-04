@@ -51,7 +51,7 @@ export function BlondelCalc({ onBack }: { onBack: () => void }) {
         `Baseado na fórmula de Blondel (2E + P = 64).`,
         isIdeal 
           ? 'As proporções estão dentro da norma (Ideal).'
-          : 'ATENÇÃO: As proporções resultantes podem ficar desconfortáveis. Considere ajustar o espaço ou patamares.'
+          : 'ATENÇíO: As proporções resultantes podem ficar desconfortáveis. Considere ajustar o espaço ou patamares.'
       ]
     });
     

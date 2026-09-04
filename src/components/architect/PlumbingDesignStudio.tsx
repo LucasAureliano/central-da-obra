@@ -175,7 +175,7 @@ export function PlumbingDesignStudio({ onBack }: { onBack?: () => void }) {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>DESCRIÇÃO</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>DESCRIÇíO</label>
               <input 
                 type="text" 
                 value={newDesc}
