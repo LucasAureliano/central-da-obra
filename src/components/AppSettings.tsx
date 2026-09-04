@@ -9,7 +9,7 @@ export function AppSettings({ onBack, onNavigate }: { onBack: () => void, onNavi
     if (!profile) return;
     const csvContent = 'data:text/csv;charset=utf-8,' 
       + 'Nome,Email,Telefone,Cargo,Data de Cadastro\n'
-      + `${profile.name || ''},${user?.email || ''},${profile.phone || ''},${profile.role || ''},${new Date().toLocaleDateString('pt-BR')}`;
+      + `${profile.name || ''},${user?.email || ''},${(profile as any).phone || ''},${(profile as any).role || ''},${new Date().toLocaleDateString('pt-BR')}`;
     
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
@@ -19,7 +19,7 @@ export function AppSettings({ onBack, onNavigate }: { onBack: () => void, onNavi
     link.click();
     document.body.removeChild(link);
     try { toast.success('Dados exportados com sucesso!'); } catch(e) {}
-  }; onBack }: { onBack: () => void }) {
+  };
   const [notifications, setNotifications] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
 
