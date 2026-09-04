@@ -48,7 +48,7 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
         </div>
 
         <div className="nav-right mobile-hidden">
-          <button onClick={onLogin} className="landing-nav-link" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }} style={{ fontWeight: 600 }}>Entrar</button>
+          <button onClick={onLogin} className="landing-nav-link" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Entrar</button>
           <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
         </div>
         
