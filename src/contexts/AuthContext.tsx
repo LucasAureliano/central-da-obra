@@ -58,6 +58,7 @@ export interface UserProfile {
   entitlements?: Entitlements;
   isAdmin?: boolean;
   hasSeenWelcome?: boolean;
+    hasSeenTour?: boolean;
   dashboardPrefs?: DashboardPrefs;
   
   // Professional / Commercial fields
@@ -136,8 +137,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             autoRenew: false
           },
           entitlements: {},
-          hasSeenWelcome:
-            localStorage.getItem("guestHasSeenWelcome") === "true",
+          hasSeenWelcome: localStorage.getItem("guestHasSeenWelcome") === "true",
+          hasSeenTour: localStorage.getItem("guestHasSeenTour") === "true",
         });
         setLocalGuest(true);
         setLoading(false);
@@ -228,8 +229,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 autoRenew: false
               },
               entitlements: {},
-              hasSeenWelcome:
-                sessionStorage.getItem("guestHasSeenWelcome") === "true",
+              hasSeenWelcome: sessionStorage.getItem("guestHasSeenWelcome") === "true",
+                hasSeenTour: sessionStorage.getItem("guestHasSeenTour") === "true",
               dashboardPrefs: {
                 widgets: ["resumo", "calculadoras", "insights", "financeiro"],
                 order: ["resumo", "calculadoras", "insights", "financeiro"],

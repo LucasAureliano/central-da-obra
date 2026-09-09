@@ -39,13 +39,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <div>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, paddingLeft: 12, marginBottom: 8, display: 'block' }}>Geral</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-               <button className={`nav-item-desktop ${activeTab === 'inicio' ? 'active' : ''}`} onClick={() => setActiveTab('inicio')}>
+               <button id="tour-inicio-desktop" className={`nav-item-desktop ${activeTab === 'inicio' ? 'active' : ''}`} onClick={() => setActiveTab('inicio')}>
                   <Home size={20} /><span>Início</span>
                </button>
-               <button className={`nav-item-desktop ${activeTab === 'obras' ? 'active' : ''}`} onClick={() => setActiveTab('obras')}>
+               <button id="tour-obras-desktop" className={`nav-item-desktop ${activeTab === 'obras' ? 'active' : ''}`} onClick={() => setActiveTab('obras')}>
                   <Briefcase size={20} /><span>{(activeRole === 'architect' || activeRole === 'engineer') ? 'Projetos' : 'Obras'}</span>
                </button>
-               <button className={`nav-item-desktop ${activeTab === 'assistente' ? 'active' : ''}`} onClick={() => setActiveTab('assistente')}>
+               <button id="tour-assistente-desktop" className={`nav-item-desktop ${activeTab === 'assistente' ? 'active' : ''}`} onClick={() => setActiveTab('assistente')}>
                   <Sparkles size={20} /><span>Assistente IA</span>
                </button>
                <button className={`nav-item-desktop ${activeTab === 'connect' ? 'active' : ''}`} onClick={() => setActiveTab('connect')}>

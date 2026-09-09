@@ -14,6 +14,7 @@ import { SplashScreen } from './components/SplashScreen';
 import { LandingPage } from './components/LandingPage';
 import { SubscriptionPlans } from './components/SubscriptionPlans';
 import { InteractiveTour } from './components/onboarding/InteractiveTour';
+import { OnboardingEngine } from './components/onboarding/OnboardingEngine';
 import { Menu } from './components/Menu';
 import { InterstitialAd } from './components/shared/InterstitialAd';
 import { GenericInfoPage } from './components/landing/GenericInfoPage';
@@ -44,7 +45,6 @@ const PublicCalculatorView = lazy(() => import('./components/public/PublicCalcul
 const Finance = lazy(() => import('./components/Finance').then(m => ({ default: m.Finance })));
 const Shopping = lazy(() => import('./components/Shopping').then(m => ({ default: m.Shopping })));
 import { Register } from './components/Register';
-import { RoleSelection } from './components/RoleSelection';
 import { NamePromptModal } from './components/ui/NamePromptModal';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
@@ -347,30 +347,11 @@ function App() {
 
   // POST-AUTH ONBOARDING FLOW
   if (user && profile) {
-    if (!profile.role) {
-      return <RoleSelection />;
-    }
+    
     
     if (!profile.hasSeenWelcome || forceOnboarding) {
-      return (
-        <InteractiveTour onComplete={async () => {
-    if (isGuest) {
-      sessionStorage.setItem('guestHasSeenWelcome', 'true');
-      window.location.reload();
-    } else {
-      setForceOnboarding(false);
-      try {
-        const { doc, updateDoc } = await import('firebase/firestore');
-        const { db } = await import('./lib/firebase');
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, { hasSeenWelcome: true });
-      } catch (e) {
-        console.error('Error saving welcome state:', e);
+        return <OnboardingEngine onComplete={() => setForceOnboarding(false)} />;
       }
-    }
-  }} />
-      );
-    }
     
     // Check if the user needs to provide a name (only for non-guests)
     if (!isGuest && !(profile as any).displayName && !user.displayName) {
@@ -705,6 +686,23 @@ function App() {
             <PortalProvider>
               <div className="app-container">
                 <CustomToaster />
+                  {user && profile?.hasSeenWelcome && !profile?.hasSeenTour && <InteractiveTour onComplete={async () => {
+  try {
+    const { doc, updateDoc } = await import('firebase/firestore');
+    if (isGuest) {
+      localStorage.setItem("guestHasSeenTour", "true");
+      // Force reload to apply state properly or just let the tour close
+      window.location.reload();
+    } else {
+      const { doc, updateDoc } = await import('firebase/firestore');
+      const { db } = await import('./lib/firebase');
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, { hasSeenTour: true });
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}} />}
                 <AppLayout 
                   activeTab={activeTab} 
                   setActiveTab={setActiveTab} 
