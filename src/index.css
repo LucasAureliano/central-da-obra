@@ -1057,3 +1057,8 @@ h3, h4 {
   background: var(--bg-elevated) !important;
   color: var(--text-main) !important;
 }
+  /* Driver.js Overlay Enhancement */
+  div#driver-page-overlay {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }

@@ -18,6 +18,43 @@ interface OnboardingEngineProps {
   onComplete: () => void;
 }
 
+
+const ParticlesBackground = () => {
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+      {Array.from({ length: 15 }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{
+            opacity: 0,
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            scale: Math.random() * 0.5 + 0.5,
+          }}
+          animate={{
+            opacity: [0.1, 0.3, 0.1],
+            y: [null, Math.random() * window.innerHeight],
+            x: [null, Math.random() * window.innerWidth],
+          }}
+          transition={{
+            duration: Math.random() * 20 + 20,
+            repeat: Infinity,
+            ease: 'linear'
+          }}
+          style={{
+            position: 'absolute',
+            width: Math.random() * 300 + 100,
+            height: Math.random() * 300 + 100,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)',
+            filter: 'blur(40px)',
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ role, onComplete }) => {
   const { user } = useAuth();
   const [stage, setStage] = useState<'demo' | 'specialty' | 'conclusion'>('demo');
@@ -133,6 +170,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ role, onComp
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden'
     }}>
+      <ParticlesBackground />
       <AnimatePresence mode="wait">
         {stage === 'demo' && (
           <motion.div 

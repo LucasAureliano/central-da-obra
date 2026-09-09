@@ -33,12 +33,18 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
         onDestroyed: () => {
           onComplete();
         },
-        steps: [
+                steps: [
+          {
+            popover: {
+              title: 'Bem-vindo ao CentralObra!',
+              description: 'Este é o seu painel de controle. Vamos fazer um tour rápido de 1 minuto para você dominar tudo.',
+            }
+          },
           {
             element: document.querySelector('.tour-inicio') || undefined,
             popover: {
-              title: 'Bem-vindo ao CentralObra!',
-              description: 'Este é o seu painel central. Aqui você tem uma visão geral de tudo.',
+              title: 'Visão Geral',
+              description: 'Aqui você acompanha o progresso de tudo. Fique de olho nos alertas vermelhos!',
               side: isDesktop ? 'right' : 'top',
               align: 'start'
             }
@@ -46,8 +52,8 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
           {
             element: document.querySelector('.tour-obras') || undefined,
             popover: {
-              title: 'Seus Projetos',
-              description: 'Gerencie todas as suas obras, orçamentos e clientes neste menu.',
+              title: 'Gestão de Obras',
+              description: 'Onde a mágica acontece. Crie cronogramas, orçamentos e convide clientes.',
               side: isDesktop ? 'right' : 'top',
               align: 'start'
             }
@@ -56,24 +62,24 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
             element: document.querySelector('.tour-assistente') || undefined,
             popover: {
               title: 'Inteligência Artificial',
-              description: 'Nossa IA responde dúvidas técnicas, normas da ABNT e auxilia nos seus orçamentos.',
+              description: 'Tem dúvidas técnicas? Nossa IA tira dúvidas e pesquisa a ABNT para você na hora.',
               side: isDesktop ? 'right' : 'top',
               align: 'start'
             }
           },
           {
-            element: document.querySelector('.tour-calculos') || document.querySelector('.tour-obras') || undefined,
+            element: document.querySelector('.tour-calculos') || undefined,
             popover: {
               title: 'Calculadoras Exatas',
-              description: 'Descubra a quantidade exata de materiais para cada etapa, evitando desperdício.',
+              description: 'Quantifique cimento, tijolo, piso e tinta para evitar dor de cabeça com sobras ou faltas.',
               side: isDesktop ? 'right' : 'top',
               align: 'start'
             }
           },
           {
             popover: {
-              title: 'Tudo pronto!',
-              description: 'Você está preparado para usar a plataforma. Explore as ferramentas e ganhe produtividade!',
+              title: 'Tudo pronto! 🚀',
+              description: 'Sinta-se em casa. Explore, crie e se torne mais produtivo hoje mesmo!',
             }
           }
         ]
