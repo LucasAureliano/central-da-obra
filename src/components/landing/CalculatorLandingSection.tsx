@@ -1,3 +1,4 @@
+import { LayoutTextFlip } from '../ui/LayoutTextFlip';
 import { motion } from 'framer-motion';
 import { Calculator, Ruler, PaintRoller, Hammer, CheckCircle2, FileSpreadsheet } from 'lucide-react';
 
@@ -53,9 +54,9 @@ export function CalculatorLandingSection() {
             Gratuito para Todos
           </div>
           
-          <h2 className="landing-section-title">A Mais Completa <span className="text-gradient">Calculadora de Materiais</span></h2>
-          <p className="landing-section-subtitle">
-            Diga adeus ao "chutômetro" e ao desperdício. Nossa plataforma oferece dezenas de calculadoras precisas para quantificar materiais de construção de forma simples, rápida e gratuita.
+          <LayoutTextFlip text="Cálculos precisos para" words={["Alvenaria", "Pisos e Revestimentos", "Gesso e Drywall", "Telhados", "Concreto", "Pintura"]} />
+          <p className="landing-section-subtitle" style={{ marginTop: 24 }}>
+            Experimente o poder de calculadoras gratuitas que evitam desperdícios e trazem precisão milimétrica para a sua obra.
           </p>
         </motion.div>
 

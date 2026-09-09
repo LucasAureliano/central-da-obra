@@ -36,17 +36,23 @@ export async function drawProfessionalHeader(doc: jsPDF, documentTitle: string, 
   doc.setLineWidth(1);
   doc.line(0, 80, pageWidth, 80);
 
-  const logoBase64 = await fetchImageAsBase64('/logo-centralobra.png');
+  const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
   if (logoBase64) {
-    const props = doc.getImageProperties(logoBase64);
-    const ratio = props.width / props.height;
-    const imgHeight = 26; 
-    const imgWidth = imgHeight * ratio;
-    doc.addImage(logoBase64, 'PNG', 40, 27, imgWidth, imgHeight);
-  } else {
-    doc.setFontSize(16);
+    const imgSize = 22; // Make the icon decent sized
+    doc.addImage(logoBase64, 'JPEG', 40, 29, imgSize, imgSize);
+    
+    doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(37, 99, 235);
+    doc.setTextColor(17, 24, 39); // dark text
+    doc.text('CentralObra', 40 + imgSize + 8, 45);
+    
+    doc.setTextColor(255, 107, 0); // primary color dot
+    const textWidth = doc.getTextWidth('CentralObra');
+    doc.text('.', 40 + imgSize + 8 + textWidth + 1, 45);
+  } else {
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(17, 24, 39);
     doc.text('CentralObra', 40, 48);
   }
 

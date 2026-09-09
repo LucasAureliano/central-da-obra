@@ -1,6 +1,6 @@
 ﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { adminDb, adminAuth } from './_lib/firebase-admin.js';
+import { adminDb, adminAuth } from './_lib/firebase-admin';
 
 export interface PriceResult {
   store: string;
