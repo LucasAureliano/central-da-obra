@@ -22,7 +22,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe }) =
     <section className="landing-section" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-base)' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, color: 'var(--text-main)', marginBottom: 16, whiteSpace: 'normal', overflow: 'visible' }}>
             Planos que se pagam na <span style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text', backgroundImage: 'linear-gradient(90deg, #3B82F6, #8B5CF6)' }}>primeira obra</span>
           </h2>
           <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto' }}>
