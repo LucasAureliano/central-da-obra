@@ -143,6 +143,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
     } else {
       localStorage.setItem('guestHasSeenWelcome', 'true');
       if (selectedRole) localStorage.setItem('pendingRole', selectedRole);
+      window.location.reload();
     }
     
     onComplete();
@@ -172,7 +173,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
   );
 
   const renderRole = () => (
-    <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '40px 24px', maxWidth: 800, margin: '0 auto' }}>
+    <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '80px 24px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: '#FFF', marginBottom: 16 }}>Qual é o seu perfil?</h2>
         <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)' }}>A CentralObra adapta a experiência de acordo com as suas necessidades reais.</p>
@@ -186,7 +187,12 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
               key={r.id}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedRole(r.id as UserRole)}
+              onClick={() => {
+                setSelectedRole(r.id as UserRole);
+                setTimeout(() => {
+                  setStage('presentation');
+                }, 400);
+              }}
               style={{
                 padding: 24, borderRadius: 24, cursor: 'pointer',
                 background: isSelected ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.03)',
@@ -233,7 +239,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
     const features = selectedRole ? ROLE_FEATURES[selectedRole as keyof typeof ROLE_FEATURES] : [];
     
     return (
-      <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '40px 24px', maxWidth: 800, margin: '0 auto' }}>
+      <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '80px 24px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: '#FFF', marginBottom: 16 }}>Preparamos o seu ambiente</h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)' }}>Abaixo estão alguns dos recursos que você terá acesso imediato.</p>

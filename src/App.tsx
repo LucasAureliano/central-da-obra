@@ -290,9 +290,9 @@ function App() {
                   <X size={20} />
                 </button>
                 {authView === 'login' ? (
-                  <Login onGoToRegister={() => setAuthView('register')} theme={theme} />
+                  <Login onGoToRegister={() => setAuthView('register')} theme="dark" />
                 ) : (
-                  <Register onGoToLogin={() => setAuthView('login')} theme={theme} />
+                  <Register onGoToLogin={() => setAuthView('login')} theme="dark" />
                 )}
               </motion.div>
             </div>
@@ -338,8 +338,8 @@ function App() {
                 </button>
                 
                 {authView === 'login' 
-                  ? <Login onGoToRegister={() => setAuthView('register')} theme={theme} /> 
-                  : <Register onGoToLogin={() => setAuthView('login')} theme={theme} />}
+                  ? <Login onGoToRegister={() => setAuthView('register')} theme="dark" /> 
+                  : <Register onGoToLogin={() => setAuthView('login')} theme="dark" />}
               </motion.div>
             </div>
           )}

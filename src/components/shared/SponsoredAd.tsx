@@ -66,7 +66,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
             marginBottom: 24,
             overflow: 'hidden',
             boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-            minHeight: 120
+            minHeight: 100
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>

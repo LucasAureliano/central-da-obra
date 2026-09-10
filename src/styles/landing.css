@@ -1,3 +1,12 @@
+
+/* Force Dark Mode locally */
+.landing-navbar, .landing-footer, .auth-modal-dark-force {
+  --text-main: #FFFFFF;
+  --text-muted: #9CA3AF;
+  --bg-main: #0A0A0B;
+  --bg-surface: #1E293B;
+  --border-subtle: rgba(255,255,255,0.1);
+}
 ﻿.landing-body {
   color: var(--text-main);
   background: var(--bg-base);
@@ -113,9 +122,7 @@
   height: 70px;
 }
 
-[data-theme='light'] .landing-navbar.scrolled {
-  background-color: rgba(255, 255, 255, 0.85);
-}
+
 
 .landing-nav-container {
   width: 100%;

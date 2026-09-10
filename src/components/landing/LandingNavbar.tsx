@@ -25,7 +25,7 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
       <div className="landing-nav-container">
         <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <a href="/" className="logo-link">
-            <Logo variant="horizontal" theme={theme} />
+            <Logo variant="horizontal" theme="dark" />
           </a>
           <div className="desktop-only">
              <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)' }} onClick={() => {

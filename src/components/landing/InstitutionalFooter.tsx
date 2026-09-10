@@ -29,7 +29,7 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
         <div className="footer-grid">
           {/* Col 1: Brand */}
           <div className="footer-brand" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <Logo variant="horizontal" theme={theme} />
+            <Logo variant="horizontal" theme="dark" />
             <p style={{ color: '#A3A3A3', lineHeight: 1.6, margin: 0, maxWidth: '280px' }}>
               Plataforma inteligente para construção civil. Orçamentos, normas e calculadoras em um só lugar.
             </p>

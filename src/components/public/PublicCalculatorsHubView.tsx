@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { motion } from 'framer-motion';
 import { Calculator, ArrowRight, Grid, HardHat, Ruler, Wrench } from 'lucide-react';
 import { SponsoredAd } from '../shared/SponsoredAd';
 import { LandingNavbar } from '../landing/LandingNavbar';
@@ -14,7 +15,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
   };
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       <Helmet>
         <title>Calculadoras de Construção Civil Grátis | CentralObra</title>
         <meta name="description" content="Acesse diversas calculadoras gratuitas para construção civil. Calcule cimento, areia, brita, argamassa, tijolos, tintas e pisos com precisão." />
@@ -51,7 +52,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
         onNavigate={handleNavigate}
       />
 
-      <main style={{ maxWidth: 960, margin: '0 auto', padding: '120px 20px 40px', boxSizing: 'border-box', width: '100%', position: 'relative', zIndex: 10, flex: 1 }}>
+      <main style={{ maxWidth: 960, margin: '0 auto', padding: '140px 20px 40px', boxSizing: 'border-box', width: '100%', position: 'relative', zIndex: 10, flex: 1 }}>
         
         {/* Hero Section */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -70,25 +71,25 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
 
         {/* Grid de Calculadoras */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 20, marginBottom: 48, marginTop: 40 }}>
-          <CalcCard 
+          <MotionCalcCard variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.02, translateY: -4 }} whileTap={{ scale: 0.98 }} 
             title="Calculadora de Concreto" 
             desc="Calcule a quantidade exata de cimento, areia, brita e água para o seu traço de concreto."
             icon={<HardHat />}
             link="/?calc=concreto"
           />
-          <CalcCard 
+          <MotionCalcCard variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.02, translateY: -4 }} whileTap={{ scale: 0.98 }} 
             title="Calculadora de Pisos e Azulejos" 
             desc="Descubra quantos metros quadrados de piso e argamassa você vai precisar."
             icon={<Grid />}
             link="/?calc=pisos"
           />
-          <CalcCard 
+          <MotionCalcCard variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.02, translateY: -4 }} whileTap={{ scale: 0.98 }} 
             title="Calculadora de Tintas" 
             desc="Estime os galões de tinta e massa corrida necessários para pintar suas paredes."
             icon={<Wrench />}
             link="/?calc=tinta"
           />
-          <CalcCard 
+          <MotionCalcCard variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.02, translateY: -4 }} whileTap={{ scale: 0.98 }} 
             title="Alvenaria (Tijolos e Blocos)" 
             desc="Cálculo de tijolos baianos, blocos de concreto e argamassa de assentamento."
             icon={<Ruler />}
@@ -135,9 +136,9 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
   );
 }
 
-function CalcCard({ title, desc, icon, link, comingSoon }: { title: string, desc: string, icon: React.ReactNode, link: string, comingSoon?: boolean }) {
+const CalcCard = React.forwardRef<HTMLAnchorElement, { title: string, desc: string, icon: React.ReactNode, link: string, comingSoon?: boolean }>(({ title, desc, icon, link, comingSoon }, ref) => {
   return (
-    <a 
+    <a ref={ref}
       href={comingSoon ? '#' : link}
       style={{ 
         display: 'block', 
@@ -170,4 +171,5 @@ function CalcCard({ title, desc, icon, link, comingSoon }: { title: string, desc
       )}
     </a>
   );
-}
+});
+const MotionCalcCard = motion(CalcCard);
