@@ -119,6 +119,7 @@ function App() {
   });
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
   const [forceOnboarding, setForceOnboarding] = useState(false);
+  const [localHasSeenWelcome, setLocalHasSeenWelcome] = useState(false);
   const rawRole = profile?.role || localStorage.getItem('pendingRole');
   const activeRole = ['service', 'architect', 'engineer', 'builder'].includes(rawRole as string) ? rawRole : 'owner';
 
@@ -360,8 +361,9 @@ function App() {
   if (user && profile) {
     
     
-    if (!profile.hasSeenWelcome || forceOnboarding) {
-        return <OnboardingEngine onComplete={() => setForceOnboarding(false)} />;
+    const hasSeenWelcome = profile.hasSeenWelcome || localHasSeenWelcome;
+      if (!hasSeenWelcome || forceOnboarding) {
+        return <OnboardingEngine onComplete={() => { setLocalHasSeenWelcome(true); setForceOnboarding(false); }} />;
       }
     
     // Check if the user needs to provide a name (only for non-guests)

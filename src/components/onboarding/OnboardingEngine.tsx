@@ -143,7 +143,6 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
     } else {
       localStorage.setItem('guestHasSeenWelcome', 'true');
       if (selectedRole) localStorage.setItem('pendingRole', selectedRole);
-      window.location.reload();
     }
     
     onComplete();
@@ -157,9 +156,9 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
 
   const renderWelcome = () => (
     <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.5, ease: "easeOut" }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', padding: 24, maxWidth: 600, margin: '0 auto' }}>
-      <div style={{ marginBottom: 40, transform: 'scale(1.5)' }}>
+      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1.2, opacity: 1 }} transition={{ duration: 0.8, type: 'spring' }} style={{ marginBottom: 40 }}>
         <Logo variant="splash" theme="dark" />
-      </div>
+        </motion.div>
       <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, color: '#FFF', marginBottom: 24, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
         Bem-vindo ao futuro da construção
       </h1>
@@ -173,20 +172,23 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
   );
 
   const renderRole = () => (
-    <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '80px 24px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 'clamp(60px, 10vh, 100px) 20px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: '#FFF', marginBottom: 16 }}>Qual é o seu perfil?</h2>
         <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)' }}>A CentralObra adapta a experiência de acordo com as suas necessidades reais.</p>
       </div>
       
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, flex: 1, alignContent: 'center' }}>
-        {ROLES.map((r) => {
+        {ROLES.map((r, index) => {
           const isSelected = selectedRole === r.id;
           return (
             <motion.div
               key={r.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.3 }}
+                whileHover={{ scale: 1.02, translateY: -4 }}
+                whileTap={{ scale: 0.98 }}
               onClick={() => {
                 setSelectedRole(r.id as UserRole);
                 setTimeout(() => {
@@ -239,7 +241,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
     const features = selectedRole ? ROLE_FEATURES[selectedRole as keyof typeof ROLE_FEATURES] : [];
     
     return (
-      <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '80px 24px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 'clamp(60px, 10vh, 100px) 20px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: '#FFF', marginBottom: 16 }}>Preparamos o seu ambiente</h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)' }}>Abaixo estão alguns dos recursos que você terá acesso imediato.</p>
@@ -291,8 +293,8 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, backgroundColor: '#0f172a',
-      zIndex: 9999, display: 'flex', flexDirection: 'column', overflow: 'hidden'
+      position: 'fixed', inset: 0, backgroundColor: 'var(--bg-base)',
+      zIndex: 9999, display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', minHeight: '100dvh'
     }}>
       <ParticlesBackground />
       
