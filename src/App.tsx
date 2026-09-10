@@ -132,6 +132,8 @@ function App() {
   const portfolioItemId = urlParams.get('portfolio');
   const isPreview = urlParams.get('preview');
   const isBlog = urlParams.has('blog') || window.location.pathname === '/blog';
+  const isHistory = urlParams.has('sobre') || window.location.pathname === '/sobre';
+  const isContact = urlParams.has('contato') || window.location.pathname === '/contato';
   const isPrivacy = urlParams.has('privacy') || window.location.pathname === '/privacidade';
   const isTerms = urlParams.has('terms') || window.location.pathname === '/termos';
   const blogPostId = urlParams.get('blog');
@@ -231,6 +233,15 @@ function App() {
 
     if (isBlog) {
       return <PublicBlogView theme={theme} postId={blogPostId && blogPostId !== 'true' ? blogPostId : null} />;
+    }
+
+    
+    if (isHistory) {
+      return <GenericInfoPage pageId="history" onBack={() => window.location.href = '/'} onLogin={() => window.location.href = '/?login=true'} onNavigate={(page) => window.location.href = '/' + (page === 'terms' ? 'termos' : page === 'privacy' ? 'privacidade' : page === 'history' ? 'sobre' : page === 'contact' ? 'contato' : '')} theme={theme} />;
+    }
+
+    if (isContact) {
+      return <GenericInfoPage pageId="contact" onBack={() => window.location.href = '/'} onLogin={() => window.location.href = '/?login=true'} onNavigate={(page) => window.location.href = '/' + (page === 'terms' ? 'termos' : page === 'privacy' ? 'privacidade' : page === 'history' ? 'sobre' : page === 'contact' ? 'contato' : '')} theme={theme} />;
     }
 
     if (isPrivacy) {

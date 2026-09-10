@@ -3,5 +3,9 @@ Allow: /
 Allow: /?calculadoras=true
 Allow: /?calc=
 Allow: /?blog=true
+Allow: /privacidade
+Allow: /termos
+Allow: /sobre
+Allow: /contato
 
 Sitemap: https://centralobra.com/sitemap.xml

@@ -50,9 +50,9 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
           <div>
             <h4 className="footer-col-title">Empresa</h4>
             <ul className="footer-links">
-              <li><button onClick={() => onNavigate('history')} className="footer-link">Sobre nós</button></li>
+              <li><a href="/sobre" className="footer-link">Sobre nós</a></li>
               <li><a href="#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="footer-link">Recursos</a></li>
-              <li><button onClick={() => onNavigate('contact')} className="footer-link">Contato</button></li>
+              <li><a href="/contato" className="footer-link">Contato</a></li>
             </ul>
           </div>
 
@@ -74,8 +74,8 @@ export function InstitutionalFooter({ theme, onLogin, onNavigate }: Institutiona
             <ul className="footer-links">
               <li><a href="#faq" onClick={(e) => handleScrollTo(e, 'faq')} className="footer-link">FAQ</a></li>
               <li><button onClick={onLogin} className="footer-link">Central de Ajuda</button></li>
-              <li><button onClick={() => onNavigate('privacy')} className="footer-link">Política de Privacidade</button></li>
-              <li><button onClick={() => onNavigate('terms')} className="footer-link">Termos de Uso</button></li>
+              <li><a href="/privacidade" className="footer-link">Política de Privacidade</a></li>
+              <li><a href="/termos" className="footer-link">Termos de Uso</a></li>
             </ul>
           </div>
         </div>
