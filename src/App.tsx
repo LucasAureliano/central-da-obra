@@ -351,21 +351,19 @@ function App() {
     );
   }
 
-  // APP ENTRANCE SPLASH SCREEN
   
+  // APP ENTRANCE SPLASH SCREEN
+  if (!hasShownAppSplash) {
     // Hide native Capacitor Splash Screen safely once React is fully hydrated
-    useEffect(() => {
-      if (!loading && Capacitor.isNativePlatform()) {
-        CapacitorSplashScreen.hide().catch(console.error);
-      }
-    }, [loading]);
-
-    // APP ENTRANCE SPLASH SCREEN
+    if (!loading && Capacitor.isNativePlatform()) {
+      CapacitorSplashScreen.hide().catch(console.error);
+    }
     return <SplashScreen onComplete={() => {
       sessionStorage.setItem('hasShownAppSplash', 'true');
       setHasShownAppSplash(true);
     }} />;
   }
+
 
   // POST-AUTH ONBOARDING FLOW
   if (user && profile) {
