@@ -58,7 +58,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <div>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, paddingLeft: 12, marginBottom: 8, display: 'block' }}>Ferramentas</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <button className={`nav-item-desktop ${activeTab === 'calculos' || activeTab === 'Calculadoras' ? 'active' : ''}`} onClick={() => setActiveTab('calculos')}>
+              <button id="tour-calculos-desktop" className={`nav-item-desktop ${activeTab === 'calculos' || activeTab === 'Calculadoras' ? 'active' : ''}`} onClick={() => setActiveTab('calculos')}>
                   <Calculator size={20} /><span>Calculadoras</span>
               </button>
               {(activeRole === 'architect' || activeRole === 'engineer' || activeRole === 'service') && (
@@ -90,7 +90,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           {/* CONFIGURAÇÕES */}
           <div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <button className={`nav-item-desktop ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
+              <button id="tour-menu-desktop" className={`nav-item-desktop ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
                   <MenuIcon size={20} /><span>Menu Completo</span>
               </button>
             </div>
@@ -147,7 +147,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
         {/* Mobile Bottom Navigation */}
         <nav className="bottom-nav glass-panel">
-          <button 
+          <button id="tour-inicio-mobile"
             className={`nav-item ${activeTab === 'inicio' ? 'active' : ''}`}
             onClick={() => setActiveTab('inicio')}
           >
@@ -157,7 +157,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             <span>Início</span>
           </button>
           
-          <button 
+          <button id="tour-obras-mobile"
             className={`nav-item ${activeTab === 'obras' ? 'active' : ''}`}
             onClick={() => setActiveTab('obras')}
           >
@@ -167,7 +167,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             <span>{(activeRole === 'architect' || activeRole === 'engineer') ? 'Projetos' : 'Obras'}</span>
           </button>
 
-          <button 
+          <button id="tour-assistente-mobile"
             className={`nav-item highlight-nav ${activeTab === 'assistente' ? 'active' : ''}`}
             onClick={() => setActiveTab('assistente')}
           >
@@ -178,7 +178,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           </button>
 
           {(activeRole === 'owner' || activeRole === 'service') ? (
-            <button 
+            <button id="tour-calculos-mobile"
               className={`nav-item ${activeTab === 'calculos' ? 'active' : ''}`}
               onClick={() => setActiveTab('calculos')}
             >
@@ -199,7 +199,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </button>
           )}
 
-          <button 
+          <button id="tour-menu-mobile"
             className={`nav-item ${activeTab === 'menu' ? 'active' : ''}`}
             onClick={() => setActiveTab('menu')}
           >
