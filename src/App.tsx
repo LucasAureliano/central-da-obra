@@ -6,6 +6,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Capacitor } from '@capacitor/core';
+import { SplashScreen as CapacitorSplashScreen } from '@capacitor/splash-screen';
 const DashboardRouter = lazy(() => import('./components/DashboardRouter').then(m => ({ default: m.DashboardRouter })));
 const Works = lazy(() => import('./components/Works').then(m => ({ default: m.Works })));
 const WorkDetails = lazy(() => import('./components/WorkDetails').then(m => ({ default: m.WorkDetails })));
@@ -351,7 +352,15 @@ function App() {
   }
 
   // APP ENTRANCE SPLASH SCREEN
-  if (!hasShownAppSplash) {
+  
+    // Hide native Capacitor Splash Screen safely once React is fully hydrated
+    useEffect(() => {
+      if (!loading && Capacitor.isNativePlatform()) {
+        CapacitorSplashScreen.hide().catch(console.error);
+      }
+    }, [loading]);
+
+    // APP ENTRANCE SPLASH SCREEN
     return <SplashScreen onComplete={() => {
       sessionStorage.setItem('hasShownAppSplash', 'true');
       setHasShownAppSplash(true);
