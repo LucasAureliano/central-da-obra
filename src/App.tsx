@@ -120,6 +120,7 @@ function App() {
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
   const [forceOnboarding, setForceOnboarding] = useState(false);
   const [localHasSeenWelcome, setLocalHasSeenWelcome] = useState(false);
+  const [localHasSeenTour, setLocalHasSeenTour] = useState(false);
   const rawRole = profile?.role || localStorage.getItem('pendingRole');
   const activeRole = ['service', 'architect', 'engineer', 'builder'].includes(rawRole as string) ? rawRole : 'owner';
 
@@ -699,23 +700,24 @@ function App() {
             <PortalProvider>
               <div className="app-container">
                 <CustomToaster />
-                  {user && profile?.hasSeenWelcome && !profile?.hasSeenTour && <InteractiveTour onComplete={async () => {
-  try {
-    const { doc, updateDoc } = await import('firebase/firestore');
-    if (isGuest) {
-      localStorage.setItem("guestHasSeenTour", "true");
-      // Force reload to apply state properly or just let the tour close
-      window.location.reload();
-    } else {
-      const { doc, updateDoc } = await import('firebase/firestore');
-      const { db } = await import('./lib/firebase');
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, { hasSeenTour: true });
+                  
+{user && profile?.hasSeenWelcome && (!profile?.hasSeenTour && !localHasSeenTour) && <InteractiveTour onComplete={async () => {
+    try {
+      if (isGuest) {
+        localStorage.setItem("guestHasSeenTour", "true");
+        setLocalHasSeenTour(true);
+      } else {
+        const { doc, updateDoc } = await import('firebase/firestore');
+        const { db } = await import('./lib/firebase');
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, { hasSeenTour: true });
+        setLocalHasSeenTour(true);
+      }
+    } catch (e) {
+      console.error('Failed to update tour state:', e);
+      setLocalHasSeenTour(true);
     }
-  } catch(e) {
-    console.error(e);
-  }
-}} />}
+  }} />}
                 <AppLayout 
                   activeTab={activeTab} 
                   setActiveTab={setActiveTab} 
