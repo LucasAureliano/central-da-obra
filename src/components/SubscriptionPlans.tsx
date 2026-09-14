@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { PLANS_CONFIG } from '../config/plans';
 import { useAuth } from '../contexts/AuthContext';
+import { purchaseNativePackage } from '../services/payments/RevenueCatService';
 
 interface SubscriptionPlansProps {
   onBack?: () => void;

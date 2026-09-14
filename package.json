@@ -17,6 +17,7 @@
     "@capacitor/push-notifications": "^8.1.2",
     "@capacitor/share": "^8.0.1",
     "@mercadopago/sdk-react": "^1.0.7",
+    "@revenuecat/purchases-capacitor": "^13.5.1",
     "@stripe/stripe-js": "^9.13.0",
     "cheerio": "^1.2.0",
     "date-fns": "^4.4.0",
