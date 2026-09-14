@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, ArrowRight, MessageSquare, Calculator, BookOpen, ShoppingCart, Lightbulb, Calendar, ClipboardList, Palette, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { takePicture } from '../../utils/nativeCamera';
+import { Camera as CameraIcon, X as XIcon } from 'lucide-react';
 import { useWorks } from '../../contexts/WorksContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency } from '../../utils/formatters';
@@ -15,6 +17,7 @@ interface SmartAssistantProps {
 
 export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const [query, setQuery] = useState('');
+  const [attachment, setAttachment] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const { primaryWork, activeWork } = useWorks();
   const { profile } = useAuth();
@@ -22,7 +25,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
   const isPremium = profile?.subscription?.planId === 'pro' || profile?.subscription?.planId === 'business' || profile?.isAdmin;
   
   const [freeCount, setFreeCount] = useState(0);
-  const [messages, setMessages] = useState<{role: 'assistant'|'user', text: string, suggestions?: any[]}[]>([]);
+  const [messages, setMessages] = useState<{role: 'assistant'|'user', text: string, imageUrl?: string, suggestions?: any[]}[]>([]);
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -46,12 +49,40 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  
+  const handleCamera = async (e: any) => {
+    e.preventDefault();
+    try {
+      const base64 = await takePicture();
+      if (base64) {
+        setAttachment(base64);
+      } else {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+          const file = (e.target as any).files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => setAttachment(reader.result as string);
+            reader.readAsDataURL(file);
+          }
+        };
+        input.click();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSend = async (text: string) => {
     if (!text.trim() || isTyping) return;
     
     const newMessages = [...messages, { role: 'user' as const, text }];
     setMessages(newMessages);
     setQuery('');
+    const currentAttachment = attachment;
+    setAttachment(null);
     setIsTyping(true);
 
     // free limit removed
