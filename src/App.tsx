@@ -48,6 +48,7 @@ const Shopping = lazy(() => import('./components/Shopping').then(m => ({ default
 import { Register } from './components/Register';
 import { NamePromptModal } from './components/ui/NamePromptModal';
 import { useAuth } from './contexts/AuthContext';
+import { usePushNotifications } from './hooks/usePushNotifications';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { useWorks } from './contexts/WorksContext';
 import { ConstructionIndexesProvider } from './contexts/ConstructionIndexesContext';

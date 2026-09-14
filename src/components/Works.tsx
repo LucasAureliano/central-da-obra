@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { useEffect } from 'react';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { takePicture } from '../utils/nativeCamera';
 import { db } from '../lib/firebase';
 import { toast } from 'react-hot-toast';
 import type { Work } from '../types';
@@ -61,6 +62,22 @@ export function Works({ onWorkSelect }: WorksProps) {
   const [editBudget, setEditBudget] = useState(0);
   const [editDeadline, setEditDeadline] = useState('');
   const [updatingWork, setUpdatingWork] = useState(false);
+
+  
+  const handleNativeCamera = async (e: any) => {
+    try {
+      const base64 = await takePicture();
+      if (base64 !== undefined) { e.preventDefault(); }
+      if (base64) {
+        setNewImageUrl(base64);
+      } else {
+        // Fallback to normal input is already handled by the input element click
+        // But we could just trigger the click on the input manually if we wanted.
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -416,7 +433,7 @@ export function Works({ onWorkSelect }: WorksProps) {
                 <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Upload de Imagem ou URL</label>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input type="text" placeholder="https://images.unsplash.com/..." value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="input-field" style={{ flex: 1, height: 44, borderRadius: 12, fontSize: 13 }} />
-                  <label className="btn-secondary" style={{ width: 44, height: 44, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12, cursor: 'pointer', flexShrink: 0 }}>
+                  <label className="btn-secondary" onClick={handleNativeCamera} style={{ width: 44, height: 44, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12, cursor: 'pointer', flexShrink: 0 }}>
                     <Image size={20} />
                     <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                   </label>
