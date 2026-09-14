@@ -6,12 +6,13 @@ import { Capacitor } from '@capacitor/core';
 import { AdMobService } from '../../services/ads/AdMobService';
 
 interface SponsoredAdProps {
+  compact?: boolean;
   probability?: number;
   className?: string;
   location?: string;
 }
 
-export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, className = '', location = 'feed' }) => {
+export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, className = '', location = 'feed', compact = false }) => {
   const { limits } = useSubscription();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -69,16 +70,16 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
             minHeight: 100
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+          {!compact && (<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ background: 'var(--color-primary-alpha)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Patrocinado
               </div>
               <Star size={12} style={{ color: '#F59E0B' }} fill="#F59E0B" />
             </div>
-          </div>
+          </div>)}
 
-          <div style={{ minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-surface)', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ minHeight: compact ? 60 : 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-surface)', borderRadius: 8, overflow: 'hidden' }}>
             {isDummySlot ? (
                <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
                  <p style={{ margin: 0, fontWeight: 600 }}>Bloco de Anúncio</p>
@@ -86,7 +87,7 @@ export const SponsoredAd: React.FC<SponsoredAdProps> = ({ probability = 0.3, cla
                </div>
             ) : (
                <ins className="adsbygoogle"
-                 style={{ display: 'block', width: '100%', height: 90 }}
+                 style={{ display: 'block', width: '100%', height: compact ? 60 : 90 }}
                  data-ad-client="ca-pub-5169145738145346"
                  data-ad-slot={AD_SLOT}
                  data-ad-format="horizontal"

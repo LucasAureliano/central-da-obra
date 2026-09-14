@@ -67,7 +67,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
           </p>
         </div>
 
-        <SponsoredAd probability={1} location="hub_top"  />
+        <SponsoredAd probability={1} location="hub_top" compact={true} />
 
         {/* Grid de Calculadoras */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 20, marginBottom: 48, marginTop: 40 }}>
@@ -131,7 +131,7 @@ export function PublicCalculatorsHubView({ theme }: { theme: string }) {
 
       </main>
       
-      <InstitutionalFooter theme={theme as 'light'|'dark'} onLogin={handleAuth} onNavigate={handleNavigate} />
+      <div style={{ flexShrink: 0 }}><InstitutionalFooter theme={theme as "light"|"dark"} onLogin={handleAuth} onNavigate={handleNavigate} /></div>
     </div>
   );
 }

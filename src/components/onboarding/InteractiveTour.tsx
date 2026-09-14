@@ -15,18 +15,16 @@ export function InteractiveTour({ onComplete }: InteractiveTourProps) {
     if (isRunning.current) return;
     isRunning.current = true;
 
-    
     const checkElements = setInterval(() => {
       const isDesktop = window.innerWidth > 1024;
       const requiredSelector = isDesktop ? '#tour-inicio-desktop' : '#tour-inicio-mobile';
       
-      if (document.querySelector(requiredSelector)) {
+      if (document.querySelector(requiredSelector) || document.querySelector('.nav-item-desktop:has(.lucide-calculator)')) {
         clearInterval(checkElements);
         startTour();
       }
     }, 200);
 
-    // Timeout after 5s just in case
     setTimeout(() => { clearInterval(checkElements); startTour(); }, 5000);
 
     const startTour = () => {
@@ -39,7 +37,7 @@ export function InteractiveTour({ onComplete }: InteractiveTourProps) {
         obras: isDesktop ? '#tour-obras-desktop' : '#tour-obras-mobile',
         assistente: isDesktop ? '#tour-assistente-desktop' : '#tour-assistente-mobile',
         menu: isDesktop ? '#tour-menu-desktop' : '#tour-menu-mobile',
-        calculos: isDesktop ? '#tour-calculos-desktop' : '#tour-calculos-mobile',
+        calculos: isDesktop ? '.nav-item-desktop:has(.lucide-calculator)' : '.nav-item:has(.lucide-calculator)',
       };
 
       let roleSteps: any[] = [];
@@ -95,7 +93,7 @@ export function InteractiveTour({ onComplete }: InteractiveTourProps) {
         showProgress: true,
         animate: true,
         smoothScroll: true,
-        overlayColor: 'rgba(0,0,0,0.85)',
+        overlayColor: 'rgba(15,23,42,0.85)',
         stagePadding: 8,
         stageRadius: 16,
         popoverClass: 'premium-tour-popover',

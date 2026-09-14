@@ -40,7 +40,7 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
   };
 
   return (
-    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
+    <div className="landing-body" data-theme={theme} style={{ backgroundColor: 'var(--bg-base)', fontFamily: "'Inter', sans-serif", position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, height: '100dvh', display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}>
       <Helmet>
         <title>{title} | CentralObra</title>
         <meta name="description" content={description} />
@@ -92,7 +92,7 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
 
       {/* Anúncio Superior */}
       <div style={{ padding: '24px 20px 0', maxWidth: 960, margin: '0 auto', width: '100%' }}>
-        <SponsoredAd probability={1} location="calc_top" />
+        <SponsoredAd probability={1} location="calc_top" compact={true} />
       </div>
 
       <main style={{ position: 'relative', width: '100%', maxWidth: 768, margin: '0 auto', display: 'flex', flexDirection: 'column', paddingBottom: 60, flex: 1 }}>
@@ -147,7 +147,7 @@ export function PublicCalculatorView({ theme, calcId }: { theme: string, calcId:
       </main>
 
       {/* Rodapé do Site Principal */}
-      <InstitutionalFooter theme={theme as 'light'|'dark'} onLogin={handleAuth} onNavigate={(p) => handleNavigate(p)} />
+      <div style={{ flexShrink: 0 }}><InstitutionalFooter theme={theme as "light"|"dark"} onLogin={handleAuth} onNavigate={(p) => handleNavigate(p)} /></div>
     </div>
   );
 }

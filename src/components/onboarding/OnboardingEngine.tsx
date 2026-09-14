@@ -18,7 +18,7 @@ interface OnboardingEngineProps {
 
 const ParticlesBackground = () => {
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+    <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
       {Array.from({ length: 15 }).map((_, i) => (
         <motion.div
           key={i}
@@ -143,22 +143,23 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
     } else {
       localStorage.setItem('guestHasSeenWelcome', 'true');
       if (selectedRole) localStorage.setItem('pendingRole', selectedRole);
+      // removed reload to avoid flashing
     }
     
     onComplete();
   };
 
   const slideVariants = {
-    enter: { opacity: 0, y: 20, scale: 0.98 },
-    center: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -20, scale: 0.98 }
+    enter: { opacity: 0, y: 30, scale: 0.95, filter: 'blur(8px)' },
+    center: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' },
+    exit: { opacity: 0, y: -30, scale: 0.95, filter: 'blur(8px)' }
   };
 
   const renderWelcome = () => (
     <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.5, ease: "easeOut" }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', padding: 24, maxWidth: 600, margin: '0 auto' }}>
-      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1.2, opacity: 1 }} transition={{ duration: 0.8, type: 'spring' }} style={{ marginBottom: 40 }}>
+      <div style={{ marginBottom: 40, transform: 'scale(1.5)' }}>
         <Logo variant="splash" theme="dark" />
-        </motion.div>
+      </div>
       <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, color: '#FFF', marginBottom: 24, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
         Bem-vindo ao futuro da construção
       </h1>
@@ -172,23 +173,20 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
   );
 
   const renderRole = () => (
-    <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 'clamp(60px, 10vh, 100px) 20px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '80px 24px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: '#FFF', marginBottom: 16 }}>Qual é o seu perfil?</h2>
         <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)' }}>A CentralObra adapta a experiência de acordo com as suas necessidades reais.</p>
       </div>
       
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, flex: 1, alignContent: 'center' }}>
-        {ROLES.map((r, index) => {
+        {ROLES.map((r) => {
           const isSelected = selectedRole === r.id;
           return (
             <motion.div
               key={r.id}
-              initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.3 }}
-                whileHover={{ scale: 1.02, translateY: -4 }}
-                whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 setSelectedRole(r.id as UserRole);
                 setTimeout(() => {
@@ -200,7 +198,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
                 background: isSelected ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.03)',
                 border: `2px solid ${isSelected ? '#3B82F6' : 'rgba(255,255,255,0.1)'}`,
                 boxShadow: isSelected ? '0 10px 40px rgba(59, 130, 246, 0.2)' : 'none',
-                backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', overflow: 'hidden'
+                backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden'
               }}
             >
               {isSelected && (
@@ -241,7 +239,7 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
     const features = selectedRole ? ROLE_FEATURES[selectedRole as keyof typeof ROLE_FEATURES] : [];
     
     return (
-      <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 'clamp(60px, 10vh, 100px) 20px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <motion.div variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.4 }} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '80px 24px 40px', maxWidth: 800, margin: '0 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 800, color: '#FFF', marginBottom: 16 }}>Preparamos o seu ambiente</h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)' }}>Abaixo estão alguns dos recursos que você terá acesso imediato.</p>
@@ -293,8 +291,8 @@ export const OnboardingEngine: React.FC<OnboardingEngineProps> = ({ onComplete }
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, backgroundColor: 'var(--bg-base)',
-      zIndex: 9999, display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', minHeight: '100dvh'
+      position: 'fixed', inset: 0, background: 'linear-gradient(135deg, var(--bg-base) 0%, var(--bg-panel) 100%)',
+      zIndex: 9999, display: 'flex', flexDirection: 'column', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overflowX: 'hidden'
     }}>
       <ParticlesBackground />
       

@@ -1,25 +1,11 @@
 ﻿const fs = require('fs');
-let code = fs.readFileSync('src/components/landing/CalculatorLandingSection.tsx', 'utf8');
+let code = fs.readFileSync('src/components/public/PublicCalculatorView.tsx', 'utf8');
 
-// add import
-code = "import { LayoutTextFlip } from '../ui/LayoutTextFlip';\n" + code;
+// Update SponsoredAd location="calc_top" to include compact
+code = code.replace(/<SponsoredAd probability=\{1\} location="calc_top" \/>/, '<SponsoredAd probability={1} location="calc_top" compact={true} />');
 
-// replace text
-const searchStr = `<h2 className="landing-section-title">A Mais Completa <span className="text-gradient">Calculadora de Materiais</span></h2>
-          <p className="landing-section-subtitle">
-            Diga adeus ao "chutômetro" e ao desperdício. Nossa plataforma oferece dezenas de calculadoras precisas para quantificar materiais de construção de forma simples, rápida e gratuita.
-          </p>`;
+// Make footer not shrink
+code = code.replace(/<InstitutionalFooter theme=\{theme as 'light'\|'dark'\} onLogin=\{handleAuth\} onNavigate=\{\(p\) => handleNavigate\(p\)\} \/>/, '<div style={{ flexShrink: 0 }}><InstitutionalFooter theme={theme as "light"|"dark"} onLogin={handleAuth} onNavigate={(p) => handleNavigate(p)} /></div>');
 
-// fallback for weird charset
-const searchFallbackRegex = /<h2 className="landing-section-title">A Mais Completa[\s\S]*?gratuita\.[\s\S]*?<\/p>/m;
-
-const replaceStr = `<LayoutTextFlip text="Cálculos precisos para" words={["Alvenaria", "Pisos e Revestimentos", "Gesso e Drywall", "Telhados", "Concreto", "Pintura"]} />
-          <p className="landing-section-subtitle" style={{ marginTop: 24 }}>
-            Experimente o poder de calculadoras gratuitas que evitam desperdícios e trazem precisão milimétrica para a sua obra.
-          </p>`;
-
-if (code.includes('A Mais Completa')) {
-  code = code.replace(searchFallbackRegex, replaceStr);
-}
-fs.writeFileSync('src/components/landing/CalculatorLandingSection.tsx', code, 'utf8');
-console.log('updated');
+fs.writeFileSync('src/components/public/PublicCalculatorView.tsx', code, 'utf8');
+console.log("Updated Calculator View");
