@@ -224,10 +224,12 @@ export function Works({ onWorkSelect }: WorksProps) {
 
           {/* List of Works */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16, paddingBottom: 40 }}>
-            {filteredWorks.map((work, index) => {
+            <Reorder.Group axis="y" values={localFilteredWorks} onReorder={handleReorder} style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {localFilteredWorks.map((work, index) => {
               const isPrimary = primaryWork?.id === work.id;
               return (
-                <div key={work.id} className={`card-premium card-premium-interactive animate-stagger-${Math.min((index + 1), 5)}`} style={{ padding: 0, position: 'relative', zIndex: contextMenuWorkId === work.id ? 50 : 1 }} onClick={() => onWorkSelect(work.id)}>
+                <Reorder.Item key={work.id} value={work} id={work.id} style={{ position: 'relative', zIndex: contextMenuWorkId === work.id ? 50 : 1 }}>
+                  <div className={`card-premium card-premium-interactive animate-stagger-${Math.min((index + 1), 5)}`} style={{ padding: 0, position: 'relative' }} onClick={() => onWorkSelect(work.id)}>
                   
                   {/* Image Header */}
                   <div style={{ height: 120, position: 'relative', borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden' }}>
@@ -389,8 +391,10 @@ export function Works({ onWorkSelect }: WorksProps) {
                   </div>
 
                 </div>
+                </Reorder.Item>
               );
             })}
+          </Reorder.Group>
           </div>
         </>
       )}

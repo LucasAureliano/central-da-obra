@@ -12,6 +12,10 @@ export interface Work {
   deadline?: string;
   createdAt?: any;
   userId?: string;
+  client?: string;
+  providerName?: string;
+  colorTheme?: string;
+  order?: number;
 }
 
 // ------------------------------------------------------------------

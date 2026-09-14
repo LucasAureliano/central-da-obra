@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.1.0",
+    "@capacitor/camera": "^8.2.4",
     "@capacitor/core": "^8.5.0",
+    "@capacitor/push-notifications": "^8.1.2",
     "@capacitor/share": "^8.0.1",
     "@mercadopago/sdk-react": "^1.0.7",
     "@stripe/stripe-js": "^9.13.0",
