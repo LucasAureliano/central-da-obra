@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { ElectricalDesignStudio } from '../architect/ElectricalDesignStudio';
 import { PlumbingDesignStudio } from '../architect/PlumbingDesignStudio';
 import { LightingDesignEngine } from '../architect/LightingDesignEngine';
@@ -8,8 +9,8 @@ import { db } from '../../lib/firebase';
 import { ArrowLeft, MapPin, Star, Activity, DollarSign, ShoppingCart, Calendar, Share2, Users, Lightbulb, TrendingUp, AlertTriangle, Clock, Briefcase, Wrench } from 'lucide-react';
 import { ShareWorkView } from '../works/ShareWorkView';
 import { InteractiveSchedule } from './InteractiveSchedule';
-import { Finance } from '../Finance';
-import { Shopping } from '../Shopping';
+const Finance = React.lazy(() => import('../Finance').then(module => ({ default: module.Finance })));
+const Shopping = React.lazy(() => import('../Shopping').then(module => ({ default: module.Shopping })));
 import { ProviderQuotes } from './ProviderQuotes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -106,7 +107,7 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
   const insights: { text: string; icon: React.ReactNode; color: string }[] = [];
   if (progress > 0) insights.push({ text: `A obra está ${progress}% concluída.`, icon: <Activity size={14} />, color: '#3B82F6' });
   if (stagesInfo.nextStage) insights.push({ text: `A próxima etapa prevista é ${stagesInfo.nextStage}.`, icon: <TrendingUp size={14} />, color: '#8B5CF6' });
-  if (shoppingInfo.pending > 0) insights.push({ text: `Existem ${shoppingInfo.pending} compras pendentes.`, icon: <ShoppingCart size={14} />, color: '#F59E0B' });
+  if (shoppingInfo.pending > 0) insights.push({ text: `Existem ${shoppingInfo.pending} compras pendentes.`, icon: <Suspense fallback={<div style={{padding: 20}}>Carregando compras...</div>}><ShoppingCart size={14} /></Suspense>, color: '#F59E0B' });
   if (budget > 0 && totalSpent > 0) insights.push({ text: `Seu gasto representa ${percentConsumed}% do orçamento.`, icon: <DollarSign size={14} />, color: percentConsumed > 80 ? '#EF4444' : '#10B981' });
   if (budget > 0 && saldo < 0) insights.push({ text: `Atenção: o orçamento foi ultrapassado em ${fmt(Math.abs(saldo))}.`, icon: <AlertTriangle size={14} />, color: '#EF4444' });
 
@@ -114,7 +115,7 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
     { id: 'resumo', label: 'Resumo', icon: <Activity size={14} /> },
     { id: 'cronograma', label: 'Cronograma', icon: <Calendar size={14} /> },
     { id: 'financeiro', label: 'Financeiro', icon: <DollarSign size={14} /> },
-    { id: 'compras', label: 'Materiais', icon: <ShoppingCart size={14} /> },
+    { id: 'compras', label: 'Materiais', icon: <Suspense fallback={<div style={{padding: 20}}>Carregando compras...</div>}><ShoppingCart size={14} /></Suspense> },
       { id: 'projetos', label: 'Projetos', icon: <Briefcase size={14} /> },
     { id: 'cotacoes', label: 'Cotações', icon: <Users size={14} /> },
     { id: 'compartilhamento', label: 'Compartilhar', icon: <Share2 size={14} /> },
@@ -259,14 +260,14 @@ export function OwnerWorkDetails({ workId, onBack, initialTab }: OwnerWorkDetail
           {/* === FINANCEIRO === */}
           {activeTab === 'financeiro' && (
             <div style={{ padding: 20 }}>
-              <Finance workId={workId} embedded />
+              <Suspense fallback={<div style={{padding: 20}}>Carregando financeiro...</div>}><Finance workId={workId} embedded /></Suspense>
             </div>
           )}
 
           {/* === COMPRAS === */}
           {activeTab === 'compras' && (
             <div style={{ padding: 20 }}>
-              <Shopping workId={workId} embedded />
+              <Suspense fallback={<div style={{padding: 20}}>Carregando compras...</div>}><Shopping workId={workId} embedded /></Suspense>
             </div>
           )}
 

@@ -1062,3 +1062,65 @@ h3, h4 {
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;
   }
+/* 3D and Premium Effects */
+.glass-panel {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  background: var(--bg-glass) !important;
+  border-top: 1px solid var(--border-subtle) !important;
+}
+
+.premium-hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.premium-hover:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06);
+  border-color: var(--color-primary-alpha);
+}
+
+.premium-hover:active {
+  transform: translateY(0px) scale(0.98);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.btn-3d {
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  transform-style: preserve-3d;
+}
+
+.btn-3d:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-3d:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.pulse-icon {
+  animation: pulse-soft 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.95); }
+}
+
+/* Nav Item Enhancements */
+.nav-item-desktop {
+  transition: all 0.2s ease !important;
+}
+.nav-item-desktop:hover {
+  background: var(--bg-elevated) !important;
+  transform: translateX(4px);
+  box-shadow: -2px 0 0 var(--color-primary);
+}
+.nav-item-desktop.active {
+  background: var(--bg-elevated) !important;
+  transform: translateX(4px);
+  box-shadow: -3px 0 0 var(--color-primary);
+}

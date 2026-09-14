@@ -39,18 +39,18 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <div>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, paddingLeft: 12, marginBottom: 8, display: 'block' }}>Geral</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-               <button id="tour-inicio-desktop" className={`nav-item-desktop ${activeTab === 'inicio' ? 'active' : ''}`} onClick={() => setActiveTab('inicio')}>
+               <motion.button whileTap={{ scale: 0.95 }} id="tour-inicio-desktop" className={`nav-item-desktop ${activeTab === 'inicio' ? 'active' : ''}`} onClick={() => setActiveTab('inicio')}>
                   <Home size={20} /><span>Início</span>
-               </button>
-               <button id="tour-obras-desktop" className={`nav-item-desktop ${activeTab === 'obras' ? 'active' : ''}`} onClick={() => setActiveTab('obras')}>
+               </motion.button>
+               <motion.button whileTap={{ scale: 0.95 }} id="tour-obras-desktop" className={`nav-item-desktop ${activeTab === 'obras' ? 'active' : ''}`} onClick={() => setActiveTab('obras')}>
                   <Briefcase size={20} /><span>{(activeRole === 'architect' || activeRole === 'engineer') ? 'Projetos' : 'Obras'}</span>
-               </button>
-               <button id="tour-assistente-desktop" className={`nav-item-desktop ${activeTab === 'assistente' ? 'active' : ''}`} onClick={() => setActiveTab('assistente')}>
+               </motion.button>
+               <motion.button whileTap={{ scale: 0.95 }} id="tour-assistente-desktop" className={`nav-item-desktop ${activeTab === 'assistente' ? 'active' : ''}`} onClick={() => setActiveTab('assistente')}>
                   <Sparkles size={20} /><span>Assistente IA</span>
-               </button>
-               <button className={`nav-item-desktop ${activeTab === 'connect' ? 'active' : ''}`} onClick={() => setActiveTab('connect')}>
+               </motion.button>
+               <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'connect' ? 'active' : ''}`} onClick={() => setActiveTab('connect')}>
                   <Globe size={20} /><span>Connect</span>
-               </button>
+               </motion.button>
             </div>
           </div>
 
@@ -58,41 +58,41 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <div>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, paddingLeft: 12, marginBottom: 8, display: 'block' }}>Ferramentas</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <button id="tour-calculos-desktop" className={`nav-item-desktop ${activeTab === 'calculos' || activeTab === 'Calculadoras' ? 'active' : ''}`} onClick={() => setActiveTab('calculos')}>
+              <motion.button whileTap={{ scale: 0.95 }} id="tour-calculos-desktop" className={`nav-item-desktop ${activeTab === 'calculos' || activeTab === 'Calculadoras' ? 'active' : ''}`} onClick={() => setActiveTab('calculos')}>
                   <Calculator size={20} /><span>Calculadoras</span>
-              </button>
+              </motion.button>
               {(activeRole === 'architect' || activeRole === 'engineer' || activeRole === 'service') && (
-                <button className={`nav-item-desktop ${activeTab === 'agenda-completa' || activeTab === 'Agenda' ? 'active' : ''}`} onClick={() => setActiveTab('agenda-completa')}>
+                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'agenda-completa' || activeTab === 'Agenda' ? 'active' : ''}`} onClick={() => setActiveTab('agenda-completa')}>
                     <Calendar size={20} /><span>Agenda</span>
-                </button>
+                </motion.button>
               )}
               {(activeRole === 'owner' || activeRole === 'builder') && (
-                <button className={`nav-item-desktop ${activeTab === 'Financeiro' ? 'active' : ''}`} onClick={() => setActiveTab('Financeiro')}>
+                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'Financeiro' ? 'active' : ''}`} onClick={() => setActiveTab('Financeiro')}>
                     <Wallet size={20} /><span>Financeiro</span>
-                </button>
+                </motion.button>
               )}
               {(activeRole === 'builder') && (
-                <button className={`nav-item-desktop ${activeTab === 'Centro de Operações' ? 'active' : ''}`} onClick={() => setActiveTab('Centro de Operações')}>
+                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'Centro de Operações' ? 'active' : ''}`} onClick={() => setActiveTab('Centro de Operações')}>
                     <Building2 size={20} /><span>Operações</span>
-                </button>
+                </motion.button>
               )}
               {(activeRole === 'owner' || activeRole === 'architect' || activeRole === 'engineer') && (
-                <button className={`nav-item-desktop ${activeTab === 'notas' ? 'active' : ''}`} onClick={() => setActiveTab('notas')}>
+                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'notas' ? 'active' : ''}`} onClick={() => setActiveTab('notas')}>
                     <ClipboardCheck size={20} /><span>Notas da Obra</span>
-                </button>
+                </motion.button>
               )}
-              <button className={`nav-item-desktop ${activeTab === 'Biblioteca & Normas' ? 'active' : ''}`} onClick={() => setActiveTab('Biblioteca & Normas')}>
+              <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'Biblioteca & Normas' ? 'active' : ''}`} onClick={() => setActiveTab('Biblioteca & Normas')}>
                   <BookOpen size={20} /><span>Biblioteca Téc.</span>
-              </button>
+              </motion.button>
             </div>
           </div>
           
           {/* CONFIGURAÇÕES */}
           <div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <button id="tour-menu-desktop" className={`nav-item-desktop ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
+              <motion.button whileTap={{ scale: 0.95 }} id="tour-menu-desktop" className={`nav-item-desktop ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>
                   <MenuIcon size={20} /><span>Menu Completo</span>
-              </button>
+              </motion.button>
             </div>
           </div>
 
@@ -147,7 +147,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
         {/* Mobile Bottom Navigation */}
         <nav className="bottom-nav glass-panel">
-          <button id="tour-inicio-mobile"
+          <motion.button whileTap={{ scale: 0.95 }} id="tour-inicio-mobile"
             className={`nav-item ${activeTab === 'inicio' ? 'active' : ''}`}
             onClick={() => setActiveTab('inicio')}
           >
@@ -155,9 +155,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <Home size={22} />
             </div>
             <span>Início</span>
-          </button>
+          </motion.button>
           
-          <button id="tour-obras-mobile"
+          <motion.button whileTap={{ scale: 0.95 }} id="tour-obras-mobile"
             className={`nav-item ${activeTab === 'obras' ? 'active' : ''}`}
             onClick={() => setActiveTab('obras')}
           >
@@ -165,9 +165,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <Briefcase size={22} />
             </div>
             <span>{(activeRole === 'architect' || activeRole === 'engineer') ? 'Projetos' : 'Obras'}</span>
-          </button>
+          </motion.button>
 
-          <button id="tour-assistente-mobile"
+          <motion.button whileTap={{ scale: 0.95 }} id="tour-assistente-mobile"
             className={`nav-item highlight-nav ${activeTab === 'assistente' ? 'active' : ''}`}
             onClick={() => setActiveTab('assistente')}
           >
@@ -175,10 +175,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <Sparkles size={22} />
             </div>
             <span>Assistente</span>
-          </button>
+          </motion.button>
 
           {(activeRole === 'owner' || activeRole === 'service') ? (
-            <button id="tour-calculos-mobile"
+            <motion.button whileTap={{ scale: 0.95 }} id="tour-calculos-mobile"
               className={`nav-item ${activeTab === 'calculos' ? 'active' : ''}`}
               onClick={() => setActiveTab('calculos')}
             >
@@ -186,9 +186,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 <Calculator size={22} />
               </div>
               <span>Cálculos</span>
-            </button>
+            </motion.button>
           ) : (
-            <button 
+            <motion.button whileTap={{ scale: 0.95 }} 
               className={`nav-item ${activeTab === 'agenda-completa' ? 'active' : ''}`}
               onClick={() => setActiveTab('agenda-completa')}
             >
@@ -196,10 +196,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 <Calendar size={22} />
               </div>
               <span>Agenda</span>
-            </button>
+            </motion.button>
           )}
 
-          <button id="tour-menu-mobile"
+          <motion.button whileTap={{ scale: 0.95 }} id="tour-menu-mobile"
             className={`nav-item ${activeTab === 'menu' ? 'active' : ''}`}
             onClick={() => setActiveTab('menu')}
           >
@@ -207,7 +207,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <MenuIcon size={22} />
             </div>
             <span>Menu</span>
-          </button>
+          </motion.button>
         </nav>
 
       </div>

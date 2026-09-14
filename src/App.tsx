@@ -734,7 +734,21 @@ function App() {
                   activeRole={activeRole as string}
                 >
                   {!isGuest && <QuotaBanner onNavigate={setActiveTab} />}
-                  <Suspense fallback={<div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}><Loader2 className="animate-spin text-blue-500" size={32} /></div>}>{renderContent()}</Suspense>
+                  
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTab + (selectedWorkId || '')}
+                      initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                      transition={{ duration: 0.3 }}
+                      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                    >
+                      <Suspense fallback={<div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}><Loader2 className="animate-spin text-blue-500" size={32} /></div>}>
+                        {renderContent()}
+                      </Suspense>
+                    </motion.div>
+                  </AnimatePresence>
                 </AppLayout>
                 <AuthModals 
                   theme={theme} 

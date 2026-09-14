@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Layers, Calendar, User, DollarSign, FileText, ClipboardList, BookOpen, Camera, Package, Puzzle, FileSpreadsheet, Share2 } from 'lucide-react';
 import { getDoc, doc } from 'firebase/firestore';
@@ -7,9 +8,9 @@ import { ClientPortalConnectModal } from './ClientPortalConnectModal';
 import { ProjectTechnicalJournal } from './ProjectTechnicalJournal';
 import { ProjectInspections } from './ProjectInspections';
 import { InteractiveSchedule } from '../owner/InteractiveSchedule';
-import { Finance } from '../Finance';
+const Finance = React.lazy(() => import('../Finance').then(module => ({ default: module.Finance })));
 import { DocumentsView } from '../works/DocumentsView';
-import { Shopping } from '../Shopping';
+const Shopping = React.lazy(() => import('../Shopping').then(module => ({ default: module.Shopping })));
 import { ProjectPhotoGallery } from './ProjectPhotoGallery';
 import { BimCompatibilityView } from './BimCompatibilityView';
 import { ProjectReportsView } from './ProjectReportsView';
@@ -216,7 +217,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
 
         {activeTab === 'financeiro' && (
           <div style={{ marginLeft: -16, marginRight: -16 }}>
-            <Finance workId={project.id} embedded parentCollection="projects" />
+            <Suspense fallback={<div style={{padding: 20}}>Carregando financeiro...</div>}><Finance workId={project.id} embedded parentCollection="projects" /></Suspense>
           </div>
         )}
 
@@ -238,7 +239,7 @@ export function ArchitectProjectDetails({ projectId, onBack }: ArchitectProjectD
 
         {activeTab === 'materiais' && (
           <div style={{ marginLeft: -16, marginRight: -16 }}>
-            <Shopping workId={project.id} embedded parentCollection="projects" />
+            <Suspense fallback={<div style={{padding: 20}}>Carregando compras...</div>}><Shopping workId={project.id} embedded parentCollection="projects" /></Suspense>
           </div>
         )}
 

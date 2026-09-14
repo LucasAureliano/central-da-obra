@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -6,8 +7,8 @@ import { DocumentsView } from './works/DocumentsView';
 import { BudgetList } from './works/BudgetList';
 import { ShareWorkView } from './works/ShareWorkView';
 import { InteractiveSchedule } from './owner/InteractiveSchedule';
-import { Finance } from './Finance';
-import { Shopping } from './Shopping';
+const Finance = React.lazy(() => import('../Finance').then(module => ({ default: module.Finance })));
+const Shopping = React.lazy(() => import('../Shopping').then(module => ({ default: module.Shopping })));
 import { X, Save, Lightbulb, Briefcase, Wrench } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -254,13 +255,13 @@ export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
 
       {activeTab === 'financas' && (
         <div style={{ padding: 20 }}>
-          <Finance workId={workId} embedded />
+          <Suspense fallback={<div style={{padding: 20}}>Carregando financeiro...</div>}><Finance workId={workId} embedded /></Suspense>
         </div>
       )}
 
       {activeTab === 'compras' && (
         <div style={{ padding: 20 }}>
-          <Shopping workId={workId} embedded />
+          <Suspense fallback={<div style={{padding: 20}}>Carregando compras...</div>}><Shopping workId={workId} embedded /></Suspense>
         </div>
       )}
 
