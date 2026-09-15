@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, X, ArrowRight, Sparkles, Star } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface PlansUpsellPopupProps {
   onGoToPlans: () => void;
@@ -9,25 +10,27 @@ interface PlansUpsellPopupProps {
 
 export const PlansUpsellPopup: React.FC<PlansUpsellPopupProps> = ({ onGoToPlans }) => {
   const { plan } = useSubscription();
+  const { profile } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   
   const isPaidPlan = plan && plan.monthlyPrice > 0 && !plan.id.includes('free');
 
   useEffect(() => {
     if (isPaidPlan) return;
+    if (!profile?.hasSeenWelcome) return; // Aguarda terminar o onboarding
+    if (!profile?.hasSeenTour && !localStorage.getItem('guestHasSeenTour')) return; // Aguarda terminar o tour
     
     // Check if shown in this session
     const hasShown = sessionStorage.getItem('plans_popup_shown') === 'true';
     if (hasShown) return;
 
-    // Show after 2 seconds
     const timer = setTimeout(() => {
       setIsVisible(true);
       sessionStorage.setItem('plans_popup_shown', 'true');
     }, 20000);
 
     return () => clearTimeout(timer);
-  }, [isPaidPlan]);
+  }, [isPaidPlan, profile?.hasSeenWelcome, profile?.hasSeenTour]);
 
   if (isPaidPlan) return null;
 

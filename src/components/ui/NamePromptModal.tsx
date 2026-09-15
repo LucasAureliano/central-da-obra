@@ -19,7 +19,7 @@ export function NamePromptModal({ onComplete }: { onComplete?: () => void }) {
       await updateDoc(doc(db, 'users', user.uid), {
         displayName: name.trim(), name: name.trim()
       });
-      if (onComplete) onComplete(); else window.location.reload();
+      if (onComplete) onComplete();
     } catch (error) {
       setIsSaving(false);
     }
