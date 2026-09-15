@@ -124,7 +124,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!process.env.OPENAI_API_KEY) {
       // Mock Response for users without API key to prevent the app from breaking
-      const lastUserMsg = messages[messages.length - 1].content.toLowerCase();
+      const lastContent = messages[messages.length - 1].content;
+      const lastUserMsg = (typeof lastContent === 'string' ? lastContent : lastContent.map((c: any) => c.text || '').join(' ')).toLowerCase();
       let reply = "OlÃ¡! Como estou operando no modo Sandbox (sem chave da OpenAI), minhas respostas sÃ£o limitadas. ";
       
       if (lastUserMsg.includes('cimento') || lastUserMsg.includes('preÃ§o') || lastUserMsg.includes('orÃ§amento')) {

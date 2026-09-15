@@ -373,7 +373,7 @@ function App() {
     
     const hasSeenWelcome = profile.hasSeenWelcome || localHasSeenWelcome;
       if (!hasSeenWelcome || forceOnboarding) {
-        return <OnboardingEngine onComplete={() => { setLocalHasSeenWelcome(true); setForceOnboarding(false); }} />;
+        return <OnboardingEngine role={activeRole as any} onComplete={() => { setLocalHasSeenWelcome(true); setForceOnboarding(false); }} />;
       }
     
     // Check if the user needs to provide a name (only for non-guests)
