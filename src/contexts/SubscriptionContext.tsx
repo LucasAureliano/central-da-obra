@@ -145,27 +145,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     setShowUpgradeModal(true);
   };
 
-  // Auto-show upgrade popup for free/starter users with 24h cooldown
-  useEffect(() => {
-    if (!user || isGuest) return;
-    const planIsBasicOrFree = !['ACTIVE', 'COMP', 'TESTER'].includes(subscription.status) || subscription.planId === 'free' || subscription.planId === 'starter';
-    if (!planIsBasicOrFree) return;
-    
-    const COOLDOWN_KEY = 'upgrade_popup_last_shown';
-    const last = localStorage.getItem(COOLDOWN_KEY);
-    if (last && Date.now() - parseInt(last) < 24 * 60 * 60 * 1000) return;
-    
-    const timer = setTimeout(() => {
-      localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
-      triggerUpgrade(
-        'Faça upgrade para desbloquear mais obras, orçamentos e clientes sem limites.',
-        'Expanda seus limites com o plano Básico ou Pro',
-        ['3 obras no Básico / Ilimitadas no Pro', 'Mais orçamentos mensais', 'Mais clientes gerenciados', 'Suporte prioritário']
-      );
-    }, 10000);
-    
-    return () => clearTimeout(timer);
-  }, [user, isGuest, subscription.status, subscription.planId]);
+  
 
   // Compute quota alerts: resources at >= 75% usage
   const quotaAlerts: QuotaAlert[] = [];

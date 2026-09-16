@@ -15,7 +15,24 @@ interface SmartAssistantProps {
   onNavigate: (tab: string, param?: string) => void;
 }
 
-export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
+
+import React from 'react';
+class AssistantErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{padding: 20, color: 'red'}}>Erro no Assistente: {this.state.error?.message}</div>;
+    }
+    return this.props.children;
+  }
+}
+export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
   const [query, setQuery] = useState('');
   const [attachment, setAttachment] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
@@ -108,7 +125,7 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
       setMessages(prev => [...prev, {
         role: 'assistant',
         text: response.answer,
-        suggestions: response.suggestions.map((s: any) => ({
+        suggestions: (response.suggestions || []).map((s: any) => ({
           label: s.label,
           action: () => onNavigate(s.actionKey, s.actionParam),
           icon: <Sparkles size={16} />
@@ -336,4 +353,8 @@ export function SmartAssistant({ onNavigate }: SmartAssistantProps) {
       </div>
     </div>
   );
+}
+
+export function SmartAssistant(props: SmartAssistantProps) {
+  return <AssistantErrorBoundary><SmartAssistantInner {...props} /></AssistantErrorBoundary>;
 }

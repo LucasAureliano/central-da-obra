@@ -101,7 +101,7 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
           </motion.div>
 
           <motion.div
-            style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 64, width: '100%' }}
+            style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 32, width: '100%' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -162,8 +162,8 @@ export function HeroSection({ onRegister }: HeroSectionProps) {
             }
           }}
         >
-          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.7 }}>Role para explorar</span>
-          <ChevronDown size={24} style={{ opacity: 0.7 }} />
+          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.8, fontWeight: 700 }}>Role para explorar</span>
+          <ChevronDown size={28} style={{ opacity: 0.9, marginTop: 4 }} />
         </motion.div>
       )}
     </section>

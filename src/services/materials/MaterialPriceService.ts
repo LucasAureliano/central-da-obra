@@ -63,10 +63,10 @@ class MaterialPriceService {
       const formattedPrices: MaterialPrice[] = resultsArray.map((item: any, index: number) => ({
         id: `api_${index}_${Date.now()}`,
         name: item.name,
-        unit: item.unit,
+        unit: item.unit || 'un',
         price: item.price,
-        supplier: item.supplier,
-        link: item.link,
+        supplier: item.store || item.supplier || 'Leroy Merlin',
+        link: item.url || item.link,
         lastUpdated: new Date().toISOString()
       }));
 
@@ -144,10 +144,10 @@ class MaterialPriceService {
           const formattedPrices: MaterialPrice[] = data[q].map((item: any, index: number) => ({
              id: `api_${index}_${Date.now()}`,
              name: item.name,
-             unit: item.unit,
+             unit: item.unit || 'un',
              price: item.price,
-             supplier: item.supplier,
-             link: item.link,
+             supplier: item.store || item.supplier || 'Leroy Merlin',
+             link: item.url || item.link,
              lastUpdated: new Date().toISOString()
           }));
 

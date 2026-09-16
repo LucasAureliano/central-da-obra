@@ -35,7 +35,7 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
         },
         steps: [
           {
-            element: document.querySelector('.tour-inicio') || undefined,
+            element: document.querySelector('#tour-inicio-desktop, #tour-inicio-mobile') || undefined,
             popover: {
               title: 'Bem-vindo ao CentralObra!',
               description: 'Este é o seu painel central. Aqui você tem uma visão geral de tudo.',
@@ -44,7 +44,7 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
             }
           },
           {
-            element: document.querySelector('.tour-obras') || undefined,
+            element: document.querySelector('#tour-obras-desktop, #tour-obras-mobile') || undefined,
             popover: {
               title: 'Seus Projetos',
               description: 'Gerencie todas as suas obras, orçamentos e clientes neste menu.',
@@ -53,7 +53,7 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
             }
           },
           {
-            element: document.querySelector('.tour-assistente') || undefined,
+            element: document.querySelector('#tour-assistente-desktop, #tour-assistente-mobile') || undefined,
             popover: {
               title: 'Inteligência Artificial',
               description: 'Nossa IA responde dúvidas técnicas, normas da ABNT e auxilia nos seus orçamentos.',
@@ -62,7 +62,7 @@ export function InteractiveTour({ onComplete, role }: InteractiveTourProps) {
             }
           },
           {
-            element: document.querySelector('.tour-calculos') || document.querySelector('.tour-obras') || undefined,
+            element: document.querySelector('#tour-calculos-desktop, #tour-calculos-mobile') || document.querySelector('#tour-obras-desktop, #tour-obras-mobile') || undefined,
             popover: {
               title: 'Calculadoras Exatas',
               description: 'Descubra a quantidade exata de materiais para cada etapa, evitando desperdício.',
