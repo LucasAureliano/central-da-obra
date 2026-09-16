@@ -107,10 +107,9 @@ export function CalculatorsWizard({ onNavigate, initialQuery }: CalculatorsWizar
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <AnimatePresence>
             {filtered.map((item, index) => (
-              <motion.button
+              <motion.button 
                 key={item.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2, delay: index * 0.03 }}
                 onClick={() => setActiveCalc(item.id)}
@@ -136,14 +135,13 @@ export function CalculatorsWizard({ onNavigate, initialQuery }: CalculatorsWizar
               </motion.button>
             ))}
           </AnimatePresence>
-
           {filtered.length === 0 && (
             <div style={{ textAlign: 'center', padding: 40 }}>
               <Calculator size={48} color="var(--text-muted)" style={{ opacity: 0.5, marginBottom: 16 }} />
               <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>Nenhum cálculo encontrado para "{search}"</p>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

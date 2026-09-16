@@ -262,7 +262,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
                     <div style={{ color: 'var(--color-primary)' }}>{sug.icon}</div>
                     <span style={{ flex: 1 }}>{sug.label}</span>
                     <ArrowRight size={16} color="var(--text-muted)" />
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             )}
