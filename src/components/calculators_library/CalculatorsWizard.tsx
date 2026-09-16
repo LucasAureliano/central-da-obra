@@ -141,7 +141,7 @@ export function CalculatorsWizard({ onNavigate, initialQuery }: CalculatorsWizar
               <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>Nenhum cálculo encontrado para "{search}"</p>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
