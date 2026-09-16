@@ -181,7 +181,14 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
   
 
   return (
-    <div className="screen-content" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', maxWidth: 800, margin: '0 auto', width: '100%' }}>
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      className="screen-content" 
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', maxWidth: 800, margin: '0 auto', width: '100%', overflow: 'hidden' }}
+    >
+      <div style={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: 100, left: -100, width: 250, height: 250, background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
       {/* Header */}
       <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 10, borderBottom: '1px solid var(--border-subtle)' }}>
         <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--color-primary-alpha)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -194,6 +201,8 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
       </div>
 
       {/* Chat Area */}
+      <div style={{ position: 'absolute', top: '20%', right: -50, width: 200, height: 200, background: 'var(--color-primary-alpha)', filter: 'blur(80px)', zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '30%', left: -50, width: 200, height: 200, background: 'rgba(59, 130, 246, 0.1)', filter: 'blur(80px)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }} className="hide-scrollbar">
         {messages.map((msg, i) => (
           <motion.div 
@@ -227,15 +236,17 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
             {msg.suggestions && msg.suggestions.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
                 {msg.suggestions.map((sug, idx) => (
-                  <button
+                  <motion.button
                     key={idx}
+                    whileHover={{ scale: 1.02, x: 5, boxShadow: '0 8px 24px rgba(59, 130, 246, 0.15)' }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={sug.action}
-                    className="card-premium-interactive"
+                    className="card-premium-interactive glow-effect"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      padding: '12px 16px',
+                      padding: '14px 18px',
                       borderRadius: 16,
                       backgroundColor: 'var(--bg-surface)',
                       border: '1px solid var(--color-primary-alpha)',
@@ -243,7 +254,9 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
                       fontSize: 14,
                       fontWeight: 600,
                       cursor: 'pointer',
-                      textAlign: 'left'
+                      textAlign: 'left',
+                      position: 'relative',
+                      overflow: 'hidden'
                     }}
                   >
                     <div style={{ color: 'var(--color-primary)' }}>{sug.icon}</div>
@@ -282,7 +295,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
                     transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
                     style={{
                       width: 8, height: 8, borderRadius: 4,
-                      backgroundColor: 'var(--text-muted)',
+                      backgroundColor: 'var(--color-primary)',
                       display: 'inline-block'
                     }}
                   />
@@ -302,29 +315,36 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
         {messages.length === 1 && (
           <div style={{ display: 'flex', overflowX: 'auto', gap: 8, paddingBottom: 16, margin: '0 -20px', paddingLeft: 20, paddingRight: 20 }} className="hide-scrollbar">
             {quickChips.map((chip, idx) => (
-              <button 
+              <motion.button 
                 key={idx}
+                whileHover={{ scale: 1.05, borderColor: 'var(--color-primary)' }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleSend(chip)}
                 style={{
                   whiteSpace: 'nowrap',
-                  padding: '8px 16px',
+                  padding: '10px 18px',
                   borderRadius: 20,
                   backgroundColor: 'var(--bg-elevated)',
                   border: '1px solid var(--border-subtle)',
                   color: 'var(--text-main)',
                   fontSize: 13,
                   fontWeight: 600,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  zIndex: 1
                 }}
               >
                 {chip}
-              </button>
+              </motion.button>
             ))}
           </div>
         )}
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', maxWidth: 800, margin: '0 auto' }}>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 24, padding: '8px 16px', border: '1px solid var(--border-light)' }}>
+          <motion.div 
+            animate={{ borderColor: query.trim() ? 'var(--color-primary)' : 'var(--border-light)', boxShadow: query.trim() ? '0 0 12px rgba(16,185,129,0.2)' : 'none' }}
+            style={{ flex: 1, display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 24, padding: '8px 16px', border: '1px solid var(--border-light)', transition: 'border-color 0.2s' }}
+          >
             <MessageSquare size={20} color="var(--text-muted)" style={{ marginRight: 12 }} />
             <input 
               type="text"
@@ -334,7 +354,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
               onKeyDown={(e) => e.key === 'Enter' && handleSend(query)}
               style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: 15 }}
             />
-          </div>
+          </motion.div>
           <button 
             onClick={() => handleSend(query)}
             disabled={!query.trim()}
@@ -351,7 +371,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

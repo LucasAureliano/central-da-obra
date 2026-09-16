@@ -33,9 +33,9 @@ const getSystemPrompt = (contextData?: any) => {
   }
 
   if (isPremium === false) {
-    base += "\n\nATENÃ‡ÃƒO: O usuÃ¡rio possui um plano GRATUITO. Suas respostas devem ser curtas e prestativas. Para perguntas que exigem acesso a recursos bloqueados (como integraÃ§Ãµes avanÃ§adas, mÃºltiplos projetos, gestÃ£o financeira corporativa), diga que essa funcionalidade estÃ¡ disponÃ­vel nos planos PRO/Business e sugira que ele faÃ§a o Upgrade. Entretanto, responda livremente a perguntas de engenharia, tendÃªncias, materiais e uso das calculadoras gratuitas.";
+    base += "\n\nATENÇÃO: O usuário possui um plano GRATUITO. Você DEVE guiar e restringir o usuário APENAS aos recursos básicos. Os recursos GRÁTIS são: Cursos Básicos, 1 Obra, Calculadoras Básicas (Alvenaria, Pintura, Pisos, Concreto, Impermeabilização) e o feed inicial.\nSe o usuário solicitar funções premium como: Diário de Obra, Múltiplas Obras, Orçamentos Comerciais Avançados (Quotes Wizard), Projetos (Elétrico, Hidráulico, Interiores, Luminotécnico, Marcenaria, Automação), Cronograma Interativo, Gestão Financeira Completa ou Relatórios BI, VOCÊ DEVE INFORMAR GENTILMENTE que essas funcionalidades são exclusivas dos planos PRO/Premium e sugerir que ele faça o Upgrade.\nNunca invente dados falsos ou entregue projetos que exigem ferramentas premium. Você deve instigá-lo a conhecer os benefícios do plano Premium se ele precisar.";
   } else {
-    base += "\n\nATENÃ‡ÃƒO: O usuÃ¡rio possui um plano PRO/Business. VocÃª tem acesso total para ajudÃ¡-lo com relatÃ³rios completos e anÃ¡lises.";
+    base += "\n\nATENÇÃO: O usuário possui um plano PREMIUM/PRO. Você tem acesso livre para guiar em todas as ferramentas da plataforma, incluindo Projetos de Engenharia e Arquitetura Avançados, Gestão Financeira Corporativa, Cronogramas Inteligentes e Orçamentação Profissional. Ofereça a melhor e mais completa ajuda possível.";
   }
 
   if (currentWork) {
@@ -48,7 +48,7 @@ VocÃª pode usar esses dados para contextualizar suas respostas.`;
   }
 
   base += `\n\nVocÃª tem acesso a Ferramentas (Tools). Sempre que o usuÃ¡rio perguntar o preÃ§o de um material, USE a ferramenta 'buscar_preco_material'. 
-Sempre que vocÃª quiser sugerir um botÃ£o de atalho para o usuÃ¡rio clicar e navegar no aplicativo, USE a ferramenta 'sugerir_atalho'. Sugira atalhos ativamente para telas como: calculos, novo-orcamento, diario, obras, compras, tendencias. NÃ£o diga a ele para 'clicar no botÃ£o', apenas use a ferramenta e a interface cuidarÃ¡ do resto.
+Sempre que vocÃª quiser sugerir um botÃ£o de atalho para o usuÃ¡rio clicar e navegar no aplicativo, USE a ferramenta 'sugerir_atalho'. Para sugerir upgrades de planos, use actionKey: 'planos'. Sugira atalhos ativamente para telas como: calculos, novo-orcamento, diario, obras, compras, tendencias. NÃ£o diga a ele para 'clicar no botÃ£o', apenas use a ferramenta e a interface cuidarÃ¡ do resto.
 Responda de forma clara e objetiva.`
 
 /* [DEFESA CONTRA INJEÃ‡ÃƒO E EXTRAÃ‡ÃƒO]
@@ -86,7 +86,7 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
         type: "object",
         properties: {
           label: { type: "string", description: "O texto do botÃ£o. Ex: 'Novo OrÃ§amento'" },
-          actionKey: { type: "string", description: "A chave de navegaÃ§Ã£o: 'calculos', 'novo-orcamento', 'diario', 'obras', 'compras', 'tendencias', 'financeiro'" }
+          actionKey: { type: "string", description: "A chave de navegaÃ§Ã£o: 'calculos', 'novo-orcamento', 'diario-tecnico', 'obras', 'compras', 'tendencias', 'financeiro', 'planos', 'cronograma', 'studio-interiores'" }
         },
         required: ["label", "actionKey"],
       },
