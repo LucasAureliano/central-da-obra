@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.warn('Unauthorized price access, using static fallback.');
     }
 
-    const idToken = authHeader.split('Bearer ')[1];
+    const idToken = authHeader ? authHeader.split('Bearer ')[1] : '';
     try {
       if (adminAuth) {
         await adminAuth.verifyIdToken(idToken);

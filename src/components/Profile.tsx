@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { User, Mail, Settings, Shield, LogOut, Package, HardHat, Home, Building2, DraftingCompass, MessageSquare, X, Camera, Phone, MapPin, Edit2 } from 'lucide-react';
 import { db } from '../lib/firebase';
@@ -19,9 +19,9 @@ export function Profile() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [name, setName] = useState(prof?.name || user?.displayName || '');
   const [phone, setPhone] = useState(prof?.phone || '(11) 99887-6655');
-  const [city, setCity] = useState(prof?.city || 'São Paulo - SP');
-  const [company, setCompany] = useState(prof?.companyName || 'Estúdio de Engenharia');
-  const [specialty, setSpecialty] = useState(prof?.specialty || 'Construção Residencial');
+  const [city, setCity] = useState(prof?.city || 'SÃ£o Paulo - SP');
+  const [company, setCompany] = useState(prof?.companyName || 'EstÃºdio de Engenharia');
+  const [specialty, setSpecialty] = useState(prof?.specialty || 'ConstruÃ§Ã£o Residencial');
   const [photoUrl, setPhotoUrl] = useState(prof?.photoUrl || prof?.photoURL || '');
   const [customQrLink, setCustomQrLink] = useState(prof?.customQrLink || '');
   const [savingProfile, setSavingProfile] = useState(false);
@@ -78,8 +78,8 @@ export function Profile() {
 
   const getRoleName = (role?: string | null) => {
     switch(role) {
-      case 'owner': return 'Proprietário';
-      case 'service': return 'Prestador de Serviço';
+      case 'owner': return 'ProprietÃ¡rio';
+      case 'service': return 'Prestador de ServiÃ§o';
       case 'architect': return 'Arquiteto / Engenheiro';
       case 'builder': return 'Construtora';
       default: return 'Visitante';
@@ -107,6 +107,7 @@ export function Profile() {
         phone,
         city,
         companyName: company,
+        customQrLink,
         specialty,
         photoUrl
       });
@@ -154,10 +155,10 @@ export function Profile() {
         </div>
 
         <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>
-          {profile?.name || name || (isGuest ? 'Visitante' : 'Usuário')}
+          {profile?.name || name || (isGuest ? 'Visitante' : 'UsuÃ¡rio')}
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
-          {user?.email || 'Acesso Anônimo'}
+          {user?.email || 'Acesso AnÃ´nimo'}
         </p>
         
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', backgroundColor: 'var(--bg-surface)', borderRadius: 20, border: '1px solid var(--border-subtle)', marginBottom: 16 }}>
@@ -187,7 +188,7 @@ export function Profile() {
           <Mail size={20} color="var(--text-muted)" />
           <div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Email</p>
-            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{user?.email || 'Não informado'}</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{user?.email || 'NÃ£o informado'}</p>
           </div>
         </div>
 
@@ -212,7 +213,7 @@ export function Profile() {
           <div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Plano Atual</p>
             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', textTransform: 'capitalize' }}>
-              {profile?.plan || 'Pro (Vitalício)'}
+              {profile?.plan || 'Pro (VitalÃ­cio)'}
             </p>
           </div>
         </div>
@@ -243,7 +244,7 @@ export function Profile() {
 
         <button onClick={() => setShowEditModal(true)} className="btn-secondary" style={{ width: '100%', height: 52, borderRadius: 16 }}>
           <Settings size={20} />
-          <span>Editar Perfil & Configurações</span>
+          <span>Editar Perfil & ConfiguraÃ§Ãµes</span>
         </button>
         
         <button 
@@ -260,8 +261,8 @@ export function Profile() {
       {showLogoutConfirm && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', flexDirection: 'column', padding: 20, overflowY: 'auto' }}>
           <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: 360, borderRadius: 28, padding: 24, textAlign: 'center', margin: 'auto' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Confirmar Saída</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>Você precisará fazer login novamente para acessar suas obras salvas. Deseja continuar?</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Confirmar SaÃ­da</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>VocÃª precisarÃ¡ fazer login novamente para acessar suas obras salvas. Deseja continuar?</p>
             <div style={{ display: 'flex', gap: 12 }}>
               <button onClick={() => setShowLogoutConfirm(false)} className="btn-secondary" style={{ flex: 1, padding: 12, borderRadius: 14 }}>Cancelar</button>
               <button onClick={handleConfirmLogout} className="btn-primary" style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: '#EF4444' }}>Sair</button>
@@ -308,9 +309,19 @@ export function Profile() {
               </div>
 
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Empresa / Escritório</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Empresa / EscritÃ³rio</label>
                 <input type="text" value={company} onChange={e => setCompany(e.target.value)} className="input-field" style={{ height: 44, borderRadius: 12, fontSize: 13 }} />
               </div>
+
+              {profile?.plan === 'pro' && (
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <Crown size={14} /> Link Customizado do QR Code (Premium)
+                  </label>
+                  <input type="url" placeholder="https://instagram.com/seu.perfil" value={customQrLink} onChange={e => setCustomQrLink(e.target.value)} className="input-field" style={{ height: 44, borderRadius: 12, fontSize: 13, borderColor: 'var(--color-primary)' }} />
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>O QR Code nos PDFs de orçamentos redirecionará para este link.</p>
+                </div>
+              )}
 
               <div>
                 <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Especialidade / Foco</label>
@@ -324,7 +335,7 @@ export function Profile() {
                   <option value="Serralheiro">Serralheiro</option>
                   <option value="Vidraceiro">Vidraceiro</option>
                   <option value="Empreiteiro Geral">Empreiteiro Geral</option>
-                  <option value="Construção Residencial">Construção Residencial</option>
+                  <option value="ConstruÃ§Ã£o Residencial">ConstruÃ§Ã£o Residencial</option>
                 </select>
               </div>
 
@@ -342,3 +353,5 @@ export function Profile() {
     </div>
   );
 }
+
+
