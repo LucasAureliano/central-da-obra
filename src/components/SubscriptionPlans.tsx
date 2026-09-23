@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { CheckCircle2, Zap, Building2, Crown, ShieldCheck, X, Sparkles, ChevronRight, FileText, Bot, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -37,9 +37,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   const roleKey = profile?.role || 'owner';
   const rolePlans = PLANS_CONFIG[roleKey];
   
-  const starterPriceObj = isAnnual ? { val: 299.90, label: '/ano' } : { val: 29.90, label: '/mês' };
-  const proPriceObj = isAnnual ? { val: 499.90, label: '/ano' } : { val: 49.90, label: '/mês' };
-  const businessPriceObj = isAnnual ? { val: 799.00, label: '/ano' } : { val: 79.90, label: '/mês' };
+  const starterPriceObj = isAnnual ? { val: 299.90, label: '/ano' } : { val: 29.90, label: '/mÃªs' };
+  const proPriceObj = isAnnual ? { val: 499.90, label: '/ano' } : { val: 49.90, label: '/mÃªs' };
+  const businessPriceObj = isAnnual ? { val: 799.00, label: '/ano' } : { val: 79.90, label: '/mÃªs' };
 
   const freePrice = 0;
   const starterPrice = starterPriceObj.val;
@@ -56,9 +56,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     }
 
     if (Capacitor.isNativePlatform()) {
-      toast.error('Gerencie sua assinatura através da loja de aplicativos (App Store ou Google Play).', {
+      toast.error('Gerencie sua assinatura atravÃ©s da loja de aplicativos (App Store ou Google Play).', {
         duration: 5000,
-        icon: '📱'
+        icon: 'ðŸ“±'
       });
       return;
     }
@@ -134,18 +134,18 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           <Sparkles size={16} /> Planos e Assinaturas
         </div>
         <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-main)', marginBottom: 12, lineHeight: 1.3, whiteSpace: 'normal', wordBreak: 'break-word' }}>
-          {roleKey === 'service' ? 'Cresça seus serviços com a' : 
-           roleKey === 'architect' || roleKey === 'engineer' ? 'Gestão avançada para seus' : 
+          {roleKey === 'service' ? 'CresÃ§a seus serviÃ§os com a' : 
+           roleKey === 'architect' || roleKey === 'engineer' ? 'GestÃ£o avanÃ§ada para seus' : 
            roleKey === 'builder' ? 'Escale sua Construtora com a' : 
-           'Leve sua Gestão para o'} <span style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text', backgroundImage: 'linear-gradient(90deg, #3B82F6, #8B5CF6)' }}>
+           'Leve sua GestÃ£o para o'} <span style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text', backgroundImage: 'linear-gradient(90deg, #3B82F6, #8B5CF6)' }}>
              {roleKey === 'service' ? ' CentralObra' : 
               roleKey === 'architect' || roleKey === 'engineer' ? ' Projetos' : 
               roleKey === 'builder' ? ' CentralObra' : 
-              ' Próximo Nível'}
+              ' PrÃ³ximo NÃ­vel'}
            </span>
         </h1>
         <p style={{ fontSize: 16, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          Escolha o plano ideal. O <strong style={{ color: 'var(--color-primary)' }}>Copilot da Obra</strong> com IA e Recursos Premium vão transformar seus resultados.
+          Escolha o plano ideal. O <strong style={{ color: 'var(--color-primary)' }}>Copilot da Obra</strong> com IA e Recursos Premium vÃ£o transformar seus resultados.
         </p>
       </div>
 
@@ -185,11 +185,11 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             </div>
           )}
 
-          {/* Orçamentos (Service only) */}
+          {/* OrÃ§amentos (Service only) */}
           {roleKey === 'service' && limits.maxQuotes < 9999 && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
-                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos (Mês)</span>
+                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>OrÃ§amentos (MÃªs)</span>
                 <span style={{ color: 'var(--text-muted)' }}>{usage.quotesCount} de {limits.maxQuotes}</span>
               </div>
               <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
@@ -245,7 +245,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             />
           </div>
           <span style={{ fontSize: 16, fontWeight: 600, color: isAnnual ? 'var(--text-main)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            Anual <span style={{ fontSize: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: 12 }}>2 meses grátis</span>
+            Anual <span style={{ fontSize: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: 12 }}>2 meses grÃ¡tis</span>
           </span>
         </div>
       </div>
@@ -261,7 +261,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
         >
           <div style={{ marginBottom: 24 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{rolePlans.free.name}</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para experimentar e gerenciar necessidades básicas.</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para experimentar e gerenciar necessidades bÃ¡sicas.</p>
           </div>
           <div style={{ marginBottom: 32 }}>
             <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ 0</span>
@@ -290,15 +290,15 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             NOVO
           </div>
           <div style={{ marginBottom: 24, marginTop: 8 }}>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{rolePlans.starter?.name || 'Básico'}</h3>
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{rolePlans.starter?.name || 'BÃ¡sico'}</h3>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para quem precisa de mais sem pagar pelo Pro.</p>
           </div>
           <div style={{ marginBottom: 32 }}>
             <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {starterPriceObj.val.toFixed(2).replace('.', ',')}</span>
-            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mÃªs'}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-            {(rolePlans.starter?.features || ['Até 3 obras ativas', `Até 15 orçamentos${isAnnual ? '/ano' : '/mês'}`, 'Até 30 clientes', 'Suporte por email']).map((feature, i) => (
+            {(rolePlans.starter?.features || ['AtÃ© 3 obras ativas', `AtÃ© 15 orÃ§amentos${isAnnual ? '/ano' : '/mÃªs'}`, 'AtÃ© 30 clientes', 'Suporte por email']).map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <CheckCircle2 size={18} color="#3B82F6" style={{ flexShrink: 0, marginTop: 2 }} />
                 <span style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 500 }}>{feature}</span>
@@ -316,7 +316,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               onClick={() => handleSubscribe('starter')}
               disabled={loadingCheckout || ['COMP', 'TESTER'].includes(subscription.status)}
             >
-              {loadingCheckout ? 'Processando...' : `Assinar Básico`}
+              {loadingCheckout ? 'Processando...' : `Assinar BÃ¡sico`}
             </button>
           )}
         </motion.div>
@@ -345,7 +345,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             ) : (
               <>
                 <span style={{ fontSize: 48, fontWeight: 900, color: 'var(--text-main)' }}>R$ {proPriceObj.val.toFixed(2).replace('.', ',')}</span>
-                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
+                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mÃªs'}</span>
               </>
             )}
           </div>
@@ -387,7 +387,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           )}
         </motion.div>
 
-        {/* BUSINESS PLAN - Só exibe se for builder */}
+        {/* BUSINESS PLAN - SÃ³ exibe se for builder */}
         {roleKey === 'builder' && rolePlans.business && businessPrice !== null && (
           <motion.div 
             whileHover={{ y: -8, boxShadow: '0 20px 40px -10px rgba(139,92,246,0.2)' }}
@@ -398,11 +398,11 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 {rolePlans.business?.name} <Building2 size={20} color="#8B5CF6" />
               </h3>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para construtoras e grandes operações.</p>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para construtoras e grandes operaÃ§Ãµes.</p>
             </div>
             <div style={{ marginBottom: 32 }}>
               <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {businessPriceObj.val.toFixed(2).replace('.', ',')}</span>
-              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mÃªs'}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
               {rolePlans.business?.features.map((feature, i) => (
@@ -434,7 +434,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             className="btn-secondary py-2 px-4 rounded-lg text-sm font-bold"
             onClick={() => {
               if(!coupon) return;
-              toast.success('Cupom inválido ou expirado.');
+              toast.success('Cupom invÃ¡lido ou expirado.');
             }}
           >
             Aplicar
@@ -445,7 +445,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
       <div style={{ textAlign: 'center', marginTop: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
         <ShieldCheck size={32} color="var(--text-muted)" opacity={0.5} />
         <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 400 }}>
-          Pagamento seguro e transparente. Você pode cancelar sua assinatura premium a qualquer momento, sem taxas adicionais.
+          Pagamento seguro e transparente. VocÃª pode cancelar sua assinatura premium a qualquer momento, sem taxas adicionais.
         </p>
       </div>
 
@@ -511,13 +511,13 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
                 <Crown size={32} />
               </div>
               <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Ambiente de Testes</h2>
-              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: 14 }}>As chaves do Stripe não estão configuradas. Utilize a simulação.</p>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: 14 }}>As chaves do Stripe nÃ£o estÃ£o configuradas. Utilize a simulaÃ§Ã£o.</p>
             </div>
             <div style={{ padding: '32px 24px 24px', textAlign: 'center', marginTop: -20, background: 'var(--bg-panel)', borderRadius: '24px 24px 0 0' }}>
               <div style={{ marginBottom: 32 }}>
                 <p style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>Plano Selecionado</p>
                 <h3 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '-0.02em', marginBottom: 8 }}>{showMockCheckout.plan}</h3>
-                <p style={{ fontSize: 36, fontWeight: 900, color: 'var(--color-primary)', margin: 0, letterSpacing: '-0.03em' }}>R$ {showMockCheckout.price.toFixed(2).replace('.', ',')}<span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 600 }}>{isAnnual ? '/ano' : '/mês'}</span></p>
+                <p style={{ fontSize: 36, fontWeight: 900, color: 'var(--color-primary)', margin: 0, letterSpacing: '-0.03em' }}>R$ {showMockCheckout.price.toFixed(2).replace('.', ',')}<span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 600 }}>{isAnnual ? '/ano' : '/mÃªs'}</span></p>
               </div>
               <button onClick={handleMockPayment} className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 Simular Pagamento <Sparkles size={18} />
@@ -533,5 +533,6 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     </div>
   );
 };
+
 
 

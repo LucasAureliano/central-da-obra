@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { HardHat, Grid as LucideGrid, Wrench, Ruler, ArrowRight } from 'lucide-react';
 import { Logo } from './ui/Logo';
 
@@ -27,7 +27,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
 
   useEffect(() => {
     // Basic SEO Meta tags injection for the institutional page
-    document.title = "CentralObra | Plataforma Inteligente para Construção Civil";
+    document.title = "CentralObra | Plataforma Inteligente para ConstruÃ§Ã£o Civil";
     
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
@@ -35,7 +35,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       metaDesc.setAttribute('name', 'description');
       document.head.appendChild(metaDesc);
     }
-    metaDesc.setAttribute('content', 'Planejamento, gestão financeira, compras, normas e mais de 80 calculadoras de materiais integradas em um único aplicativo para a construção civil.');
+    metaDesc.setAttribute('content', 'Planejamento, gestÃ£o financeira, compras, normas e mais de 80 calculadoras de materiais integradas em um Ãºnico aplicativo para a construÃ§Ã£o civil.');
 
     // Add Schema.org structured data dynamically
     const scriptId = 'schema-org-data';
@@ -49,7 +49,7 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
         "name": "CentralObra",
         "operatingSystem": "Web, Android, iOS",
         "applicationCategory": "BusinessApplication",
-        "description": "Plataforma completa para gestão de obras, calculadoras de materiais, financeiro e biblioteca técnica.",
+        "description": "Plataforma completa para gestÃ£o de obras, calculadoras de materiais, financeiro e biblioteca tÃ©cnica.",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -140,5 +140,6 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
     </div>
   );
 }
+
 
 

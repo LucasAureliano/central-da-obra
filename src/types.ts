@@ -1,10 +1,10 @@
-export interface Work {
+﻿export interface Work {
   id: string;
   name?: string;
   title?: string; // Some old docs might use title instead of name
   location?: string;
   address?: string;
-  status?: 'Em Andamento' | 'Concluída' | 'Pausada' | string;
+  status?: 'Em Andamento' | 'ConcluÃ­da' | 'Pausada' | string;
   budget?: number; // Changed from string to number
   spent?: number;
   progress?: number;
@@ -22,13 +22,13 @@ export interface Work {
 // Types added for Material Assistant and Finance integration
 export type Category =
   | 'Materiais'
-  | 'Mão de obra'
+  | 'MÃ£o de obra'
   | 'Fretes'
-  | 'Locação'
+  | 'LocaÃ§Ã£o'
   | 'Ferramentas'
   | 'Acabamentos'
-  | 'Elétrica'
-  | 'Hidráulica'
+  | 'ElÃ©trica'
+  | 'HidrÃ¡ulica'
   | 'Pintura'
   | 'Outros';
 
@@ -40,10 +40,10 @@ export type Unit =
   | 'Caixa'
   | 'Pacote'
   | 'Barra'
-  | 'Peça'
+  | 'PeÃ§a'
   | 'Metro'
-  | 'Metro²'
-  | 'Metro³'
+  | 'MetroÂ²'
+  | 'MetroÂ³'
   | 'Quilograma'
   | 'Grama'
   | 'Litro'
@@ -120,7 +120,7 @@ export interface ProviderService {
   address?: string;
   value: number;
   progress: number;
-  status: 'Agendado' | 'Em Execução' | 'Pausado' | 'Concluído' | 'Cancelado';
+  status: 'Agendado' | 'Em ExecuÃ§Ã£o' | 'Pausado' | 'ConcluÃ­do' | 'Cancelado';
   deadline?: any;
   photos?: string[];
   userId: string;
@@ -133,7 +133,7 @@ export interface Receipt {
   amount: number;
   status: 'Recebido' | 'Pendente' | 'Vencido';
   date: any; // Timestamp
-  paymentMethod?: 'PIX' | 'Dinheiro' | 'Cartão' | 'Transferência' | 'Cheque' | 'Boleto';
+  paymentMethod?: 'PIX' | 'Dinheiro' | 'CartÃ£o' | 'TransferÃªncia' | 'Cheque' | 'Boleto';
   clientId?: string;
   serviceId?: string;
   notes?: string;
@@ -154,3 +154,6 @@ export interface AgendaEvent {
   userId: string;
   createdAt: any;
 }
+
+export type UserRole = 'owner' | 'service' | 'architect' | 'engineer' | 'builder';
+
