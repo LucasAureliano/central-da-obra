@@ -59,14 +59,14 @@ async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false, profileNam
   }
 }
 
-async function drawAppLogo(doc: jsPDF, x: number, y: number) {
+async function drawAppLogo(doc: jsPDF, x: number, y: number, isDarkBackground: boolean = false) {
   const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
   if (logoBase64) {
     doc.addImage(logoBase64, 'JPEG', x, y, 22, 22);
   }
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(30, 41, 59);
+  doc.setTextColor(isDarkBackground ? 255 : 30, isDarkBackground ? 255 : 41, isDarkBackground ? 255 : 59);
   doc.text('CentralObra', x + 28, y + 16);
   doc.setTextColor(249, 115, 22);
   doc.text('.', x + 28 + doc.getTextWidth('CentralObra'), y + 16);
@@ -108,7 +108,7 @@ export async function generateCalculationPDF({
   doc.text(dataHoje, margin, 78);
 
   if (!isPremium) {
-    await drawAppLogo(doc, pageWidth - margin - 120, 48);
+    await drawAppLogo(doc, pageWidth - margin - 120, 48, false);
   }
 
   // Accent line
@@ -219,52 +219,51 @@ export async function generateCommercialQuotePDF({
   // Dark Block on the left
   const darkBlockWidth = 170;
   doc.setFillColor(30, 41, 59); // Dark Gray
-  doc.rect(margin, margin, darkBlockWidth, 260, 'F');
+  doc.rect(margin, margin, darkBlockWidth, 290, 'F'); // Expanded block
   
-  // Text inside Dark Block (Fixed coordinates to avoid overlap)
+  if (!isPremium) {
+    await drawAppLogo(doc, margin + 15, margin + 20, true);
+  }
+
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text('Data:', margin + 20, margin + 30);
+  doc.text('Data:', margin + 20, margin + 65);
   doc.setFontSize(10);
-  doc.text(dataHoje, margin + 20, margin + 45);
+  doc.text(dataHoje, margin + 20, margin + 80);
   
   doc.setFontSize(8);
-  doc.text('Validade:', margin + 20, margin + 65);
+  doc.text('Validade:', margin + 20, margin + 100);
   doc.setFontSize(10);
-  doc.text(conditions.validade || '15 dias', margin + 20, margin + 80);
+  doc.text(conditions.validade || '15 dias', margin + 20, margin + 115);
   
   doc.setDrawColor(71, 85, 105);
   doc.setLineWidth(1);
-  doc.line(margin + 20, margin + 95, margin + darkBlockWidth - 20, margin + 95);
+  doc.line(margin + 20, margin + 130, margin + darkBlockWidth - 20, margin + 130);
   
   doc.setFontSize(8);
-  doc.text('Para:', margin + 20, margin + 115);
+  doc.text('Para:', margin + 20, margin + 150);
   doc.setFontSize(10);
-  doc.text(client.name || 'Cliente', margin + 20, margin + 130, { maxWidth: darkBlockWidth - 40 });
+  doc.text(client.name || 'Cliente', margin + 20, margin + 165, { maxWidth: darkBlockWidth - 40 });
   
   doc.setFontSize(8);
-  let clientContactY = margin + 145;
+  let clientContactY = margin + 180;
   if (client.phone) { doc.text(client.phone, margin + 20, clientContactY); clientContactY += 12; }
   if (client.email) { doc.text(client.email, margin + 20, clientContactY, { maxWidth: darkBlockWidth - 40 }); }
 
-  // QR Code Box (Bottom aligned, strictly separated)
+  // QR Code Box (Shifted down)
   doc.setFillColor(255, 255, 255);
-  doc.rect(margin + 20, margin + 180, 70, 70, 'F'); // White Box
+  doc.rect(margin + 20, margin + 205, 70, 70, 'F'); // White Box
   
   const qrUrl = (isPremium && profile.customQrLink) ? profile.customQrLink : https://centralobra.com.br/p/;
   const qrApi = https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=;
   const qrBase64 = await fetchImageAsBase64(qrApi);
   if (qrBase64) {
-    doc.addImage(qrBase64, 'PNG', margin + 25, margin + 185, 60, 60, undefined, 'FAST');
+    doc.addImage(qrBase64, 'PNG', margin + 25, margin + 210, 60, 60, undefined, 'FAST');
   }
 
   // Header Right Side
   const contentStartX = margin + darkBlockWidth + 30;
-  
-  if (!isPremium) {
-    await drawAppLogo(doc, pageWidth - margin - 120, margin + 40);
-  }
 
   // Company Name / Proposta
   doc.setFontSize(14);
@@ -300,7 +299,7 @@ export async function generateCommercialQuotePDF({
   doc.text(workData?.name || '-', contentStartX + 15, margin + 165, { maxWidth: 120 });
   doc.text(profile?.phone || '-', contentStartX + 150, margin + 165);
 
-  let currentY = margin + 300;
+  let currentY = margin + 310;
 
   // TABLE
   const itemsBody = [];
