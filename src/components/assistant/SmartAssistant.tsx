@@ -185,7 +185,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
       className="screen-content" 
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', maxWidth: 800, margin: '0 auto', width: '100%', overflow: 'hidden' }}
+      style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', maxWidth: 800, margin: '0 auto', width: '100%', overflow: 'hidden', background: 'transparent' }}
     >
       <div style={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: 100, left: -100, width: 250, height: 250, background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />

@@ -10,6 +10,7 @@ import { FeaturesGridSection } from './landing/FeaturesGridSection';
 import { PricingSection } from './landing/PricingSection';
 import { FaqSection } from './landing/FaqSection';
 import { InstitutionalFooter } from './landing/InstitutionalFooter';
+import { SEOArticleBlock } from './landing/SEOArticleBlock';
 import { GenericInfoPage } from './landing/GenericInfoPage';
 import { SponsoredAd } from './shared/SponsoredAd';
 import { LandingNavbar } from './landing/LandingNavbar';
@@ -131,6 +132,8 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
       <div id="como-funciona">
         <FaqSection />
       </div>
+
+      <SEOArticleBlock />
 
       <InstitutionalFooter theme={theme} onLogin={onLogin} onNavigate={(page) => setSubPage(page)} />
 

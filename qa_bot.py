@@ -7,22 +7,20 @@ with sync_playwright() as p:
     page = browser.new_page()
     page.set_viewport_size({'width': 1280, 'height': 800})
     
-    print('Navigating to landing page...')
+    print('Navigating to Assistant...')
+    # Mocking auth state might be hard, but let's just go to /?tab=assistente if it relies on URL parameters, but it's a SPA.
+    # Actually, we can just render the assistant standalone by editing App.tsx temporarily if needed.
+    # Let's try to capture errors first.
+    
+    errors = []
+    page.on('console', lambda msg: errors.append(msg.text) if msg.type == 'error' else None)
+    
     page.goto('http://localhost:5173')
     page.wait_for_load_state('networkidle')
     time.sleep(2)
-    page.screenshot(path='C:/Users/Lucas/.gemini/antigravity/brain/d64109d4-793e-47eb-83ed-0f80ce20ee0d/qa_landing.png', full_page=True)
     
-    print('Navigating to calculators hub...')
-    page.goto('http://localhost:5173/?calc=wallpaint')
-    page.wait_for_load_state('networkidle')
-    time.sleep(2)
-    page.screenshot(path='C:/Users/Lucas/.gemini/antigravity/brain/d64109d4-793e-47eb-83ed-0f80ce20ee0d/qa_calculators.png', full_page=True)
+    # Try to click the "assistente" button if we can find it. But we are not logged in!
+    # If not logged in, we are on LandingPage.
+    print(errors)
     
-    print('Navigating to Assistant...')
-    page.goto('http://localhost:5173/assistente') # Will redirect to login since not auth, but just to check
-    page.wait_for_load_state('networkidle')
-    time.sleep(2)
-    page.screenshot(path='C:/Users/Lucas/.gemini/antigravity/brain/d64109d4-793e-47eb-83ed-0f80ce20ee0d/qa_assistant.png', full_page=True)
-        
     browser.close()
