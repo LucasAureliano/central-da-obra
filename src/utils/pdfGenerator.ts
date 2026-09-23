@@ -62,7 +62,15 @@ async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false, profileNam
 async function drawAppLogo(doc: jsPDF, x: number, y: number, isDarkBackground: boolean = false) {
   const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
   if (logoBase64) {
-    doc.addImage(logoBase64, 'JPEG', x, y, 22, 22);
+    if ((doc as any).advancedAPI) {
+      (doc as any).advancedAPI((d: any) => {
+        d.roundedRect(x, y, 22, 22, 5, 5);
+        d.clip();
+        d.addImage(logoBase64, 'JPEG', x, y, 22, 22);
+      });
+    } else {
+      doc.addImage(logoBase64, 'JPEG', x, y, 22, 22);
+    }
   }
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
