@@ -62,7 +62,6 @@ async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false, profileNam
 async function drawAppLogo(doc: jsPDF, x: number, y: number, isDarkBackground: boolean = false) {
   const logoBase64 = await fetchImageAsBase64('/logo-centralobra.png');
   if (logoBase64) {
-    // Drawn as a perfect 22x22 square, and explicitly as PNG for transparency
     doc.addImage(logoBase64, 'PNG', x, y, 22, 22, undefined, 'FAST');
   }
   doc.setFontSize(14);
@@ -150,7 +149,7 @@ export async function generateCalculationPDF({
         const total = unitPrice * m.quantity;
         return [
           { content: m.name, styles: { fontStyle: 'bold', textColor: [30, 41, 59] } },
-          ${m.quantity} ,
+          `${m.quantity} ${m.unit}`,
           unitPrice > 0 ? brlFormatter.format(unitPrice) : '-',
           total > 0 ? brlFormatter.format(total) : '-'
         ];
@@ -175,7 +174,7 @@ export async function generateCalculationPDF({
   const pdfUrl = URL.createObjectURL(pdfBlob);
   const pdfLink = document.createElement('a');
   pdfLink.href = pdfUrl;
-  pdfLink.download = calculo_materiais_.pdf;
+  pdfLink.download = `calculo_materiais_${new Date().getTime()}.pdf`;
   document.body.appendChild(pdfLink);
   pdfLink.click();
   document.body.removeChild(pdfLink);
@@ -256,8 +255,8 @@ export async function generateCommercialQuotePDF({
   doc.setFillColor(255, 255, 255);
   doc.rect(margin + 20, margin + 205, 70, 70, 'F'); 
   
-  const qrUrl = (isPremium && profile.customQrLink) ? profile.customQrLink : https://centralobra.com.br/p/;
-  const qrApi = https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=;
+  const qrUrl = (isPremium && profile?.customQrLink) ? profile.customQrLink : `https://centralobra.com.br/p/${profile?.id || 'profissional'}`;
+  const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(qrUrl)}`;
   const qrBase64 = await fetchImageAsBase64(qrApi);
   if (qrBase64) {
     doc.addImage(qrBase64, 'PNG', margin + 25, margin + 210, 60, 60, undefined, 'FAST');
@@ -270,7 +269,7 @@ export async function generateCommercialQuotePDF({
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(249, 115, 22); // Orange detail
-  doc.text(profile.name || 'Empresa / Profissional', contentStartX, margin + 60);
+  doc.text(profile?.name || 'Empresa / Profissional', contentStartX, margin + 60);
 
   doc.setFontSize(32);
   doc.setFont('helvetica', 'bold');
@@ -352,13 +351,13 @@ export async function generateCommercialQuotePDF({
     doc.text(brlFormatter.format(totals.total || 0), pageWidth - margin, currentY + 40, { align: 'right' });
   }
 
-  await drawDarkFooter(doc, isPremium, profile.name);
+  await drawDarkFooter(doc, isPremium, profile?.name);
 
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);
   const pdfLink = document.createElement('a');
   pdfLink.href = pdfUrl;
-  pdfLink.download = proposta_comercial_.pdf;
+  pdfLink.download = `proposta_comercial_${new Date().getTime()}.pdf`;
   document.body.appendChild(pdfLink);
   pdfLink.click();
   document.body.removeChild(pdfLink);
@@ -367,3 +366,5 @@ export async function generateCommercialQuotePDF({
 
 export async function generateBudgetPDF(args: any) { return generateCommercialQuotePDF(args); }
 export async function generateGeneralReport(args: any) {}
+export function drawHeader(doc: any, userName: string, userEmail: string, workName: string) {}
+export function drawFooter(doc: any) {}
