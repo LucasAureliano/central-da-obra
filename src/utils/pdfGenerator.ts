@@ -20,11 +20,9 @@ const fetchImageAsBase64 = async (url: string): Promise<string | null> => {
   }
 };
 
-export function applyGlobalWatermark(doc: jsPDF, isPremium: boolean = false) {
-  // Now handled exclusively by drawDarkFooter on the last page.
-}
+export function applyGlobalWatermark(doc: jsPDF, isPremium: boolean = false) {}
 
-async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false) {
+async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false, profileName?: string) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 40;
@@ -46,21 +44,33 @@ async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false) {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
-  doc.text('CentralObra App', pageWidth / 2 + 50, pageHeight - footerHeight + 25);
+  doc.text(isPremium ? (profileName || 'Profissional') : 'CentralObra App', pageWidth / 2 + 50, pageHeight - footerHeight + 25);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(148, 163, 184);
-  doc.text('Gestão inteligente para sua obra.', pageWidth / 2 + 50, pageHeight - footerHeight + 40);
+  doc.text(isPremium ? 'Gestão e Orçamentos' : 'Gestão inteligente para sua obra.', pageWidth / 2 + 50, pageHeight - footerHeight + 40);
 
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'italic');
-  doc.setTextColor(180, 180, 180);
-  const text = isPremium 
-    ? 'Gerado via CentralObra Premium - www.centralobra.com.br' 
-    : 'Gerado gratuitamente por CentralObra - www.centralobra.com.br';
-  doc.text(text, pageWidth - 280, pageHeight - 15);
+  if (!isPremium) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(180, 180, 180);
+    const text = 'Gerado por CentralObra - www.centralobra.com.br';
+    doc.text(text, pageWidth - margin - doc.getTextWidth(text), pageHeight - 15);
+  }
 }
 
+async function drawAppLogo(doc: jsPDF, x: number, y: number) {
+  const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
+  if (logoBase64) {
+    doc.addImage(logoBase64, 'JPEG', x, y, 22, 22);
+  }
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 41, 59);
+  doc.text('CentralObra', x + 28, y + 16);
+  doc.setTextColor(249, 115, 22);
+  doc.text('.', x + 28 + doc.getTextWidth('CentralObra'), y + 16);
+}
 
 // ============================================================================
 // 1. CÁLCULO DE MATERIAIS
@@ -89,7 +99,7 @@ export async function generateCalculationPDF({
   // HEADER
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(30, 41, 59); // Dark Gray
+  doc.setTextColor(30, 41, 59);
   doc.text(title.toUpperCase(), margin, 60);
 
   doc.setFontSize(10);
@@ -97,21 +107,17 @@ export async function generateCalculationPDF({
   doc.setTextColor(100, 116, 139);
   doc.text(dataHoje, margin, 78);
 
-  const logoBase64 = await fetchImageAsBase64('/logo-centralobra.png');
-  if (logoBase64) {
-    const imgWidth = 140;
-    const imgHeight = 35;
-    doc.addImage(logoBase64, 'PNG', pageWidth - margin - imgWidth, 40, imgWidth, imgHeight);
+  if (!isPremium) {
+    await drawAppLogo(doc, pageWidth - margin - 120, 48);
   }
 
   // Accent line
-  doc.setDrawColor(249, 115, 22);
-  doc.setLineWidth(2);
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(1);
   doc.line(margin, 95, pageWidth - margin, 95);
 
   // INFO SECTION
   let currentY = 120;
-  
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 41, 59);
@@ -127,13 +133,9 @@ export async function generateCalculationPDF({
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 41, 59);
-  doc.text('Emitido pelo Sistema:', pageWidth / 2, currentY);
+  doc.text('Emitido por:', pageWidth / 2, currentY);
   doc.setFontSize(11);
-  doc.text('CentralObra App', pageWidth / 2, currentY + 14);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 116, 139);
-  doc.text('www.centralobra.com.br', pageWidth / 2, currentY + 28);
+  doc.text(isPremium ? (userName || 'Profissional') : 'CentralObra App', pageWidth / 2, currentY + 14);
 
   currentY += 80;
 
@@ -153,9 +155,9 @@ export async function generateCalculationPDF({
         ];
       }),
       theme: 'plain',
-      headStyles: { textColor: [255, 255, 255], fillColor: [249, 115, 22], fontStyle: 'bold', fontSize: 10, cellPadding: 8 },
-      bodyStyles: { textColor: [71, 85, 105], fontSize: 9, cellPadding: 8, lineColor: [226, 232, 240], lineWidth: { bottom: 1 } },
-      alternateRowStyles: { fillColor: [248, 250, 252] }, // Degrade/zebra entre linhas
+      headStyles: { textColor: [255, 255, 255], fillColor: [30, 41, 59], fontStyle: 'bold', fontSize: 9, cellPadding: 8 },
+      bodyStyles: { fillColor: [255, 255, 255], textColor: [71, 85, 105], fontSize: 9, cellPadding: 8, lineColor: [226, 232, 240], lineWidth: { bottom: 0.5, top: 0.5 } },
+      alternateRowStyles: { fillColor: [241, 245, 249] },
       columnStyles: {
         0: { cellWidth: 'auto' },
         1: { halign: 'center' },
@@ -166,7 +168,7 @@ export async function generateCalculationPDF({
     });
   }
 
-  await drawDarkFooter(doc, isPremium);
+  await drawDarkFooter(doc, isPremium, userName);
   
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -211,13 +213,13 @@ export async function generateCommercialQuotePDF({
   const pageHeight = doc.internal.pageSize.getHeight();
   const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  doc.setFillColor(250, 250, 250);
+  doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
   // Dark Block on the left
-  const darkBlockWidth = 160;
+  const darkBlockWidth = 170;
   doc.setFillColor(30, 41, 59); // Dark Gray
-  doc.rect(margin, margin, darkBlockWidth, 240, 'F');
+  doc.rect(margin, margin, darkBlockWidth, 260, 'F');
   
   // Text inside Dark Block (Fixed coordinates to avoid overlap)
   doc.setTextColor(255, 255, 255);
@@ -232,7 +234,8 @@ export async function generateCommercialQuotePDF({
   doc.setFontSize(10);
   doc.text(conditions.validade || '15 dias', margin + 20, margin + 80);
   
-  doc.setDrawColor(100, 116, 139);
+  doc.setDrawColor(71, 85, 105);
+  doc.setLineWidth(1);
   doc.line(margin + 20, margin + 95, margin + darkBlockWidth - 20, margin + 95);
   
   doc.setFontSize(8);
@@ -245,23 +248,22 @@ export async function generateCommercialQuotePDF({
   if (client.phone) { doc.text(client.phone, margin + 20, clientContactY); clientContactY += 12; }
   if (client.email) { doc.text(client.email, margin + 20, clientContactY, { maxWidth: darkBlockWidth - 40 }); }
 
-  // QR Code nicely centered inside a white box at the BOTTOM of the dark block
+  // QR Code Box (Bottom aligned, strictly separated)
   doc.setFillColor(255, 255, 255);
-  doc.rect(margin + 20, margin + 180, 60, 60, 'F'); // White Box
+  doc.rect(margin + 20, margin + 180, 70, 70, 'F'); // White Box
   
   const qrUrl = (isPremium && profile.customQrLink) ? profile.customQrLink : https://centralobra.com.br/p/;
-  const qrApi = https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=;
+  const qrApi = https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=;
   const qrBase64 = await fetchImageAsBase64(qrApi);
   if (qrBase64) {
-    doc.addImage(qrBase64, 'PNG', margin + 22, margin + 182, 56, 56);
+    doc.addImage(qrBase64, 'PNG', margin + 25, margin + 185, 60, 60, undefined, 'FAST');
   }
 
   // Header Right Side
   const contentStartX = margin + darkBlockWidth + 30;
   
-  const logoBase64 = await fetchImageAsBase64('/logo-centralobra.png');
-  if (logoBase64) {
-    doc.addImage(logoBase64, 'PNG', pageWidth - margin - 120, margin, 120, 35);
+  if (!isPremium) {
+    await drawAppLogo(doc, pageWidth - margin - 120, margin + 40);
   }
 
   // Company Name / Proposta
@@ -280,7 +282,7 @@ export async function generateCommercialQuotePDF({
   doc.text('Documento Formal de Prestação de Serviços', contentStartX, margin + 110);
 
   // Info Box
-  doc.setFillColor(255, 255, 255);
+  doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
   doc.setLineWidth(1);
   doc.rect(contentStartX, margin + 130, pageWidth - contentStartX - margin, 50, 'FD');
@@ -300,7 +302,7 @@ export async function generateCommercialQuotePDF({
 
   let currentY = margin + 300;
 
-  // TABLE (With Alternating Colors and Better Spacing)
+  // TABLE
   const itemsBody = [];
   if (services && services.length > 0) {
     itemsBody.push(...services.map((s: any) => [s.description, s.quantity, brlFormatter.format(s.unitPrice), brlFormatter.format(s.quantity * s.unitPrice)]));
@@ -316,8 +318,8 @@ export async function generateCommercialQuotePDF({
       body: itemsBody,
       theme: 'plain',
       headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10, cellPadding: 8 }, 
-      bodyStyles: { textColor: [55, 65, 81], fontSize: 9, cellPadding: { top: 12, bottom: 12, left: 8, right: 8 }, lineColor: [226, 232, 240], lineWidth: { bottom: 1 } },
-      alternateRowStyles: { fillColor: [248, 250, 252] }, // Zebra row striping
+      bodyStyles: { fillColor: [255, 255, 255], textColor: [55, 65, 81], fontSize: 9, cellPadding: { top: 12, bottom: 12, left: 8, right: 8 }, lineColor: [226, 232, 240], lineWidth: { bottom: 0.5, top: 0.5 } },
+      alternateRowStyles: { fillColor: [241, 245, 249] }, // Light grey zebra row striping
       columnStyles: {
         0: { cellWidth: 'auto', fontStyle: 'bold', textColor: [30, 41, 59] },
         3: { halign: 'right', fontStyle: 'bold', textColor: [249, 115, 22] } // Orange total highlight
@@ -351,7 +353,7 @@ export async function generateCommercialQuotePDF({
   }
 
   // Shared Dark Footer
-  await drawDarkFooter(doc, isPremium);
+  await drawDarkFooter(doc, isPremium, profile.name);
 
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);

@@ -72,7 +72,7 @@ export function BaseCalculatorLayout({
   const resultRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [pdfSuccess, setPdfSuccess] = useState(false);
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, profile } = useAuth();
   const { triggerGuestAlert } = useAuthModal();
   const { activeWork } = useWorks();
   
