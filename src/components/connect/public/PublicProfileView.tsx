@@ -5,6 +5,7 @@ import type { PublicProfile, ProfessionalService, PortfolioItem } from '../../..
 import { MapPin, Star, Phone, Camera as Instagram, MapPin as Globe, CheckCircle2, ShieldCheck, Mail } from 'lucide-react';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { Helmet } from 'react-helmet-async';
+import { Logo } from '../../ui/Logo';
 
 export function PublicProfileView({ uid, theme }: { uid: string, theme: string }) {
   const [profile, setProfile] = useState<PublicProfile | null>(null);
@@ -59,7 +60,12 @@ export function PublicProfileView({ uid, theme }: { uid: string, theme: string }
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', paddingBottom: 100 }}>
       {/* Header Cover */}
-      <div style={{ height: 160, background: 'linear-gradient(135deg, var(--color-primary), #1E3A8A)', position: 'relative' }}>
+      <div style={{ height: 64, backgroundColor: 'var(--bg-base)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', padding: '0 24px', justifyContent: 'center' }}>
+          <a href="/" style={{ textDecoration: 'none' }}>
+            <Logo variant="horizontal" theme={theme as any} />
+          </a>
+        </div>
+        <div style={{ height: 160, background: 'linear-gradient(135deg, var(--color-primary), #1E3A8A)', position: 'relative' }}>
         <button onClick={handleShare} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(24px)', color: '#FFF', padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: 700, border: 'none' }}>
           Compartilhar
         </button>

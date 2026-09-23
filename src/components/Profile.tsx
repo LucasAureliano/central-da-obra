@@ -23,6 +23,7 @@ export function Profile() {
   const [company, setCompany] = useState(prof?.companyName || 'Estúdio de Engenharia');
   const [specialty, setSpecialty] = useState(prof?.specialty || 'Construção Residencial');
   const [photoUrl, setPhotoUrl] = useState(prof?.photoUrl || prof?.photoURL || '');
+  const [customQrLink, setCustomQrLink] = useState(prof?.customQrLink || '');
   const [savingProfile, setSavingProfile] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, autoSave = false) => {

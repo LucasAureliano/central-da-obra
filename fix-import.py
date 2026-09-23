@@ -1,11 +1,11 @@
 ﻿import os
-import re
 
-with open('src/components/SubscriptionPlans.tsx', 'r', encoding='utf-8') as f:
-    plans = f.read()
+with open('src/components/connect/public/PublicProfileView.tsx', 'r', encoding='utf-8') as f:
+    code = f.read()
 
-plans = re.sub(r"import \{ CheckoutBrick \} from '\./shared/CheckoutBrick';\n?", "", plans)
-plans = re.sub(r"<CheckoutBrick.*?/>", "", plans)
+code = code.replace("import { Logo } from '../../../ui/Logo';", "import { Logo } from '../../ui/Logo';")
 
-with open('src/components/SubscriptionPlans.tsx', 'w', encoding='utf-8') as f:
-    f.write(plans)
+with open('src/components/connect/public/PublicProfileView.tsx', 'w', encoding='utf-8') as f:
+    f.write(code)
+
+print("Fixed import")

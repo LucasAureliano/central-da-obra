@@ -1,15 +1,8 @@
-import jsPDF from 'jspdf';
+﻿import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { formatDate } from './formatters';
 
 const brlFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-interface PDFExportParams {
-  work: any;
-  user: any;
-  calculations: any[];
-  profile?: any;
-}
 
 const fetchImageAsBase64 = async (url: string): Promise<string | null> => {
   try {
@@ -27,239 +20,176 @@ const fetchImageAsBase64 = async (url: string): Promise<string | null> => {
   }
 };
 
-
-async function drawCoverPage(doc: jsPDF, clientName: string, projectName: string, companyName: string, dateStr: string) {
+export function applyGlobalWatermark(doc: jsPDF, isPremium: boolean = false) {
+  const pageCount = (doc as any).internal.getNumberOfPages();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  
-  // Background Block
-  doc.setFillColor(37, 99, 235); // Corporate Blue
-  doc.rect(0, 0, pageWidth, pageHeight, 'F');
-  
-  // White panel for content
-  doc.setFillColor(255, 255, 255);
-  doc.rect(40, 100, pageWidth - 80, pageHeight - 200, 'F');
-  
-  // Try to load logo
-  const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
-  if (logoBase64) {
-    doc.addImage(logoBase64, 'JPEG', 60, 130, 40, 40);
-  }
-  
-  doc.setFontSize(36);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(37, 99, 235);
-  doc.text('PROPOSTA', 60, 220);
-  doc.text('COMERCIAL', 60, 260);
-  
-  doc.setDrawColor(37, 99, 235);
-  doc.setLineWidth(3);
-  doc.line(60, 280, 140, 280);
-  
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  doc.text(`Para: ${clientName || 'Cliente Especial'}`, 60, 320);
-  doc.text(`Projeto: ${projectName || 'Construção/Reforma'}`, 60, 345);
-  
-  doc.setFontSize(12);
-  doc.setTextColor(156, 163, 175);
-  doc.text(dateStr, 60, pageHeight - 140);
-  
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(37, 99, 235);
-  doc.text(companyName || 'CentralObra Parceiro', pageWidth - 60, pageHeight - 140, { align: 'right' });
-  
-  doc.addPage();
-}
 
-export async function drawProfessionalHeader(doc: jsPDF, documentTitle: string, subtitle?: string, responsible?: string, docNumber?: string) {
-  const pageWidth = doc.internal.pageSize.getWidth();
-  
-  doc.setFillColor(249, 250, 251);
-  doc.rect(0, 0, pageWidth, 80, 'F');
-  doc.setDrawColor(229, 231, 235);
-  doc.setLineWidth(1);
-  doc.line(0, 80, pageWidth, 80);
-
-  const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
-  if (logoBase64) {
-    const imgSize = 22; // Make the icon decent sized
-    doc.addImage(logoBase64, 'JPEG', 40, 29, imgSize, imgSize);
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(200, 200, 200);
     
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(17, 24, 39); // dark text
-    doc.text('CentralObra', 40 + imgSize + 8, 45);
+    const text = isPremium ? "Gerado via CentralObra Premium" : "Gerado gratuitamente por CentralObra - www.centralobra.com.br";
+    const textWidth = doc.getTextWidth(text);
     
-    doc.setTextColor(255, 107, 0); // primary color dot
-    const textWidth = doc.getTextWidth('CentralObra');
-    doc.text('.', 40 + imgSize + 8 + textWidth + 1, 45);
-  } else {
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(17, 24, 39);
-    doc.text('CentralObra', 40, 48);
+    // Bottom right watermark
+    doc.text(text, pageWidth - 40 - textWidth, pageHeight - 15);
   }
-
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(17, 24, 39);
-  doc.text(documentTitle, pageWidth - 40, 34, { align: 'right' });
-  
-  let currentY = 48;
-  if (docNumber) {
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(107, 114, 128);
-    doc.text(`NÂº ${docNumber}`, pageWidth - 40, currentY, { align: 'right' });
-    currentY += 12;
-  }
-
-  if (subtitle) {
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(107, 114, 128);
-    doc.text(subtitle, pageWidth - 40, currentY, { align: 'right' });
-    currentY += 12;
-  }
-  
-  if (responsible) {
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(107, 114, 128);
-    doc.text(`Resp: ${responsible}`, pageWidth - 40, currentY, { align: 'right' });
-  }
-
-  return 110;
 }
 
-export function drawProfessionalFooter(doc: jsPDF, pageNumber: number, totalPages: number) {
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(156, 163, 175);
-  doc.text('Gerado por CentralObra - centralobra.com', 40, pageHeight - 30);
-  
-  doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth - 40, pageHeight - 30, { align: 'right' });
-}
-
-export function applyGlobalWatermark(doc: jsPDF, isPro: boolean = false) {
-  if (isPro) return;
-  
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  
-  doc.setTextColor(200, 200, 200);
-  doc.setFontSize(60);
-  doc.setFont('helvetica', 'bold');
-  
-  doc.saveGraphicsState();
-  doc.setGState(new (doc as any).GState({ opacity: 0.05 }));
-  
-  doc.text('GERADO VIA CENTRALOBRA', pageWidth / 2, pageHeight / 2, {
-    align: 'center',
-    angle: 45
-  });
-  
-  doc.restoreGraphicsState();
-}
-
+// ============================================================================
+// IMAGE 1 INSPIRATION: Materials Calculation (Minimalist, Orange Accents, Dark Footer)
+// ============================================================================
 export async function generateCalculationPDF({
   title,
   results,
   prices,
   workName,
-  userName
+  userName,
+  isPremium = false
 }: {
   title: string;
   results: any;
   prices: any;
   workName?: string;
   userName?: string;
+  isPremium?: boolean;
 }) {
   const doc = new jsPDF('p', 'pt', 'a4');
   const margin = 40;
-  const dataHoje = new Date().toLocaleDateString('pt-BR');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const dataHoje = new Date().toLocaleDateString('pt-BR', { month: 'long', day: 'numeric', year: 'numeric' });
 
-  let currentY = await drawProfessionalHeader(doc, 'Cálculo de Materiais', `Data: ${dataHoje}`, userName);
-
-  doc.setFontSize(18);
+  // HEADER (Title left, Logo right)
+  doc.setFontSize(28);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(17, 24, 39);
-  doc.text(title, margin, currentY);
-  currentY += 20;
+  doc.setTextColor(30, 41, 59); // Dark Gray
+  doc.text(title.toUpperCase(), margin, 60);
 
-  if (results.mainMetrics && results.mainMetrics.length > 0) {
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Métrica', 'Valor']],
-      body: results.mainMetrics.map((m: any) => [m.label, `${m.value} ${m.unit || ''}`]),
-      theme: 'plain',
-      headStyles: { fillColor: [243, 244, 246], textColor: [17, 24, 39], fontStyle: 'bold', fontSize: 10 },
-      bodyStyles: { textColor: [55, 65, 81], fontSize: 10, cellPadding: 6 },
-      alternateRowStyles: { fillColor: [250, 250, 250] },
-      columnStyles: { 0: { cellWidth: 300 } },
-      margin: { left: margin, right: margin }
-    });
-    currentY = (doc as any).lastAutoTable.finalY + 25;
-  }
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 116, 139);
+  doc.text(dataHoje, margin, 78);
 
+  // Fake Logo Block on Right
+  const rightX = pageWidth - margin - 120;
+  doc.setFillColor(249, 115, 22); // Orange Accent
+  doc.rect(rightX, 42, 10, 30, 'F');
+  doc.rect(rightX + 14, 48, 10, 24, 'F');
+  
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('Central', rightX + 32, 60);
+  doc.setTextColor(249, 115, 22); // Orange
+  doc.text('Obra', rightX + 32 + doc.getTextWidth('Central'), 60);
+  
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Gestão Inteligente', rightX + 32, 72);
+
+  // INFO SECTION
+  let currentY = 120;
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Para:', margin, currentY);
+  doc.setFontSize(11);
+  doc.setTextColor(30, 41, 59);
+  doc.text(userName || 'Usuário', margin, currentY + 14);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 116, 139);
+  doc.text('Obra:', margin, currentY + 28);
+  doc.text(workName || 'Nenhuma Obra Vinculada', margin, currentY + 40);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Emitido pelo Sistema:', pageWidth / 2, currentY);
+  doc.setFontSize(11);
+  doc.setTextColor(30, 41, 59);
+  doc.text('CentralObra App', pageWidth / 2, currentY + 14);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 116, 139);
+  doc.text('www.centralobra.com.br', pageWidth / 2, currentY + 28);
+
+  currentY += 80;
+
+  // TABLES
   if (results.materials && results.materials.length > 0) {
     autoTable(doc, {
       startY: currentY,
-      head: [['Material', 'Quantidade', 'Preço Unit. (Informado)']],
-      body: results.materials.map((m: any) => [
-        m.name,
-        `${m.quantity} ${m.unit}`,
-        prices && prices[m.name]?.price ? brlFormatter.format(prices[m.name].price) : '-'
-      ]),
-      theme: 'grid',
-      headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10 },
-      bodyStyles: { textColor: [17, 24, 39], fontSize: 10, cellPadding: 6 },
-      alternateRowStyles: { fillColor: [243, 248, 255] },
+      head: [['DESCRIÇÃO DO ITEM', 'QTD', 'VALOR UNIT', 'TOTAL']],
+      body: results.materials.map((m: any) => {
+        const unitPrice = prices && prices[m.name]?.price ? prices[m.name].price : 0;
+        const total = unitPrice * m.quantity;
+        return [
+          { content: m.name, styles: { fontStyle: 'bold', textColor: [30, 41, 59] } },
+          ${m.quantity} ,
+          unitPrice > 0 ? brlFormatter.format(unitPrice) : '-',
+          total > 0 ? brlFormatter.format(total) : '-'
+        ];
+      }),
+      theme: 'plain',
+      headStyles: { textColor: [15, 23, 42], fontStyle: 'bold', fontSize: 9, lineWidth: { top: 1, bottom: 1 }, lineColor: [30, 41, 59] },
+      bodyStyles: { textColor: [100, 116, 139], fontSize: 9, cellPadding: { top: 12, bottom: 12, left: 6, right: 6 } },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { halign: 'center' },
+        2: { halign: 'right' },
+        3: { halign: 'right', fontStyle: 'bold', textColor: [30, 41, 59] }
+      },
       margin: { left: margin, right: margin }
     });
-    currentY = (doc as any).lastAutoTable.finalY + 25;
-  }
-
-  if (results.observations && results.observations.length > 0) {
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(17, 24, 39);
-    doc.text('Observações', margin, currentY);
-    currentY += 15;
     
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(75, 85, 99);
-    results.observations.forEach((obs: any) => {
-      const lines = doc.splitTextToSize(`• ${obs}`, 500);
-      doc.text(lines, margin, currentY);
-      currentY += (lines.length * 12) + 4;
-    });
+    currentY = (doc as any).lastAutoTable.finalY + 30;
   }
 
-  const pageCount = (doc as any).internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    drawProfessionalFooter(doc, i, pageCount);
-  }
+  // DRAW DARK FOOTER (Like Image 1)
+  const footerHeight = 120;
+  doc.setFillColor(45, 55, 72); // Very dark gray
+  doc.rect(0, pageHeight - footerHeight, pageWidth, footerHeight, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Termos & Condições.', margin, pageHeight - footerHeight + 30);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(160, 174, 192);
+  doc.text('Cálculo gerado automaticamente com base em ABNT e TCPO.', margin, pageHeight - footerHeight + 50);
+  doc.text('Valores sujeitos a variações do mercado.', margin, pageHeight - footerHeight + 62);
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('Método de Utilização', pageWidth / 2 + 50, pageHeight - footerHeight + 30);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(160, 174, 192);
+  doc.text('Documento Exclusivo CentralObra', pageWidth / 2 + 50, pageHeight - footerHeight + 50);
 
+  applyGlobalWatermark(doc, isPremium);
+  
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);
   const pdfLink = document.createElement('a');
   pdfLink.href = pdfUrl;
-  pdfLink.download = `Calculo_${title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+  pdfLink.download = calculo_materiais_.pdf;
   document.body.appendChild(pdfLink);
   pdfLink.click();
   document.body.removeChild(pdfLink);
   URL.revokeObjectURL(pdfUrl);
 }
 
+// ============================================================================
+// IMAGE 2 INSPIRATION: Commercial Quote (Dark Left Block, QR Code, Professional)
+// ============================================================================
 export async function generateCommercialQuotePDF({
   client,
   workData,
@@ -269,7 +199,8 @@ export async function generateCommercialQuotePDF({
   costs,
   conditions,
   totals,
-  profile
+  profile,
+  isPremium = false
 }: {
   client: any;
   workData: any;
@@ -280,364 +211,166 @@ export async function generateCommercialQuotePDF({
   conditions: any;
   totals: any;
   profile: any;
+  isPremium?: boolean;
 }) {
   const doc = new jsPDF('p', 'pt', 'a4');
+  const margin = 40;
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 40;
+  const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  const docNumber = Math.floor(Math.random() * 90000) + 10000;
-  const dataHoje = new Date().toLocaleDateString('pt-BR');
+  // Background light gray base
+  doc.setFillColor(243, 244, 246);
+  doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-  let currentY = await drawProfessionalHeader(
-    doc, 
-    'Orçamento Comercial', 
-    `Data: ${dataHoje} | Validade: ${conditions.validade || '15 dias'}`, 
-    profile?.name || 'Profissional',
-    docNumber.toString()
-  );
+  // White content container
+  doc.setFillColor(255, 255, 255);
+  doc.rect(margin, margin, pageWidth - (margin*2), pageHeight - (margin*2), 'F');
 
-  const halfWidth = (pageWidth - (margin * 2)) / 2;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(156, 163, 175);
-  doc.text('EMITIDO POR:', margin, currentY);
+  // Dark Block on the left
+  const darkBlockWidth = 140;
+  doc.setFillColor(30, 41, 59); // Dark Gray
+  doc.rect(margin + 20, margin + 40, darkBlockWidth, 200, 'F');
   
-  doc.setFontSize(11);
-  doc.setTextColor(17, 24, 39);
-  doc.text(profile?.name || 'Profissional', margin, currentY + 14);
-  
-  doc.setFontSize(9);
+  // Date and To inside Dark Block
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  let pY = currentY + 26;
-  if (profile?.documentNumber) { doc.text(`CPF/CNPJ: ${profile.documentNumber}`, margin, pY); pY += 10; }
-  if (profile?.phone) { doc.text(`Tel: ${profile.phone}`, margin, pY); pY += 10; }
-  if (profile?.email) { doc.text(profile.email, margin, pY); }
+  doc.text('Data:', margin + 35, margin + 70);
+  doc.setFontSize(10);
+  doc.text(dataHoje, margin + 35, margin + 85);
+  
+  doc.setFontSize(8);
+  doc.text('Validade:', margin + 35, margin + 110);
+  doc.setFontSize(10);
+  doc.text(conditions.validade || '15 dias', margin + 35, margin + 125);
+  
+  doc.setDrawColor(100, 116, 139);
+  doc.line(margin + 35, margin + 145, margin + 55, margin + 145);
+  
+  doc.setFontSize(8);
+  doc.text('Para:', margin + 35, margin + 165);
+  doc.setFontSize(10);
+  doc.text(client.name || 'Cliente', margin + 35, margin + 180, { maxWidth: 110 });
+  doc.setFontSize(8);
+  if (client.phone) doc.text(client.phone, margin + 35, margin + 210);
+  if (client.email) doc.text(client.email, margin + 35, margin + 225, { maxWidth: 110 });
 
-  const rightX = margin + halfWidth + 20;
-  doc.setFontSize(9);
+  // QR Code on top of Dark Block
+  doc.setFillColor(255, 255, 255);
+  doc.rect(margin + 35, margin + 20, 80, 80, 'F'); // White Box for QR Code
+  
+  const qrUrl = (isPremium && profile.customQrLink) ? profile.customQrLink : https://centralobra.com.br/p/;
+  const qrApi = https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=;
+  const qrBase64 = await fetchImageAsBase64(qrApi);
+  if (qrBase64) {
+    doc.addImage(qrBase64, 'PNG', margin + 40, margin + 25, 70, 70);
+  }
+
+  // Right Side Header
+  const contentStartX = margin + 180;
+  
+  // Logo
+  doc.setFillColor(30, 41, 59);
+  doc.circle(contentStartX + 10, margin + 40, 8, 'F');
+  doc.setFillColor(249, 115, 22);
+  doc.circle(contentStartX + 10, margin + 40, 4, 'F');
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(156, 163, 175);
-  doc.text('PREPARADO PARA:', rightX, currentY);
-  
-  doc.setFontSize(11);
-  doc.setTextColor(17, 24, 39);
-  doc.text(client.name || 'Cliente Não Informado', rightX, currentY + 14);
-  
-  doc.setFontSize(9);
+  doc.setTextColor(30, 41, 59);
+  doc.text(profile.name || 'Empresa / Profissional', contentStartX + 30, margin + 44);
+
+  // Title INVOICE / PROPOSTA
+  doc.setFontSize(40);
+  doc.setFont('helvetica', 'bold');
+  doc.text('PROPOSTA', contentStartX, margin + 100);
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  let cY = currentY + 26;
-  if (client.phone) { doc.text(`Tel: ${client.phone}`, rightX, cY); cY += 10; }
-  if (client.email) { doc.text(client.email, rightX, cY); cY += 10; }
-  if (workData?.name) { doc.text(`Obra: ${workData.name}`, rightX, cY); cY += 10; }
-  if (workData?.address) { doc.text(`Endereço: ${workData.address}`, rightX, cY); }
+  doc.setTextColor(100, 116, 139);
+  doc.text('Documento Formal de Prestação de Serviços', contentStartX, margin + 115);
 
-  currentY += 80;
+  // Info Box
+  doc.setFillColor(248, 250, 252);
+  doc.rect(contentStartX, margin + 130, pageWidth - contentStartX - margin - 20, 50, 'F');
+  doc.setFontSize(8);
+  doc.text('Obra:', contentStartX + 15, margin + 150);
+  doc.text('Contato:', contentStartX + 120, margin + 150);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 41, 59);
+  doc.text(workData?.name || '-', contentStartX + 15, margin + 165);
+  doc.text(profile?.phone || '-', contentStartX + 120, margin + 165);
 
-  const drawTable = (title: string, head: string[][], body: any[][]) => {
-    if (body.length === 0) return;
-    
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(37, 99, 235);
-    doc.text(title, margin, currentY);
-    currentY += 10;
+  let currentY = margin + 260;
 
+  // TABLE (Dark Header)
+  const itemsBody = [];
+  if (services && services.length > 0) {
+    itemsBody.push(...services.map((s: any) => [s.description, s.quantity, brlFormatter.format(s.unitPrice), brlFormatter.format(s.quantity * s.unitPrice)]));
+  }
+  if (materials && materials.length > 0) {
+    itemsBody.push(...materials.map((m: any) => [m.description, m.quantity, brlFormatter.format(m.unitPrice), brlFormatter.format(m.quantity * m.unitPrice)]));
+  }
+
+  if (itemsBody.length > 0) {
     autoTable(doc, {
       startY: currentY,
-      head: head,
-      body: body,
+      head: [['DESCRIÇÃO DO ITEM', 'QTD', 'VALOR UNIT', 'SUBTOTAL']],
+      body: itemsBody,
       theme: 'plain',
-      headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9, lineWidth: { bottom: 1 }, lineColor: [229, 231, 235] },
-      bodyStyles: { textColor: [17, 24, 39], fontSize: 9, cellPadding: 6, lineWidth: { bottom: 0.5 }, lineColor: [243, 244, 246] },
+      headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 }, // Dark header
+      bodyStyles: { textColor: [55, 65, 81], fontSize: 9, cellPadding: { top: 10, bottom: 10, left: 6, right: 6 } },
+      alternateRowStyles: { fillColor: [255, 255, 255] },
       columnStyles: {
-        0: { cellWidth: 'auto', fontStyle: 'bold' },
-        [head[0].length - 1]: { halign: 'right' }
+        0: { cellWidth: 'auto' },
+        3: { halign: 'right', fontStyle: 'bold' }
       },
-      margin: { left: margin, right: margin }
+      margin: { left: margin + 20, right: margin + 20 }
     });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 20;
 
-    currentY = (doc as any).lastAutoTable.finalY + 25;
-  };
-
-  if (services && services.length > 0) {
-    const sBody = services.map(s => [
-      s.desc,
-      `${s.qtd} ${s.un}`,
-      brlFormatter.format(s.price),
-      brlFormatter.format(s.qtd * s.price)
-    ]);
-    drawTable('Serviços Profissionais', [['Descrição', 'Qtd', 'V. Unitário', 'Subtotal']], sBody);
-  }
-
-  if (materials && materials.length > 0) {
-    const mBody = materials.map(m => [
-      m.name,
-      `${m.qtd} un`,
-      brlFormatter.format(m.price),
-      brlFormatter.format(m.qtd * m.price)
-    ]);
-    drawTable('Materiais Fornecidos', [['Material', 'Qtd', 'V. Unitário', 'Subtotal']], mBody);
-  }
-
-  if ((totals?.totalLabor > 0) || (totals?.totalCosts > 0)) {
-    const extraBody = [];
-    if (totals.totalLabor > 0) {
-      extraBody.push(['Mão de Obra Especializada', `${labor.workers} prof. x ${labor.days} dias`, brlFormatter.format(labor.dailyRate), brlFormatter.format(totals.totalLabor)]);
-    }
-    if (costs.freight > 0) extraBody.push(['Frete / Logística', '-', '-', brlFormatter.format(costs.freight)]);
-    if (costs.displacement > 0) extraBody.push(['Deslocamento', '-', '-', brlFormatter.format(costs.displacement)]);
-    if (costs.rental > 0) extraBody.push(['Locação de Equipamentos', '-', '-', brlFormatter.format(costs.rental)]);
-    if (costs.others > 0) extraBody.push(['Outros Custos / Taxas', '-', '-', brlFormatter.format(costs.others)]);
-
-    drawTable('Custos Adicionais', [['Descrição', 'Detalhe', 'Referência', 'Subtotal']], extraBody);
-  }
-
-  if (currentY > pageHeight - 220) {
-    doc.addPage();
-    currentY = margin;
-  }
-
-  const boxWidth = 240;
-  const boxX = pageWidth - margin - boxWidth;
-  
-  doc.setFillColor(249, 250, 251);
-  doc.setDrawColor(229, 231, 235);
-  doc.setLineWidth(1);
-  doc.roundedRect(boxX, currentY, boxWidth, 120, 6, 6, 'FD');
-
-  let tY = currentY + 24;
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  
-  doc.text('Subtotal:', boxX + 16, tY);
-  doc.text(brlFormatter.format(totals?.subtotal || 0), boxX + boxWidth - 16, tY, { align: 'right' });
-  
-  tY += 20;
-  if (totals?.discountAmount > 0) {
-    doc.setTextColor(239, 68, 68);
-    doc.text('Desconto:', boxX + 16, tY);
-    doc.text(`- ${brlFormatter.format(totals.discountAmount)}`, boxX + boxWidth - 16, tY, { align: 'right' });
-    tY += 20;
-  }
-
-  doc.setDrawColor(229, 231, 235);
-  doc.line(boxX + 16, tY - 6, boxX + boxWidth - 16, tY - 6);
-  tY += 12;
-  
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(17, 24, 39);
-  doc.text('Total Final:', boxX + 16, tY);
-  
-  doc.setFontSize(16);
-  doc.setTextColor(37, 99, 235);
-  doc.text(brlFormatter.format(totals?.grandTotal || 0), boxX + boxWidth - 16, tY, { align: 'right' });
-
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(17, 24, 39);
-  doc.text('Condições Comerciais', margin, currentY + 16);
-  
-  let condY = currentY + 36;
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  
-  doc.text(`• Prazo de Execução: ${conditions?.prazo || 'A combinar'}`, margin, condY); condY += 16;
-  doc.text(`• Garantia: ${conditions?.garantia || 'Padrão legal'}`, margin, condY); condY += 16;
-  doc.text(`• Pagamento: ${conditions?.pagamento || 'A combinar'}`, margin, condY); condY += 16;
-  if (conditions?.obs) {
-    const lines = doc.splitTextToSize(`• Observações: ${conditions.obs}`, boxX - margin - 20);
-    doc.text(lines, margin, condY);
-  }
-
-  const centerX = pageWidth / 2;
-  let sigY = Math.max(currentY + 140, condY + 40);
-  if (sigY > pageHeight - 100) {
-    doc.addPage();
-    sigY = margin + 40;
-  }
-  
-  doc.setDrawColor(209, 213, 219);
-  doc.line(centerX - 100, sigY, centerX + 100, sigY);
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text('De acordo (Assinatura do Cliente)', centerX, sigY + 16, { align: 'center' });
-
-  const pageCount = (doc as any).internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    drawProfessionalFooter(doc, i, pageCount);
-  }
-
-  applyGlobalWatermark(doc, profile?.isPro);
-  
-  const pdfBlob = doc.output('blob');
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  const pdfLink = document.createElement('a');
-  pdfLink.href = pdfUrl;
-  pdfLink.download = `Orcamento_CentralObra.pdf`;
-  document.body.appendChild(pdfLink);
-  pdfLink.click();
-  document.body.removeChild(pdfLink);
-  URL.revokeObjectURL(pdfUrl);
-}
-
-export async function generateGeneralReport(work: any) {}
-export async function generateBudgetPDF({ work, user, calculations, profile }: PDFExportParams) {
-  const doc = new jsPDF('p', 'pt', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 40;
-
-  const dataHoje = new Date().toLocaleDateString('pt-BR');
-  const docNumber = Math.floor(Math.random() * 90000) + 10000;
-  
-  let currentY = await drawProfessionalHeader(
-    doc,
-    'Orçamento de Obra (Interno)',
-    `Data: ${dataHoje}`,
-    profile?.name || user?.displayName || 'CentralObra',
-    docNumber.toString()
-  );
-
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(17, 24, 39);
-  doc.text('Dados do Projeto', margin, currentY);
-  currentY += 20;
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  doc.text(`Obra: ${work?.name || 'Não informada'}`, margin, currentY);
-  currentY += 14;
-  if (work?.address) {
-    doc.text(`Endereço: ${work.address}`, margin, currentY);
-    currentY += 14;
-  }
-  currentY += 20;
-
-  let grandTotal = 0;
-  let totalItems = 0;
-
-  // Filter calculations that have materials
-  const validCalcs = calculations?.filter(c => c.resultData?.materials?.length > 0) || [];
-
-  if (validCalcs.length === 0) {
+    // Totals block on the right
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 41, 59);
+    
+    const totalsX = pageWidth - margin - 150;
+    doc.text('Subtotal:', totalsX, currentY);
+    doc.text(brlFormatter.format(totals.subtotal || 0), pageWidth - margin - 20, currentY, { align: 'right' });
+    
+    doc.text('Descontos:', totalsX, currentY + 15);
+    doc.text(brlFormatter.format(totals.discount || 0), pageWidth - margin - 20, currentY + 15, { align: 'right' });
+    
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('Nenhum material encontrado neste orçamento.', margin, currentY);
-  } else {
-    validCalcs.forEach(calc => {
-      // Draw Calculation Header
-      if (currentY > pageHeight - 100) {
-        doc.addPage();
-        currentY = margin;
-      }
-
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(37, 99, 235);
-      doc.text(`Serviço/Etapa: ${calc.calcType || 'Geral'}`, margin, currentY);
-      currentY += 15;
-
-      const head = [['Material', 'Quantidade', 'Preço Unit.', 'Subtotal']];
-      const body = calc.resultData.materials.map((mat: any) => {
-        const price = mat.price || 0;
-        const qty = mat.quantity || 0;
-        const subtotal = price * qty;
-        
-        grandTotal += subtotal;
-        totalItems++;
-
-        return [
-          mat.name || 'Item sem nome',
-          `${qty} ${mat.unit || 'un'}`,
-          brlFormatter.format(price),
-          brlFormatter.format(subtotal)
-        ];
-      });
-
-      autoTable(doc, {
-        startY: currentY,
-        head: head,
-        body: body,
-        theme: 'plain',
-        headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9, lineWidth: { bottom: 1 }, lineColor: [229, 231, 235] },
-        bodyStyles: { textColor: [17, 24, 39], fontSize: 9, cellPadding: 6, lineWidth: { bottom: 0.5 }, lineColor: [243, 244, 246] },
-        columnStyles: {
-          0: { cellWidth: 'auto', fontStyle: 'bold' },
-          2: { halign: 'right' },
-          3: { halign: 'right', fontStyle: 'bold' }
-        },
-        margin: { left: margin, right: margin }
-      });
-
-      currentY = (doc as any).lastAutoTable.finalY + 25;
-    });
+    doc.text('Total:', totalsX, currentY + 35);
+    doc.text(brlFormatter.format(totals.total || 0), pageWidth - margin - 20, currentY + 35, { align: 'right' });
   }
 
-  // Draw Totals Box
-  if (currentY > pageHeight - 120) {
-    doc.addPage();
-    currentY = margin;
-  }
-
-  const boxWidth = 240;
-  const boxX = pageWidth - margin - boxWidth;
-  
-  doc.setFillColor(249, 250, 251);
-  doc.setDrawColor(229, 231, 235);
-  doc.setLineWidth(1);
-  doc.roundedRect(boxX, currentY, boxWidth, 70, 6, 6, 'FD');
-
-  let tY = currentY + 24;
-  doc.setFontSize(10);
+  // Footer / Terms
+  const footerY = pageHeight - margin - 80;
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(75, 85, 99);
-  
-  doc.text('Total de Itens:', boxX + 16, tY);
-  doc.text(`${totalItems}`, boxX + boxWidth - 16, tY, { align: 'right' });
-  
-  tY += 12;
-  doc.setDrawColor(229, 231, 235);
-  doc.line(boxX + 16, tY - 2, boxX + boxWidth - 16, tY - 2);
-  tY += 18;
-  
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(17, 24, 39);
-  doc.text('Custo Total Previsto:', boxX + 16, tY);
-  
-  doc.setFontSize(14);
-  doc.setTextColor(37, 99, 235);
-  doc.text(brlFormatter.format(grandTotal), boxX + boxWidth - 16, tY, { align: 'right' });
+  doc.setTextColor(148, 163, 184);
+  doc.text('TERMOS E CONDIÇÕES', margin + 20, footerY);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Aprovado mediante assinatura ou aceite via WhatsApp.', margin + 20, footerY + 15);
+  doc.text(Pagamento via: , margin + 20, footerY + 25);
 
-  // Add Footers to all pages
-  const pageCount = (doc as any).internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    drawProfessionalFooter(doc, i, pageCount);
-  }
+  applyGlobalWatermark(doc, isPremium);
 
-  applyGlobalWatermark(doc, profile?.isPro);
-  
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);
   const pdfLink = document.createElement('a');
   pdfLink.href = pdfUrl;
-  pdfLink.download = `Orcamento_Interno_${work?.name ? work.name.replace(/\s+/g, '_') : 'Obra'}.pdf`;
+  pdfLink.download = proposta_comercial_.pdf;
   document.body.appendChild(pdfLink);
   pdfLink.click();
   document.body.removeChild(pdfLink);
   URL.revokeObjectURL(pdfUrl);
 }
 
-export async function drawHeader(doc: jsPDF, userName: string, _userEmail: string, workName?: string, customLogoUrl?: string | null) { await drawProfessionalHeader(doc, 'Relatório', workName, userName); return 100; }
-export function drawFooter(doc: jsPDF) { drawProfessionalFooter(doc, 1, 1); }
-
+// Dummy stubs for old methods so imports don't break
+export async function generateBudgetPDF(args: any) { return generateCommercialQuotePDF(args); }
+export async function generateGeneralReport(args: any) {}
