@@ -1,4 +1,4 @@
-﻿import jsPDF from 'jspdf';
+import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { formatDate } from './formatters';
 
@@ -221,10 +221,6 @@ export async function generateCommercialQuotePDF({
   doc.setFillColor(30, 41, 59); // Dark Gray
   doc.rect(margin, margin, darkBlockWidth, 290, 'F'); 
   
-  if (!isPremium) {
-    await drawAppLogo(doc, margin + 15, margin + 20, true);
-  }
-
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
@@ -264,6 +260,10 @@ export async function generateCommercialQuotePDF({
 
   // Header Right Side
   const contentStartX = margin + darkBlockWidth + 30;
+
+  if (!isPremium) {
+    await drawAppLogo(doc, contentStartX, margin + 20, false);
+  }
 
   // Company Name / Proposta
   doc.setFontSize(14);
