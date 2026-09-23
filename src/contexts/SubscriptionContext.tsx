@@ -153,7 +153,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     { resource: 'Obras', used: usage.worksCount, limit: limits.maxWorks },
     { resource: 'Orçamentos', used: usage.quotesCount, limit: limits.maxQuotes },
     { resource: 'Clientes', used: usage.clientsCount, limit: limits.maxClients },
-    { resource: 'Equipe', used: usage.teamMembersCount, limit: limits.maxTeamMembers || 0 },
+    { resource: 'Equipe', used: usage.teamMembersCount, limit: (limits?.maxTeamMembers || 0) || 0 },
   ];
   for (const entry of numericLimits) {
     if (isFinite(entry.limit) && entry.limit > 0) {
@@ -197,7 +197,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   };
 
   const canAddTeamMember = () => {
-    if (usage.teamMembersCount >= limits.maxTeamMembers) {
+    if (usage.teamMembersCount >= (limits?.maxTeamMembers || 0)) {
       triggerUpgrade(`Você atingiu o limite de equipe no seu plano atual.`);
       return false;
     }
@@ -244,3 +244,4 @@ export const useSubscription = () => {
   }
   return context;
 };
+

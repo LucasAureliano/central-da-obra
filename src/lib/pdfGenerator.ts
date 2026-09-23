@@ -11,7 +11,7 @@ export const generateGeneralReport = async (activeWork: Work) => {
   const doc = new jsPDF('p', 'pt', 'a4');
   const user = auth.currentUser;
   
-  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork.name);
+  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', (activeWork.name || ''));
   
   doc.setFontSize(20);
   doc.setTextColor(30, 30, 30);
@@ -40,14 +40,14 @@ export const generateGeneralReport = async (activeWork: Work) => {
 
   drawFooter(doc);
   applyGlobalWatermark(doc);
-  doc.save(`relatorio_geral_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
+  doc.save(`relatorio_geral_${((activeWork.name || '') || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
 
 export const generateFinancialReport = async (activeWork: Work) => {
   const doc = new jsPDF('p', 'pt', 'a4');
   const user = auth.currentUser;
   
-  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork.name);
+  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', (activeWork.name || ''));
   
   doc.setFontSize(20);
   doc.setTextColor(30, 30, 30);
@@ -92,14 +92,14 @@ export const generateFinancialReport = async (activeWork: Work) => {
 
   drawFooter(doc);
   applyGlobalWatermark(doc);
-  doc.save(`financeiro_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
+  doc.save(`financeiro_${((activeWork.name || '') || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
 
 export const generateShoppingReport = async (activeWork: Work) => {
   const doc = new jsPDF('p', 'pt', 'a4');
   const user = auth.currentUser;
   
-  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', activeWork.name);
+  drawHeader(doc, user?.displayName || 'Usuário', user?.email || '', (activeWork.name || ''));
   
   doc.setFontSize(20);
   doc.setTextColor(30, 30, 30);
@@ -163,5 +163,6 @@ export const generateShoppingReport = async (activeWork: Work) => {
 
   drawFooter(doc);
   applyGlobalWatermark(doc);
-  doc.save(`compras_${(activeWork.name || 'obra').replace(/\s+/g, '_')}.pdf`);
+  doc.save(`compras_${((activeWork.name || '') || 'obra').replace(/\s+/g, '_')}.pdf`);
 };
+

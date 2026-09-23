@@ -140,3 +140,5 @@ export function LandingPage({ onLogin, onRegister, theme }: LandingPageProps) {
     </div>
   );
 }
+
+

@@ -216,15 +216,15 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           )}
 
           {/* Equipe (Builder only) */}
-          {roleKey === 'builder' && limits.maxTeamMembers < 9999 && (
+          {roleKey === 'builder' && (limits?.maxTeamMembers || 0) < 9999 && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
                 <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Membros da Equipe</span>
-                <span style={{ color: 'var(--text-muted)' }}>{usage.teamMembersCount} de {limits.maxTeamMembers}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{usage.teamMembersCount} de {(limits?.maxTeamMembers || 0)}</span>
               </div>
               <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
                 <div 
-                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#10B981', width: `${Math.min(100, (usage.teamMembersCount / limits.maxTeamMembers) * 100)}%` }}
+                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#10B981', width: `${Math.min(100, (usage.teamMembersCount / (limits?.maxTeamMembers || 0)) * 100)}%` }}
                 />
               </div>
             </div>
@@ -396,7 +396,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           >
             <div style={{ marginBottom: 24 }}>
               <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                {rolePlans.business.name} <Building2 size={20} color="#8B5CF6" />
+                {rolePlans.business?.name} <Building2 size={20} color="#8B5CF6" />
               </h3>
               <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para construtoras e grandes operações.</p>
             </div>
@@ -405,7 +405,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-              {rolePlans.business.features.map((feature, i) => (
+              {rolePlans.business?.features.map((feature, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <CheckCircle2 size={18} color="#8B5CF6" style={{ flexShrink: 0, marginTop: 2 }} />
                   <span style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 500 }}>{feature}</span>
@@ -533,3 +533,5 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     </div>
   );
 };
+
+
