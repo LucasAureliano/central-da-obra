@@ -1,15 +1,15 @@
-import type { UserRole } from '../contexts/AuthContext';
+﻿import { UserRole } from '../types';
 
 export interface PlanLimits {
   maxWorks: number;
+  maxProjects?: number;
   maxQuotes: number;
   maxClients: number;
-  maxProjects: number;
-  maxTeamMembers: number;
+  maxTeamMembers?: number;
+  hasAds: boolean;
   hasAdvancedPDF: boolean;
   hasFunnel: boolean;
-  hasPremiumSupport: boolean;
-  hasAds: boolean;
+  hasPremiumSupport?: boolean;
 }
 
 export interface PlanDefinition {
@@ -21,26 +21,16 @@ export interface PlanDefinition {
   features: string[];
 }
 
-export type RolePlans = {
-  free: PlanDefinition;
-  starter?: PlanDefinition;
-  pro: PlanDefinition;
-  business?: PlanDefinition;
-};
-
-export const DEFAULT_LIMITS: PlanLimits = {
+const DEFAULT_LIMITS: PlanLimits = {
   maxWorks: 1,
-  maxQuotes: 5,
+  maxQuotes: 3,
   maxClients: 5,
-  maxProjects: 2,
-  maxTeamMembers: 1,
+  hasAds: false,
   hasAdvancedPDF: false,
   hasFunnel: false,
-  hasPremiumSupport: false,
-  hasAds: false,
 };
 
-export const PLANS_CONFIG: Record<string, RolePlans> = {
+export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
   owner: {
     free: {
       id: 'owner_free',
@@ -50,15 +40,15 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
       limits: {
         ...DEFAULT_LIMITS,
         maxWorks: 1,
-        maxQuotes: 10,
-        maxClients: 10,
+        maxQuotes: 3,
+        maxClients: 5,
         hasAds: true,
       },
       features: [
         '1 obra ativa',
-        'Cronograma e progresso básico',
-        'Lista de compras',
-        'Calculadoras ilimitadas',
+        'Cálculo de materiais básico',
+        'Controle financeiro simples',
+        'Com anúncios na plataforma'
       ]
     },
     starter: {
@@ -89,7 +79,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
       yearlyPrice: 479.90,
       limits: {
         ...DEFAULT_LIMITS,
-        maxWorks: 9999, // unlimited
+        maxWorks: 9999,
         maxQuotes: 9999,
         maxClients: 9999,
         hasAdvancedPDF: true,
@@ -97,7 +87,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
       features: [
         'Obras ilimitadas',
         'Relatórios avançados e comparativos',
-        "PDFs Premium (Sem marca d'água)",
+        'PDFs White-label (Sem marca do app)',
         'Armazenamento ampliado de fotos'
       ]
     }
@@ -157,7 +147,8 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
       features: [
         'Até 50 orçamentos por mês',
         'Clientes ilimitados',
-        'Identidade visual no orçamento (PDF Premium)',
+        'Orçamentos White-label (PDF Premium)',
+        'QR Code personalizado no PDF',
         'Funil de vendas e indicadores comerciais'
       ]
     },
@@ -178,7 +169,8 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         'Orçamentos e clientes ilimitados',
         'Automações e análise de margem',
         'Agenda avançada',
-        'Copilot da Obra (IA)'
+        'Copilot da Obra (IA)',
+        'Orçamentos White-label Premium'
       ]
     }
   },
@@ -232,11 +224,10 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         hasAdvancedPDF: true,
       },
       features: [
-        'Projetos ilimitados',
-        'Clientes ilimitados',
-        'Diário técnico completo com fotos ilimitadas',
+        'Projetos e clientes ilimitados',
+        'Diário técnico completo (fotos ilimitadas)',
         'Portal do cliente e compartilhamento',
-        'PDFs com identidade visual'
+        'PDFs Premium (White-label & QR Code customizado)'
       ]
     }
   },
@@ -290,10 +281,10 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         hasAdvancedPDF: true,
       },
       features: [
-        'Projetos ilimitados',
-        'Clientes ilimitados',
+        'Projetos e clientes ilimitados',
         'Controle documental avançado',
-        'Orçamento técnico profissional'
+        'Orçamento técnico profissional',
+        'PDFs Premium (White-label & QR Code customizado)'
       ]
     }
   },
@@ -351,7 +342,8 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         'Até 5 obras ativas',
         'Equipes e usuários ampliados (até 10)',
         'Gestão financeira e compras avançadas',
-        'Gantt e Centro de Operações'
+        'Gantt e Centro de Operações',
+        'PDFs Profissionais White-label'
       ]
     },
     business: {
@@ -370,7 +362,7 @@ export const PLANS_CONFIG: Record<string, RolePlans> = {
         'Obras ilimitadas',
         'Múltiplas equipes e usuários ilimitados',
         'API e integrações ERP',
-        'Dashboards personalizados'
+        'Dashboards personalizados e Orçamentos White-label'
       ]
     }
   }
@@ -384,7 +376,7 @@ export const getPlanDetails = (role: UserRole, planId: string): PlanDefinition =
     return rolePlans.starter || rolePlans.free;
   }
   if (planId === 'pro' || planId === 'premium' || planId === 'business') {
-    return rolePlans.pro; // map legacy 'premium' to 'pro'
+    return rolePlans.pro; 
   }
   if (planId === 'enterprise' && rolePlans.business) {
     return rolePlans.business;

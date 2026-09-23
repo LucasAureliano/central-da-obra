@@ -1,52 +1,70 @@
-import React, { useState } from 'react';
-import { CheckCircle2, Sparkles, Building2, Crown, Bot } from 'lucide-react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
+import { CheckCircle2, Crown, Sparkles, Building2, Bot } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { PLANS_CONFIG } from '../../config/plans';
 
 interface PricingSectionProps {
   onSubscribe: () => void;
+  billingCycle: 'mensal' | 'anual';
+  setBillingCycle: (cycle: 'mensal' | 'anual') => void;
 }
 
-export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe }) => {
-  const [billingCycle, setBillingCycle] = useState<'mensal' | 'anual'>('anual');
+export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe, billingCycle, setBillingCycle }) => {
+  const { profile } = useAuth();
+  const role = profile?.role || 'owner';
+  
+  const rolePlans = PLANS_CONFIG[role];
+  const isAnnual = billingCycle === 'anual';
 
-  const starterMonthly = 29.99;
-  const starterYearly = 23.99; // (287.90 / 12)
+  const getPrice = (plan: any) => {
+    if (!plan) return 0;
+    return isAnnual ? plan.yearlyPrice / 12 : plan.monthlyPrice; // Displaying equivalent monthly price for annual
+  };
 
-  const proMonthly = 49.99;
-  const proYearly = 39.99; // (479.90 / 12)
+  const starterMonthly = rolePlans.starter ? rolePlans.starter.monthlyPrice : 29.90;
+  const starterYearly = rolePlans.starter ? rolePlans.starter.yearlyPrice / 12 : 24.90;
+  
+  const proMonthly = rolePlans.pro ? rolePlans.pro.monthlyPrice : 49.90;
+  const proYearly = rolePlans.pro ? rolePlans.pro.yearlyPrice / 12 : 39.90;
 
-  const businessMonthly = 79.90;
-  const businessYearly = 66.58; // (799.00 / 12)
+  const businessMonthly = rolePlans.business ? rolePlans.business.monthlyPrice : 99.90;
+  const businessYearly = rolePlans.business ? rolePlans.business.yearlyPrice / 12 : 79.90;
 
   return (
-    <section className="landing-section" style={{ padding: '80px 20px', backgroundColor: 'var(--bg-base)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, color: 'var(--text-main)', marginBottom: 16, whiteSpace: 'normal', overflow: 'visible' }}>
-            Planos que se pagam na <span style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text', backgroundImage: 'linear-gradient(90deg, #3B82F6, #8B5CF6)' }}>primeira obra</span>
+    <section className="pricing-section" id="planos">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 60 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 100, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', fontWeight: 800, fontSize: 13, marginBottom: 24, letterSpacing: 1, textTransform: 'uppercase' }}>
+            <Crown size={16} /> Planos Flexíveis
+          </div>
+          <h2 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, color: 'var(--text-main)', marginBottom: 24, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+            O Poder do Digital <br />
+            <span style={{ color: 'var(--color-primary)' }}>ao seu Alcance</span>
           </h2>
-          <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto' }}>
-            Experimente grátis. Quando a operação crescer, escolha o plano ideal para alavancar seus lucros com inteligência artificial.
+          <p style={{ fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+            Escolha o plano ideal para o tamanho da sua operação e comece a escalar seus resultados hoje mesmo.
           </p>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 32, gap: 12 }}>
-            <span style={{ fontSize: 16, fontWeight: 600, color: billingCycle === 'mensal' ? 'var(--text-main)' : 'var(--text-muted)' }}>Mensal</span>
-            <div 
-              style={{ width: 64, height: 36, borderRadius: 18, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', position: 'relative', cursor: 'pointer' }}
-              onClick={() => setBillingCycle(billingCycle === 'mensal' ? 'anual' : 'mensal')}
-            >
-              <motion.div 
-                animate={{ x: billingCycle === 'mensal' ? 4 : 32 }}
-                style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'var(--color-primary)', position: 'absolute', top: 4 }}
-              />
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
+            <div style={{ display: 'flex', backgroundColor: 'var(--bg-panel)', padding: 6, borderRadius: 24, border: '1px solid var(--border-subtle)', position: 'relative' }}>
+              <button 
+                onClick={() => setBillingCycle('mensal')}
+                style={{ padding: '12px 24px', borderRadius: 20, fontSize: 15, fontWeight: 700, backgroundColor: billingCycle === 'mensal' ? 'var(--color-primary)' : 'transparent', color: billingCycle === 'mensal' ? '#FFF' : 'var(--text-muted)', border: 'none', cursor: 'pointer', transition: 'all 0.3s ease', zIndex: 1 }}
+              >
+                Mensal
+              </button>
+              <button 
+                onClick={() => setBillingCycle('anual')}
+                style={{ padding: '12px 24px', borderRadius: 20, fontSize: 15, fontWeight: 700, backgroundColor: billingCycle === 'anual' ? 'var(--color-primary)' : 'transparent', color: billingCycle === 'anual' ? '#FFF' : 'var(--text-muted)', border: 'none', cursor: 'pointer', transition: 'all 0.3s ease', zIndex: 1, display: 'flex', alignItems: 'center', gap: 8 }}
+              >
+                Anual <span style={{ backgroundColor: billingCycle === 'anual' ? 'rgba(255,255,255,0.2)' : 'rgba(59,130,246,0.1)', color: billingCycle === 'anual' ? '#FFF' : '#3B82F6', padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 800 }}>-20%</span>
+              </button>
             </div>
-            <span style={{ fontSize: 16, fontWeight: 600, color: billingCycle === 'anual' ? 'var(--text-main)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              Anual <span style={{ fontSize: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: 12 }}>Economize 20%</span>
-            </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32, alignItems: 'stretch' }}>
           
           {/* FREE PLAN */}
           <motion.div 
@@ -55,18 +73,18 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe }) =
             style={{ padding: 40, borderRadius: 24, border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column' }}
           >
             <div style={{ marginBottom: 24 }}>
-              <h3 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>Starter</h3>
-              <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 8 }}>Para engenheiros autônomos iniciando digitalização.</p>
+              <h3 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>Gratuito</h3>
+              <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 8 }}>O essencial para dar os primeiros passos digitais.</p>
             </div>
             <div style={{ marginBottom: 40 }}>
               <span style={{ fontSize: 48, fontWeight: 900, color: 'var(--text-main)' }}>R$ 0</span>
-              <span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/para sempre</span>
+              <span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/mês</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-              {['1 Obra Simultânea', '3 Orçamentos por mês', 'Calculadoras Básicas', 'Diário de Obra Padrão'].map((feature, i) => (
+              {['Até 1 Obra Ativa', 'Calculadoras Básicas', 'Controle Financeiro Simples', 'Geração de PDF (Com Logo)'].map((feature, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <CheckCircle2 size={20} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span style={{ fontSize: 15, color: 'var(--text-main)', fontWeight: 500 }}>{feature}</span>
+                  <CheckCircle2 size={20} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: 2, opacity: 0.5 }} />
+                  <span style={{ fontSize: 15, color: 'var(--text-main)', fontWeight: 500, opacity: 0.8 }}>{feature}</span>
                 </div>
               ))}
             </div>
@@ -139,7 +157,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe }) =
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-              {['Até 10 Obras Simultâneas', 'Orçamentos Ilimitados', 'Acesso a +80 Calculadoras', 'Portal do Cliente Connect', 'Exportação PDF/Excel (Logo)'].map((feature, i) => (
+              {['Até 10 Obras Simultâneas', 'Orçamentos Ilimitados', 'Acesso a +80 Calculadoras', 'Portal do Cliente Connect', 'PDFs Premium (White-label & QR)'].map((feature, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <CheckCircle2 size={20} color="#10B981" style={{ flexShrink: 0, marginTop: 2 }} />
                   <span style={{ fontSize: 15, color: 'var(--text-main)', fontWeight: 600 }}>{feature}</span>
