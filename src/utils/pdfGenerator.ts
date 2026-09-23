@@ -60,17 +60,10 @@ async function drawDarkFooter(doc: jsPDF, isPremium: boolean = false, profileNam
 }
 
 async function drawAppLogo(doc: jsPDF, x: number, y: number, isDarkBackground: boolean = false) {
-  const logoBase64 = await fetchImageAsBase64('/assets/logo_light_3d.jpg');
+  const logoBase64 = await fetchImageAsBase64('/logo-centralobra.png');
   if (logoBase64) {
-    if ((doc as any).advancedAPI) {
-      (doc as any).advancedAPI((d: any) => {
-        d.roundedRect(x, y, 22, 22, 5, 5);
-        d.clip();
-        d.addImage(logoBase64, 'JPEG', x, y, 22, 22);
-      });
-    } else {
-      doc.addImage(logoBase64, 'JPEG', x, y, 22, 22);
-    }
+    // Drawn as a perfect 22x22 square, and explicitly as PNG for transparency
+    doc.addImage(logoBase64, 'PNG', x, y, 22, 22, undefined, 'FAST');
   }
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
@@ -227,7 +220,7 @@ export async function generateCommercialQuotePDF({
   // Dark Block on the left
   const darkBlockWidth = 170;
   doc.setFillColor(30, 41, 59); // Dark Gray
-  doc.rect(margin, margin, darkBlockWidth, 290, 'F'); // Expanded block
+  doc.rect(margin, margin, darkBlockWidth, 290, 'F'); 
   
   if (!isPremium) {
     await drawAppLogo(doc, margin + 15, margin + 20, true);
@@ -259,9 +252,9 @@ export async function generateCommercialQuotePDF({
   if (client.phone) { doc.text(client.phone, margin + 20, clientContactY); clientContactY += 12; }
   if (client.email) { doc.text(client.email, margin + 20, clientContactY, { maxWidth: darkBlockWidth - 40 }); }
 
-  // QR Code Box (Shifted down)
+  // QR Code Box
   doc.setFillColor(255, 255, 255);
-  doc.rect(margin + 20, margin + 205, 70, 70, 'F'); // White Box
+  doc.rect(margin + 20, margin + 205, 70, 70, 'F'); 
   
   const qrUrl = (isPremium && profile.customQrLink) ? profile.customQrLink : https://centralobra.com.br/p/;
   const qrApi = https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=;
@@ -296,7 +289,7 @@ export async function generateCommercialQuotePDF({
 
   doc.setDrawColor(249, 115, 22);
   doc.setLineWidth(3);
-  doc.line(contentStartX, margin + 130, contentStartX, margin + 180); // Orange left border indicator
+  doc.line(contentStartX, margin + 130, contentStartX, margin + 180);
 
   doc.setFontSize(8);
   doc.text('Obra:', contentStartX + 15, margin + 150);
@@ -326,10 +319,10 @@ export async function generateCommercialQuotePDF({
       theme: 'plain',
       headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10, cellPadding: 8 }, 
       bodyStyles: { fillColor: [255, 255, 255], textColor: [55, 65, 81], fontSize: 9, cellPadding: { top: 12, bottom: 12, left: 8, right: 8 }, lineColor: [226, 232, 240], lineWidth: { bottom: 0.5, top: 0.5 } },
-      alternateRowStyles: { fillColor: [241, 245, 249] }, // Light grey zebra row striping
+      alternateRowStyles: { fillColor: [241, 245, 249] },
       columnStyles: {
         0: { cellWidth: 'auto', fontStyle: 'bold', textColor: [30, 41, 59] },
-        3: { halign: 'right', fontStyle: 'bold', textColor: [249, 115, 22] } // Orange total highlight
+        3: { halign: 'right', fontStyle: 'bold', textColor: [249, 115, 22] } 
       },
       margin: { left: margin, right: margin }
     });
@@ -359,7 +352,6 @@ export async function generateCommercialQuotePDF({
     doc.text(brlFormatter.format(totals.total || 0), pageWidth - margin, currentY + 40, { align: 'right' });
   }
 
-  // Shared Dark Footer
   await drawDarkFooter(doc, isPremium, profile.name);
 
   const pdfBlob = doc.output('blob');
