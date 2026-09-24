@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { Sparkles, ArrowRight, MessageSquare, Calculator, BookOpen, ShoppingCart, Lightbulb, Calendar, ClipboardList, Palette, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { takePicture } from '../../utils/nativeCamera';
 import { Camera as CameraIcon, X as XIcon } from 'lucide-react';
 import { useWorks } from '../../contexts/WorksContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { Crown } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { assistantService } from '../../services/assistant/AssistantService';
 
@@ -38,6 +40,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
   const [isTyping, setIsTyping] = useState(false);
   const { primaryWork, activeWork } = useWorks();
   const { profile } = useAuth();
+  const { setShowUpgradeModal } = useSubscription();
   const currentWork = profile?.role === 'owner' ? primaryWork : activeWork;
   const isPremium = profile?.subscription?.planId === 'pro' || profile?.subscription?.planId === 'business' || profile?.isAdmin;
   
@@ -48,14 +51,14 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
     if (messages.length === 0) {
       const getRoleGreeting = () => {
         if (profile?.role === 'architect' || profile?.role === 'engineer') return 'Atuo como seu mentor de engenharia e projetos.';
-        if (profile?.role === 'builder') return 'Atuo como seu consultor de gestão de obras e equipes.';
-        if (profile?.role === 'service') return 'Atuo como seu parceiro em serviços e orçamentos.';
-        return 'Atuo como seu consultor de obras residenciais e finanças.';
+        if (profile?.role === 'builder') return 'Atuo como seu consultor de gestÃ£o de obras e equipes.';
+        if (profile?.role === 'service') return 'Atuo como seu parceiro em serviÃ§os e orÃ§amentos.';
+        return 'Atuo como seu consultor de obras residenciais e finanÃ§as.';
       };
 
       setMessages([{
         role: 'assistant',
-        text: `Olá! Sou o Assistente Inteligente da CentralObra. ${getRoleGreeting()}${currentWork ? ` Vejo que você está focado na obra "${currentWork.name}".` : ''} Pode me dizer o que precisa em linguagem natural.`,
+        text: `OlÃ¡! Sou o Assistente Inteligente da CentralObra. ${getRoleGreeting()}${currentWork ? ` Vejo que vocÃª estÃ¡ focado na obra "${currentWork.name}".` : ''} Pode me dizer o que precisa em linguagem natural.`,
       }]);
     }
   }, [currentWork, messages.length, profile]);
@@ -135,7 +138,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
       console.error(err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: 'Desculpe, ocorreu um erro de conexão com a API do Copilot. Tente novamente em instantes.'
+        text: 'Desculpe, ocorreu um erro de conexÃ£o com a API do Copilot. Tente novamente em instantes.'
       }]);
     } finally {
       setIsTyping(false);
@@ -146,32 +149,24 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
     const role = profile?.role;
     if (role === 'architect' || role === 'engineer') {
       return [
-        "Acessar Studio de Interiores",
-        "Consultar normas NBR",
-        "Agenda de visitas técnicas",
-        "Diário de obra"
+        { text: "Memorial Descritivo Mágico", isPremium: true },
+        { text: "Criar Diário de Obra Formal", isPremium: true },
+        { text: "Pitch de Vendas para Cliente", isPremium: true },
+        { text: "Consultar NBR Básica", isPremium: false }
       ];
-    } else if (role === 'builder') {
+    } else if (role === 'builder' || role === 'service') {
       return [
-        "Relatório diário de obra",
-        "Gestão de equipe",
-        "Compras pendentes",
-        "Como está minha obra?"
-      ];
-    } else if (role === 'service') {
-      return [
-        "Criar novo orçamento",
-        "Calcular materiais (Tintas/Pisos)",
-        "Divulgar meus serviços",
-        "Ver minha agenda"
+        { text: "Reescrever Orçamento Matador", isPremium: true },
+        { text: "Otimizar Cronograma", isPremium: true },
+        { text: "Dicas de Desperdício Zero", isPremium: true },
+        { text: "Calcular Material Básico", isPremium: false }
       ];
     } else {
       return [
-        "Como está minha obra?",
-        "O que falta terminar?",
-        "Lista de compras",
-        "Quanto já gastei?",
-        "Calcular quantidade de material"
+        { text: "Doutor Financeiro (Análise)", isPremium: true },
+        { text: "Analisar minha Saúde da Obra", isPremium: true },
+        { text: "Ideias para Economizar", isPremium: true },
+        { text: "Dúvidas sobre materiais", isPremium: false }
       ];
     }
   };
@@ -317,24 +312,34 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
             {quickChips.map((chip, idx) => (
               <motion.button 
                 key={idx}
-                whileHover={{ scale: 1.05, borderColor: 'var(--color-primary)' }}
+                whileHover={{ scale: 1.05, borderColor: chip.isPremium ? '#F59E0B' : 'var(--color-primary)' }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleSend(chip)}
+                onClick={() => {
+                  if (chip.isPremium && !isPremium) {
+                    setShowUpgradeModal(true);
+                  } else {
+                    handleSend(chip.text);
+                  }
+                }}
                 style={{
                   whiteSpace: 'nowrap',
                   padding: '10px 18px',
                   borderRadius: 20,
-                  backgroundColor: 'var(--bg-elevated)',
-                  border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-main)',
+                  backgroundColor: chip.isPremium ? 'rgba(245, 158, 11, 0.05)' : 'var(--bg-elevated)',
+                  border: chip.isPremium ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid var(--border-subtle)',
+                  color: chip.isPremium ? '#F59E0B' : 'var(--text-main)',
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: 'pointer',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                  zIndex: 1
+                  zIndex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
                 }}
               >
-                {chip}
+                {chip.isPremium && <Crown size={14} />}
+                {chip.text}
               </motion.button>
             ))}
           </div>
@@ -348,7 +353,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
             <MessageSquare size={20} color="var(--text-muted)" style={{ marginRight: 12 }} />
             <input 
               type="text"
-              placeholder="O que você deseja fazer?"
+              placeholder="O que vocÃª deseja fazer?"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend(query)}
@@ -378,3 +383,5 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
 export function SmartAssistant(props: SmartAssistantProps) {
   return <AssistantErrorBoundary><SmartAssistantInner {...props} /></AssistantErrorBoundary>;
 }
+
+
