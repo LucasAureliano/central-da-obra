@@ -1,5 +1,7 @@
+﻿import { auth } from '../../lib/firebase';
+
 export interface AssistantQuery {
-  messages: { role: 'user' | 'assistant'; content: string }[];
+  messages: { role: 'user' | 'assistant'; content: any }[];
   contextData?: any;
 }
 
@@ -15,7 +17,6 @@ export interface AssistantResponse {
 class AssistantService {
   async sendMessage(query: AssistantQuery): Promise<AssistantResponse> {
     try {
-      const { auth } = await import('../../lib/firebase');
       const user = auth.currentUser;
       
       let token = '';
@@ -27,7 +28,7 @@ class AssistantService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': \Bearer \\
         },
         body: JSON.stringify({
           messages: query.messages,
@@ -36,7 +37,7 @@ class AssistantService {
       });
 
       if (!response.ok) {
-        throw new Error(`API retornou status ${response.status}`);
+        throw new Error(\API retornou status \\);
       }
 
       const data = await response.json();

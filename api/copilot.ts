@@ -9,7 +9,7 @@ const openai = new OpenAI({
 
 const CopilotMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
-  content: z.string().max(4000)
+  content: z.any() // Can be string or array for vision
 });
 
 const CopilotPayloadSchema = z.object({
@@ -22,40 +22,37 @@ const getSystemPrompt = (contextData?: any) => {
   const currentWork = contextData?.currentWork;
   const isPremium = contextData?.isPremium;
 
-  let base = \Você é a CentralObra AI, a inteligência artificial mais avançada e completa para construção civil.
-Aja exatamente como o ChatGPT: seja extremamente amigável, consultivo, prestativo e detalhista. Nunca dê respostas curtas ou superficiais. Sempre estruture suas respostas de forma impecável usando Markdown (listas, negritos, quebras de linha). Explique o 'porquê' das coisas e dê dicas extras valiosas que o usuário nem pediu.\n\;
+  let base = \Você é a CentralObra AI 2.0, um assistente contextual e multimodal de construção civil.
+Sua missão: ENTENDER → ANALISAR → SUGERIR → EXECUTAR.
+Aja como um verdadeiro copiloto integrado à obra. Se o usuário quiser fazer um orçamento, sugerir compras, registrar despesas ou fazer diário de obra, USE AS FERRAMENTAS (Tools) para gerar botões de ação na interface. Nunca invente dados que não possui.\n\;
   
   if (role === 'engineer' || role === 'architect') {
-    base += \\nATENÇÃO: O usuário é um Engenheiro/Arquiteto. Converse em alto nível técnico. Aprofunde-se em normas técnicas (NBR), dimensionamentos, patologias da construção e compatibilização estrutural. Mostre que você é um especialista Sênior.\;
+    base += \\nPERFIL: Engenheiro/Arquiteto. Priorize vistorias, diário técnico, acompanhamento, medições, normas NBR e relatórios.\;
   } else if (role === 'builder' || role === 'service') {
-    base += \\nATENÇÃO: O usuário é um Construtor/Prestador de Serviços. Dê conselhos extremamente práticos sobre canteiro de obras, gestão de equipes, redução de desperdício e como ser mais profissional para lucrar mais e fechar contratos.\;
+    base += \\nPERFIL: Prestador/Construtor. Priorize orçamentos, cronograma, equipes, produtividade e compras.\;
   } else {
-    base += \\nATENÇÃO: O usuário é Dono de Obra (Leigo). Seja super didático, explique termos difíceis com analogias simples. Ajude-o a não ser enganado e a controlar o dinheiro da obra com inteligência.\;
+    base += \\nPERFIL: Dono da Obra. Priorize controle financeiro, cálculos de material, progresso da obra e economia.\;
   }
 
   if (isPremium === false) {
-    base += \\n\n[MÓDULO: PLANO FREE]
-O usuário possui o plano GRATUITO. 
-Forneça informações muito completas e úteis, mas avise que funções de geração de documentos (Diário de Obra Formal, Memorial Descritivo Completo, Orçamento Matador Persuasivo) requerem o Plano Premium. Explique os benefícios do plano Premium para deixá-lo com vontade de assinar.\;
+    base += \\n[PLANO FREE]: Ajude com cálculos básicos e dúvidas. Para diários, orçamentos complexos ou financeiro avançado, avise que é um recurso Premium.\;
   } else {
-    base += \\n\n[MÓDULO: PLANO PREMIUM]
-O usuário possui o plano PREMIUM. Entregue a melhor experiência possível. 
-Se ele pedir relatórios, memoriais, ou propostas, gere textos profissionais, longos, persuasivos e prontos para uso. Analise orçamentos com profundidade matemática.\;
+    base += \\n[PLANO PREMIUM]: Acesso total. Entregue respostas ricas, completas, e orçamentos persuasivos.\;
   }
 
   if (currentWork) {
     base += \\n\n[CONTEXTO DA OBRA ATUAL]
-A obra que o usuário está focando agora se chama: \
-Progresso atual: \%
-Orçamento Total Planejado: R$ \
+Nome: \
+Progresso: \%
+Orçamento Total: R$ \
 Gasto até o momento: R$ \
-Use esses dados de forma proativa. Se ele perguntar 'como está minha obra?', faça uma análise financeira completa, dizendo se ele está gastando muito ou dentro da meta.\;
-  } else {
-    base += \\n\n[CONTEXTO DA OBRA ATUAL]
-O usuário não possui nenhuma obra selecionada ou criada no momento. Se ele quiser falar sobre uma obra específica, oriente-o a criar uma obra no menu inicial.\;
+Status: \
+Sempre contextualize suas respostas com esses dados. Se ele pedir para registrar despesa, forneça um botão (sugerir_acao).\;
   }
 
-  base += \\n\nSempre que couber, sugira atalhos da plataforma usando a ferramenta sugerir_atalho (ex: enviar para a tela de novo orçamento).\;
+  base += \\n\nDiretrizes de Análise de Imagem:
+Se o usuário enviar uma imagem, analise materiais, estado visual, ou extraia itens de notas fiscais.
+Sempre inclua este aviso no final da análise de imagem: "*Essa análise é visual e preliminar. Para avaliação técnica ou estrutural, consulte um profissional habilitado.*"\;
 
   return base;
 };
@@ -65,7 +62,7 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "buscar_preco_material",
-      description: "Busca o preço médio atualizado de um material de construção.",
+      description: "Busca o preço de um material.",
       parameters: {
         type: "object",
         properties: {
@@ -78,13 +75,14 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
     type: "function",
     function: {
-      name: "sugerir_atalho",
-      description: "Adiciona um botão na interface do chat para navegar rapidamente para outra tela.",
+      name: "sugerir_acao",
+      description: "Gera um botão na interface do chat para executar uma ação no aplicativo.",
       parameters: {
         type: "object",
         properties: {
-          label: { type: "string" },
-          actionKey: { type: "string", description: "Valores válidos: 'novo-orcamento', 'diario-tecnico', 'compras', 'planos'" }
+          label: { type: "string", description: "O texto do botão. Ex: 'Registrar Despesa', 'Criar Orçamento', 'Calcular Cimento'" },
+          actionKey: { type: "string", description: "Destino: 'financeiro', 'novo-orcamento', 'compras', 'calculos', 'diario-tecnico', 'cronograma'" },
+          actionParam: { type: "string", description: "Parâmetro opcional. Ex: nome do material ('cimento'), ou tipo de cálculo." }
         },
         required: ["label", "actionKey"],
       },
@@ -103,14 +101,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const token = authHeader.split('Bearer ')[1];
     if (adminAuth && token) {
-      try { await adminAuth.verifyIdToken(token); } catch (err) {
-        console.warn('Invalid token for Copilot API');
-      }
+      try { await adminAuth.verifyIdToken(token); } catch (err) { }
     }
 
     const validationResult = CopilotPayloadSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Bad Request', details: validationResult.error.format() });
+      return res.status(400).json({ error: 'Bad Request' });
     }
 
     const { messages, contextData } = validationResult.data;
@@ -121,7 +117,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ];
 
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(200).json({ reply: "A API da OpenAI não está configurada (OPENAI_API_KEY). Como simulação: Seu orçamento matador/memorial ficaria incrível se gerado com a chave configurada!", suggestions: [] });
+      return res.status(200).json({ reply: "Modo Simulação: A API da OpenAI não está configurada.", suggestions: [] });
     }
 
     let completion = await openai.chat.completions.create({
@@ -142,22 +138,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         try {
           if (toolCall.function.name === 'buscar_preco_material') {
             const args = JSON.parse(toolCall.function.arguments);
-            const STATIC = { 'cimento': 35.90, 'areia': 150.00, 'brita': 160.00, 'tijolo': 1.20, 'bloco': 3.50, 'tinta': 250.00, 'piso': 45.00 };
-            let foundPrice = null;
-            let matLower = (args.material || '').toLowerCase();
-            for (const [key, p] of Object.entries(STATIC)) {
-              if (matLower.includes(key)) foundPrice = p;
-            }
-            const resultText = foundPrice ? \Catálogo CentralObra: R$ \\ : "Preço não encontrado.";
-            conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: resultText });
-          } else if (toolCall.function.name === 'sugerir_atalho') {
+            conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: \Preço simulado/encontrado para \\ });
+          } else if (toolCall.function.name === 'sugerir_acao') {
             const args = JSON.parse(toolCall.function.arguments);
-            finalSuggestions.push({ label: args.label, actionKey: args.actionKey });
-            conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: "Atalho criado com sucesso na interface do usuário." });
+            finalSuggestions.push({ label: args.label, actionKey: args.actionKey, actionParam: args.actionParam });
+            conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: "Atalho fornecido ao usuário." });
           }
         } catch (err) {
-          // Fallback if JSON parse fails
-          conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: "Erro ao executar ferramenta." });
+          conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: "Erro." });
         }
       }
 
@@ -173,7 +161,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ reply, suggestions: finalSuggestions });
 
   } catch (error: any) {
-    console.error('Copilot API error:', error.message);
-    return res.status(500).json({ error: 'Internal server error processing copilot request' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -50,15 +50,22 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
   useEffect(() => {
     if (messages.length === 0) {
       const getRoleGreeting = () => {
-        if (profile?.role === 'architect' || profile?.role === 'engineer') return 'Atuo como seu mentor de engenharia e projetos.';
-        if (profile?.role === 'builder') return 'Atuo como seu consultor de gestÃ£o de obras e equipes.';
-        if (profile?.role === 'service') return 'Atuo como seu parceiro em serviÃ§os e orÃ§amentos.';
-        return 'Atuo como seu consultor de obras residenciais e finanÃ§as.';
+        if (profile?.role === 'architect' || profile?.role === 'engineer') {
+          return currentWork ? `Sua obra principal está em ${currentWork.progress || 0}% de conclusão. Quer registrar o diário técnico de hoje ou analisar uma foto da obra?` : `Atuo como seu mentor de engenharia e projetos. Você possui uma vistoria pendente ou deseja analisar alguma imagem?`;
+        }
+        if (profile?.role === 'builder') {
+          return currentWork ? `A obra "${currentWork.name}" está em andamento. Existem tarefas aguardando atualização. Quer criar um novo orçamento ou calcular materiais desse serviço?` : `Você tem orçamentos aguardando resposta. Quer criar um novo orçamento?`;
+        }
+        if (profile?.role === 'service') {
+          return `Atuo como seu parceiro em serviços. Quer calcular os materiais para o próximo serviço ou gerar um orçamento?`;
+        }
+        // Owner
+        return currentWork ? `Como está o andamento da sua obra "${currentWork.name}"? Ela está em ${currentWork.progress || 0}% de conclusão. Há itens pendentes ou despesas para registrar?` : `Atuo como seu consultor de obras residenciais e finanças. Quer calcular materiais ou iniciar uma nova obra?`;
       };
 
       setMessages([{
         role: 'assistant',
-        text: `OlÃ¡! Sou o Assistente Inteligente da CentralObra. ${getRoleGreeting()}${currentWork ? ` Vejo que vocÃª estÃ¡ focado na obra "${currentWork.name}".` : ''} Pode me dizer o que precisa em linguagem natural.`,
+        text: `Olá! Sou a CentralObra AI 2.0. ${getRoleGreeting()} O que você precisa fazer?`,
       }]);
     }
   }, [currentWork, messages.length, profile]);
@@ -98,17 +105,24 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
   const handleSend = async (text: string) => {
     if (!text.trim() || isTyping) return;
     
-    const newMessages = [...messages, { role: 'user' as const, text }];
+    const currentAttachment = attachment;
+    const newMessages = [...messages, { role: 'user' as const, text, imageUrl: currentAttachment || undefined }];
     setMessages(newMessages);
     setQuery('');
-    const currentAttachment = attachment;
     setAttachment(null);
     setIsTyping(true);
 
-    // free limit removed
-
     try {
-      const apiMessages = newMessages.map(m => ({ role: m.role, content: m.text }));
+      const apiMessages = newMessages.map(m => {
+        let content: any = m.text;
+        if (m.imageUrl) {
+          content = [
+            { type: "text", text: m.text },
+            { type: "image_url", image_url: { url: m.imageUrl } }
+          ];
+        }
+        return { role: m.role, content };
+      });
       
       const response = await assistantService.sendMessage({
         messages: apiMessages,
@@ -121,7 +135,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
             status: currentWork.status
           } : null,
           role: profile?.role,
-            isPremium: isPremium
+          isPremium: isPremium
         }
       });
       
@@ -138,7 +152,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
       console.error(err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: 'Desculpe, ocorreu um erro de conexÃ£o com a API do Copilot. Tente novamente em instantes.'
+        text: 'Desculpe, ocorreu um erro de conexão com a API do Copilot. Tente novamente em instantes.'
       }]);
     } finally {
       setIsTyping(false);
@@ -212,7 +226,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
               gap: 8
             }}
           >
-            <div style={{ 
+                        <div style={{ 
               padding: '12px 16px', 
               borderRadius: 20, 
               borderBottomRightRadius: msg.role === 'user' ? 4 : 20,
@@ -224,6 +238,11 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
               border: msg.role === 'assistant' ? '1px solid var(--border-subtle)' : 'none',
               boxShadow: msg.role === 'user' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 4px 12px rgba(0,0,0,0.05)'
             }}>
+              {msg.imageUrl && (
+                <div style={{ marginBottom: 12 }}>
+                  <img src={msg.imageUrl} alt="Anexo" style={{ maxWidth: '100%', borderRadius: 12, maxHeight: 200, objectFit: 'cover' }} />
+                </div>
+              )}
               {msg.text}
             </div>
 
@@ -345,35 +364,56 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center', maxWidth: 800, margin: '0 auto' }}>
-          <motion.div 
-            animate={{ borderColor: query.trim() ? 'var(--color-primary)' : 'var(--border-light)', boxShadow: query.trim() ? '0 0 12px rgba(16,185,129,0.2)' : 'none' }}
-            style={{ flex: 1, display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 24, padding: '8px 16px', border: '1px solid var(--border-light)', transition: 'border-color 0.2s' }}
-          >
-            <MessageSquare size={20} color="var(--text-muted)" style={{ marginRight: 12 }} />
-            <input 
-              type="text"
-              placeholder="O que vocÃª deseja fazer?"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend(query)}
-              style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: 15 }}
-            />
-          </motion.div>
-          <button 
-            onClick={() => handleSend(query)}
-            disabled={!query.trim()}
-            style={{ 
-              width: 44, height: 44, borderRadius: 22, 
-              backgroundColor: query.trim() ? 'var(--color-primary)' : 'var(--bg-surface)', 
-              color: query.trim() ? '#FFF' : 'var(--text-muted)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: 'none', cursor: query.trim() ? 'pointer' : 'not-allowed',
-              transition: 'all 0.2s'
-            }}
-          >
-            <ArrowRight size={20} />
-          </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 800, margin: '0 auto' }}>
+          
+          {attachment && (
+            <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 12, overflow: 'hidden', border: '2px solid var(--color-primary)' }}>
+              <img src={attachment} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <button 
+                onClick={() => setAttachment(null)}
+                style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', color: '#FFF', border: 'none', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+              >
+                <XIcon size={14} />
+              </button>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', width: '100%' }}>
+            <button 
+              onClick={handleCamera}
+              style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <CameraIcon size={20} />
+            </button>
+            <motion.div 
+              animate={{ borderColor: query.trim() ? 'var(--color-primary)' : 'var(--border-light)', boxShadow: query.trim() ? '0 0 12px rgba(16,185,129,0.2)' : 'none' }}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: 24, padding: '8px 16px', border: '1px solid var(--border-light)', transition: 'border-color 0.2s' }}
+            >
+              <MessageSquare size={20} color="var(--text-muted)" style={{ marginRight: 12 }} />
+              <input 
+                type="text"
+                placeholder="Ex: Como está o andamento da obra?"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend(query)}
+                style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: 15 }}
+              />
+            </motion.div>
+            <button 
+              onClick={() => handleSend(query)}
+              disabled={!query.trim() && !attachment}
+              style={{ 
+                width: 44, height: 44, borderRadius: 22, 
+                backgroundColor: (query.trim() || attachment) ? 'var(--color-primary)' : 'var(--bg-surface)', 
+                color: (query.trim() || attachment) ? '#FFF' : 'var(--text-muted)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: 'none', cursor: (query.trim() || attachment) ? 'pointer' : 'not-allowed',
+                transition: 'all 0.2s'
+              }}
+            >
+              <ArrowRight size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -383,6 +423,10 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
 export function SmartAssistant(props: SmartAssistantProps) {
   return <AssistantErrorBoundary><SmartAssistantInner {...props} /></AssistantErrorBoundary>;
 }
+
+
+
+
 
 
 
