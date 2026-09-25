@@ -1,4 +1,4 @@
-import { auth } from '../../lib/firebase';
+﻿import { auth } from '../../lib/firebase';
 export interface MaterialPrice {
   id: string;
   name: string;
@@ -13,14 +13,11 @@ const CACHE_KEY_PREFIX = 'centralobra_prices_';
 const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 class MaterialPriceService {
-  /**
-   * Busca preços de materiais reais através do nosso BFF no Vercel Functions.
-   * Utiliza cache local para não estourar limites de API ou abusar da rede.
-   */
   async searchMaterial(query: string): Promise<MaterialPrice[]> {
     if (!query) return [];
 
-    const cacheKey = `${CACHE_KEY_PREFIX}${query.toLowerCase().trim()}`;
+    const lowerQuery = query.toLowerCase().trim();
+    const cacheKey = \\\\;
     const cachedStr = localStorage.getItem(cacheKey);
 
     if (cachedStr) {
@@ -30,7 +27,6 @@ class MaterialPriceService {
           return cached.data;
         }
       } catch (e) {
-        // Cache corrompido, ignora
       }
     }
 
@@ -42,13 +38,11 @@ class MaterialPriceService {
           token = await user.getIdToken();
         }
       } catch (e) {
-        console.warn('Could not get auth token for prices API');
       }
 
-      // Usamos a URL absoluta para funcionar no localhost sem proxy do Vite e evitar Vercel Protection em previews
-      const response = await fetch(`/api/prices?q=${encodeURIComponent(query)}`, {
+      const response = await fetch(\/api/prices?q=\\, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': \Bearer \\
         }
       });
       
@@ -57,11 +51,10 @@ class MaterialPriceService {
       }
 
       const result = await response.json();
-      const resultsArray = result.data?.[query] || result.data?.[query.toLowerCase()] || [];
+      const resultsArray = result.data?.[query] || result.data?.[lowerQuery] || [];
 
-      // Converte o formato do backend para o formato do MaterialPrice
       const formattedPrices: MaterialPrice[] = resultsArray.map((item: any, index: number) => ({
-        id: `api_${index}_${Date.now()}`,
+        id: \pi_\_\\,
         name: item.name,
         unit: item.unit || 'un',
         price: item.price,
@@ -70,7 +63,6 @@ class MaterialPriceService {
         lastUpdated: new Date().toISOString()
       }));
 
-      // Salva no cache
       if (formattedPrices.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify({
           timestamp: Date.now(),
@@ -81,8 +73,6 @@ class MaterialPriceService {
       return formattedPrices;
     } catch (error) {
       console.error('Erro no MaterialPriceService:', error);
-      // Fallback pra não quebrar a aplicação
-      // Se tiver cache vencido, usamos ele
       if (cachedStr) {
         try {
           return JSON.parse(cachedStr).data;
@@ -92,9 +82,6 @@ class MaterialPriceService {
     }
   }
 
-  /**
-   * Busca preços para múltiplos materiais simultaneamente.
-   */
   async searchMultiple(queries: string[]): Promise<Record<string, MaterialPrice[]>> {
     const validQueries = queries.filter(Boolean);
     if (!validQueries.length) return {};
@@ -102,9 +89,8 @@ class MaterialPriceService {
     const results: Record<string, MaterialPrice[]> = {};
     const missingQueries: string[] = [];
 
-    // Checa cache primeiro
     validQueries.forEach(q => {
-      const cacheKey = `${CACHE_KEY_PREFIX}${q.toLowerCase().trim()}`;
+      const cacheKey = \\\\;
       const cachedStr = localStorage.getItem(cacheKey);
       if (cachedStr) {
         try {
@@ -120,19 +106,16 @@ class MaterialPriceService {
 
     if (missingQueries.length === 0) return results;
 
-    // Busca os que faltaram
     try {
       let token = '';
       try {
         const user = auth.currentUser;
-        if (user) {
-          token = await user.getIdToken();
-        }
+        if (user) token = await user.getIdToken();
       } catch (e) {}
 
-      const response = await fetch(`/api/prices?materials=${encodeURIComponent(missingQueries.join(','))}`, {
+      const response = await fetch(\/api/prices?materials=\\, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': \Bearer \\
         }
       });
       
@@ -140,25 +123,29 @@ class MaterialPriceService {
         const result = await response.json();
         const data = result.data || {};
 
-        Object.keys(data).forEach(q => {
-          const formattedPrices: MaterialPrice[] = data[q].map((item: any, index: number) => ({
-             id: `api_${index}_${Date.now()}`,
-             name: item.name,
-             unit: item.unit || 'un',
-             price: item.price,
-             supplier: item.store || item.supplier || 'Leroy Merlin',
-             link: item.url || item.link,
-             lastUpdated: new Date().toISOString()
-          }));
+        missingQueries.forEach(q => {
+          const lowerQ = q.toLowerCase().trim();
+          const sourceArray = data[lowerQ] || data[q];
+          if (sourceArray && Array.isArray(sourceArray)) {
+            const formattedPrices: MaterialPrice[] = sourceArray.map((item: any, index: number) => ({
+               id: \pi_\_\\,
+               name: item.name,
+               unit: item.unit || 'un',
+               price: item.price,
+               supplier: item.store || item.supplier || 'Leroy Merlin',
+               link: item.url || item.link,
+               lastUpdated: new Date().toISOString()
+            }));
 
-          results[q] = formattedPrices;
+            results[q] = formattedPrices;
 
-          if (formattedPrices.length > 0) {
-             const cacheKey = `${CACHE_KEY_PREFIX}${q.toLowerCase().trim()}`;
-             localStorage.setItem(cacheKey, JSON.stringify({
-               timestamp: Date.now(),
-               data: formattedPrices
-             }));
+            if (formattedPrices.length > 0) {
+               const cacheKey = \\\\;
+               localStorage.setItem(cacheKey, JSON.stringify({
+                 timestamp: Date.now(),
+                 data: formattedPrices
+               }));
+            }
           }
         });
       }
@@ -171,4 +158,3 @@ class MaterialPriceService {
 }
 
 export const materialPriceService = new MaterialPriceService();
-
