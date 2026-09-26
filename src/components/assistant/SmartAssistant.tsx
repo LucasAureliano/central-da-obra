@@ -77,6 +77,35 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
   }, [messages]);
 
   
+  const resizeImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const max_size = 800;
+          if (width > height && width > max_size) {
+            height *= max_size / width;
+            width = max_size;
+          } else if (height > max_size) {
+            width *= max_size / height;
+            height = max_size;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleCamera = async (e: any) => {
     e.preventDefault();
     try {
@@ -87,12 +116,11 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        input.onchange = (e) => {
+        input.onchange = async (e) => {
           const file = (e.target as any).files[0];
           if (file) {
-            const reader = new FileReader();
-            reader.onload = () => setAttachment(reader.result as string);
-            reader.readAsDataURL(file);
+            const resizedBase64 = await resizeImage(file);
+            setAttachment(resizedBase64);
           }
         };
         input.click();
@@ -194,7 +222,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
       className="screen-content" 
-      style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', maxWidth: 900, margin: '0 auto', width: '100%', background: 'transparent', paddingBottom: 20 }}
+      style={{ position: 'relative', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', maxWidth: 900, margin: '0 auto', width: '100%', background: 'transparent' }}
     >
       <div style={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: 100, left: -100, width: 250, height: 250, background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
@@ -423,6 +451,9 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
 export function SmartAssistant(props: SmartAssistantProps) {
   return <AssistantErrorBoundary><SmartAssistantInner {...props} /></AssistantErrorBoundary>;
 }
+
+
+
 
 
 

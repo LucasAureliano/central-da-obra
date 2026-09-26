@@ -8,8 +8,11 @@ const openai = new OpenAI({
 });
 
 const CopilotMessageSchema = z.object({
-  role: z.enum(['user', 'assistant', 'system']),
-  content: z.any() // Can be string or array for vision
+  role: z.enum(['user', 'assistant', 'system', 'tool']),
+  content: z.any(), // Can be string or array for vision, or null for tool calls
+  tool_calls: z.any().optional(),
+  tool_call_id: z.string().optional(),
+  name: z.string().optional()
 });
 
 const CopilotPayloadSchema = z.object({
@@ -22,37 +25,37 @@ const getSystemPrompt = (contextData?: any) => {
   const currentWork = contextData?.currentWork;
   const isPremium = contextData?.isPremium;
 
-  let base = \Você é a CentralObra AI 2.0, um assistente contextual e multimodal de construção civil.
+  let base = `Você é a CentralObra AI 2.0, um assistente contextual e multimodal de construção civil.
 Sua missão: ENTENDER → ANALISAR → SUGERIR → EXECUTAR.
-Aja como um verdadeiro copiloto integrado à obra. Se o usuário quiser fazer um orçamento, sugerir compras, registrar despesas ou fazer diário de obra, USE AS FERRAMENTAS (Tools) para gerar botões de ação na interface. Nunca invente dados que não possui.\n\;
+Aja como um verdadeiro copiloto integrado à obra. Se o usuário quiser fazer um orçamento, sugerir compras, registrar despesas ou fazer diário de obra, USE AS FERRAMENTAS (Tools) para gerar botões de ação na interface. Nunca invente dados que não possui.\n`;
   
   if (role === 'engineer' || role === 'architect') {
-    base += \\nPERFIL: Engenheiro/Arquiteto. Priorize vistorias, diário técnico, acompanhamento, medições, normas NBR e relatórios.\;
+    base += `\nPERFIL: Engenheiro/Arquiteto. Priorize vistorias, diário técnico, acompanhamento, medições, normas NBR e relatórios.`;
   } else if (role === 'builder' || role === 'service') {
-    base += \\nPERFIL: Prestador/Construtor. Priorize orçamentos, cronograma, equipes, produtividade e compras.\;
+    base += `\nPERFIL: Prestador/Construtor. Priorize orçamentos, cronograma, equipes, produtividade e compras.`;
   } else {
-    base += \\nPERFIL: Dono da Obra. Priorize controle financeiro, cálculos de material, progresso da obra e economia.\;
+    base += `\nPERFIL: Dono da Obra. Priorize controle financeiro, cálculos de material, progresso da obra e economia.`;
   }
 
   if (isPremium === false) {
-    base += \\n[PLANO FREE]: Ajude com cálculos básicos e dúvidas. Para diários, orçamentos complexos ou financeiro avançado, avise que é um recurso Premium.\;
+    base += `\n[PLANO FREE]: Ajude com cálculos básicos e dúvidas. Para diários, orçamentos complexos ou financeiro avançado, avise que é um recurso Premium.`;
   } else {
-    base += \\n[PLANO PREMIUM]: Acesso total. Entregue respostas ricas, completas, e orçamentos persuasivos.\;
+    base += `\n[PLANO PREMIUM]: Acesso total. Entregue respostas ricas, completas, e orçamentos persuasivos.`;
   }
 
   if (currentWork) {
-    base += \\n\n[CONTEXTO DA OBRA ATUAL]
-Nome: \
-Progresso: \%
-Orçamento Total: R$ \
-Gasto até o momento: R$ \
-Status: \
-Sempre contextualize suas respostas com esses dados. Se ele pedir para registrar despesa, forneça um botão (sugerir_acao).\;
+    base += `\n\n[CONTEXTO DA OBRA ATUAL]
+Nome: ${currentWork.name || 'Desconhecido'}
+Progresso: ${currentWork.progress || 0}%
+Orçamento Total: R$ ${currentWork.budget || 0}
+Gasto até o momento: R$ ${currentWork.spent || 0}
+Status: ${currentWork.status || 'Em andamento'}
+Sempre contextualize suas respostas com esses dados. Se ele pedir para registrar despesa, forneça um botão (sugerir_acao).`;
   }
 
-  base += \\n\nDiretrizes de Análise de Imagem:
+  base += `\n\nDiretrizes de Análise de Imagem:
 Se o usuário enviar uma imagem, analise materiais, estado visual, ou extraia itens de notas fiscais.
-Sempre inclua este aviso no final da análise de imagem: "*Essa análise é visual e preliminar. Para avaliação técnica ou estrutural, consulte um profissional habilitado.*"\;
+Sempre inclua este aviso no final da análise de imagem: "*Essa análise é visual e preliminar. Para avaliação técnica ou estrutural, consulte um profissional habilitado.*"`;
 
   return base;
 };
@@ -106,7 +109,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const validationResult = CopilotPayloadSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Bad Request' });
+      console.error("Copilot Validation Error:", validationResult.error);
+      return res.status(400).json({ error: 'Bad Request', details: validationResult.error.format() });
     }
 
     const { messages, contextData } = validationResult.data;
@@ -138,7 +142,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         try {
           if (toolCall.function.name === 'buscar_preco_material') {
             const args = JSON.parse(toolCall.function.arguments);
-            conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: \Preço simulado/encontrado para \\ });
+            conversation.push({ tool_call_id: toolCall.id, role: "tool", name: toolCall.function.name, content: `Preço simulado/encontrado para ${args.material}` });
           } else if (toolCall.function.name === 'sugerir_acao') {
             const args = JSON.parse(toolCall.function.arguments);
             finalSuggestions.push({ label: args.label, actionKey: args.actionKey, actionParam: args.actionParam });
@@ -161,6 +165,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ reply, suggestions: finalSuggestions });
 
   } catch (error: any) {
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Copilot API error:', error);
+    return res.status(500).json({ error: 'Internal server error processing copilot request', details: error.message });
   }
 }
