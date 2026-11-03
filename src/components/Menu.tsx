@@ -264,19 +264,23 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 24 }}>
         {actions.map((act, idx) => (
-          <button
+          <motion.button
             key={idx}
             onClick={act.action}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.94 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className="card-premium-interactive"
             style={{
-              padding: '10px 4px', borderRadius: 14, border: '1px solid var(--border-subtle)',
-              backgroundColor: 'var(--bg-surface)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              fontSize: 11, fontWeight: 700, color: 'var(--text-main)', cursor: 'pointer'
+              padding: '12px 6px', borderRadius: 16, border: '1px solid var(--border-subtle)',
+              backgroundColor: 'var(--bg-surface)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+              fontSize: 11, fontWeight: 700, color: 'var(--text-main)', cursor: 'pointer',
+              boxShadow: 'var(--shadow-card)'
             }}
           >
             <div style={{ color: 'var(--color-primary)' }}>{act.icon}</div>
             <span style={{ textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{act.label}</span>
-          </button>
+          </motion.button>
         ))}
       </div>
     );
@@ -525,25 +529,49 @@ export function Menu({ theme, onToggleTheme, onMenuSelect, onReplayOnboarding }:
             </h3>
             <div style={{ backgroundColor: 'var(--bg-surface)', borderRadius: 24, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
               {section.items.map((item, itemIdx) => (
-                <div 
+                <motion.div 
                   key={itemIdx}
                   onClick={item.action}
+                  whileHover="hover"
+                  whileTap={{ scale: 0.98 }}
+                  initial="initial"
+                  variants={{
+                    initial: {},
+                    hover: {}
+                  }}
                   style={{ 
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
                     padding: '16px 20px', 
                     borderBottom: itemIdx < section.items.length - 1 ? '1px solid var(--border-subtle)' : 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease'
                   }}
                   className="card-premium-interactive"
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${item.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color }}>
+                    <motion.div 
+                      variants={{
+                        initial: { scale: 1 },
+                        hover: { scale: 1.12, boxShadow: `0 0 16px ${item.color}45` }
+                      }}
+                      transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                      style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${item.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color }}
+                    >
                       {item.icon}
-                    </div>
+                    </motion.div>
                     <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)' }}>{item.label}</span>
                   </div>
-                  <ChevronRight size={18} color="var(--text-muted)" />
-                </div>
+                  <motion.div
+                    variants={{
+                      initial: { x: 0 },
+                      hover: { x: 5 }
+                    }}
+                    transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <ChevronRight size={18} color="var(--text-muted)" />
+                  </motion.div>
+                </motion.div>
               ))}
             </div>
           </div>

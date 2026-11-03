@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Crown, Sparkles, Building2, Bot } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,11 +6,18 @@ import { PLANS_CONFIG } from '../../config/plans';
 
 interface PricingSectionProps {
   onSubscribe: () => void;
-  billingCycle: 'mensal' | 'anual';
-  setBillingCycle: (cycle: 'mensal' | 'anual') => void;
+  billingCycle?: 'mensal' | 'anual';
+  setBillingCycle?: (cycle: 'mensal' | 'anual') => void;
 }
 
-export const PricingSection: React.FC<PricingSectionProps> = ({ onSubscribe, billingCycle, setBillingCycle }) => {
+export const PricingSection: React.FC<PricingSectionProps> = ({ 
+  onSubscribe, 
+  billingCycle: propBillingCycle, 
+  setBillingCycle: propSetBillingCycle 
+}) => {
+  const [internalBillingCycle, setInternalBillingCycle] = React.useState<'mensal' | 'anual'>('mensal');
+  const billingCycle = propBillingCycle ?? internalBillingCycle;
+  const setBillingCycle = propSetBillingCycle ?? setInternalBillingCycle;
   const { profile } = useAuth();
   const role = profile?.role || 'owner';
   

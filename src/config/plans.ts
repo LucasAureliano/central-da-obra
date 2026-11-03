@@ -1,4 +1,4 @@
-﻿import { UserRole } from '../types';
+import type { UserRole } from '../types';
 
 export interface PlanLimits {
   maxWorks: number;
@@ -368,10 +368,10 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
   }
 };
 
-export const getPlanDetails = (role: UserRole, planId: string): PlanDefinition => {
-  if (!role || !PLANS_CONFIG[role]) return PLANS_CONFIG.owner.free;
+export const getPlanDetails = (role?: UserRole | string | null, planId: string = 'free'): PlanDefinition => {
+  if (!role || !PLANS_CONFIG[role as UserRole]) return PLANS_CONFIG.owner.free;
   
-  const rolePlans = PLANS_CONFIG[role];
+  const rolePlans = PLANS_CONFIG[role as UserRole];
   if (planId === 'starter') {
     return rolePlans.starter || rolePlans.free;
   }

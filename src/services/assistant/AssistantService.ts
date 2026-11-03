@@ -1,4 +1,4 @@
-﻿import { auth } from '../../lib/firebase';
+import { auth } from '../../lib/firebase';
 
 export interface AssistantQuery {
   messages: { role: 'user' | 'assistant'; content: any }[];
@@ -28,7 +28,7 @@ class AssistantService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': \Bearer \\
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           messages: query.messages,
@@ -37,7 +37,7 @@ class AssistantService {
       });
 
       if (!response.ok) {
-        throw new Error(\API retornou status \\);
+        throw new Error(`API retornou status ${response.status}`);
       }
 
       const data = await response.json();

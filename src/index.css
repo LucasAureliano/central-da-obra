@@ -28,6 +28,14 @@
   --bg-card-glass-hover: rgba(255, 255, 255, 0.04);
   
   --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --color-primary-glow: rgba(255, 107, 0, 0.35);
+  --border-glow: rgba(255, 107, 0, 0.25);
+  --bg-gradient-app: radial-gradient(at 0% 0%, rgba(255, 107, 0, 0.09) 0px, transparent 50%),
+                     radial-gradient(at 100% 15%, rgba(59, 130, 246, 0.08) 0px, transparent 45%),
+                     radial-gradient(at 50% 100%, rgba(139, 92, 246, 0.06) 0px, transparent 55%),
+                     linear-gradient(180deg, #0e1017 0%, #08090c 100%);
   
   /* Status */
   --color-success: #10B981;
@@ -62,6 +70,14 @@
   --bg-card-glass-hover: rgba(0, 0, 0, 0.04);
   
   --shadow-elevated: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --color-primary-glow: rgba(255, 107, 0, 0.25);
+  --border-glow: rgba(255, 107, 0, 0.2);
+  --bg-gradient-app: radial-gradient(at 0% 0%, rgba(255, 107, 0, 0.06) 0px, transparent 50%),
+                     radial-gradient(at 100% 15%, rgba(59, 130, 246, 0.05) 0px, transparent 45%),
+                     radial-gradient(at 50% 100%, rgba(240, 243, 248, 0.8) 0px, transparent 55%),
+                     linear-gradient(180deg, #F8FAFC 0%, #EEF2F6 100%);
 }
 
 /* Base Styles */
@@ -75,7 +91,8 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--bg-base);
+  background: var(--bg-gradient-app);
+  background-attachment: fixed;
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1123,4 +1140,48 @@ h3, h4 {
   background: var(--bg-elevated) !important;
   transform: translateX(4px);
   box-shadow: -3px 0 0 var(--color-primary);
+}
+
+/* Global Interactive & Touch Experience (UI/UX Pro Max) */
+button, [role="button"], a, input[type="submit"], input[type="button"], .card-premium-interactive, .clickable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tactile Click & Active Feedback */
+button:active:not(:disabled), .btn-primary:active, .btn-secondary:active, .card-premium-interactive:active {
+  transform: scale(0.97) !important;
+  transition: transform 0.1s cubic-bezier(0.2, 0, 0.1, 1) !important;
+}
+
+/* Interactive Card Elevation & Glow */
+.card-premium-interactive {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease !important;
+}
+.card-premium-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--border-glow);
+}
+
+/* Primary Action Glow on Hover */
+.btn-primary:hover, .btn-landing-primary:hover {
+  box-shadow: 0 6px 24px var(--color-primary-glow) !important;
+  transform: translateY(-1px);
+}
+
+/* Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

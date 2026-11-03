@@ -1,6 +1,6 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Mail, Settings, Shield, LogOut, Package, HardHat, Home, Building2, DraftingCompass, MessageSquare, X, Camera, Phone, MapPin, Edit2 } from 'lucide-react';
+import { User, Mail, Settings, Shield, LogOut, Package, HardHat, Home, Building2, DraftingCompass, MessageSquare, X, Camera, Phone, MapPin, Edit2, Crown } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';

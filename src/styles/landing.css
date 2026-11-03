@@ -22,11 +22,22 @@
 }
 
 [data-theme='dark'] .landing-body {
-  background: linear-gradient(135deg, #1e1e2d 0%, #08080b 100%), 
-              radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
-              radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.15), transparent 40%) !important;
-  background-size: 200% 200% !important;
-  animation: bgGradientMove 15s ease infinite alternate;
+  background: radial-gradient(circle at 12% 15%, rgba(255, 107, 0, 0.12), transparent 42%),
+              radial-gradient(circle at 88% 22%, rgba(59, 130, 246, 0.14), transparent 48%),
+              radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.09), transparent 52%),
+              linear-gradient(145deg, #12131a 0%, #08090c 100%) !important;
+  background-size: 150% 150% !important;
+  animation: bgGradientMove 20s ease-in-out infinite alternate;
+  background-attachment: fixed !important;
+}
+
+[data-theme='light'] .landing-body {
+  background: radial-gradient(circle at 12% 15%, rgba(255, 107, 0, 0.08), transparent 42%),
+              radial-gradient(circle at 88% 22%, rgba(59, 130, 246, 0.06), transparent 48%),
+              radial-gradient(circle at 50% 80%, rgba(240, 243, 248, 0.9), transparent 52%),
+              linear-gradient(145deg, #F8FAFC 0%, #EDF2F7 100%) !important;
+  background-size: 150% 150% !important;
+  animation: bgGradientMove 20s ease-in-out infinite alternate;
   background-attachment: fixed !important;
 }
 
@@ -241,6 +252,14 @@
 }
 
 /* Base Cards */
+.landing-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+.landing-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 107, 0, 0.25);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
 .landing-card { padding: 32px;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);

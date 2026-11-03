@@ -67,8 +67,10 @@ export function CalculatorLandingSection() {
               className="landing-card"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.3, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="card-icon-wrapper" style={{ color: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
                 {feature.icon}
@@ -86,14 +88,17 @@ export function CalculatorLandingSection() {
           transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           style={{ display: 'flex', justifyContent: 'center', marginTop: '48px' }}
         >
-          <button 
+          <motion.button 
             onClick={() => window.location.href = '/calculadoras'}
             className="btn-primary" 
-            style={{ padding: '16px 32px', fontSize: '18px', fontWeight: 700, borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '16px 32px', fontSize: '18px', fontWeight: 700, borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+            whileHover={{ scale: 1.04, boxShadow: '0 10px 28px var(--color-primary-glow)' }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           >
             Acessar Calculadoras Gratuitas
             <Calculator size={20} />
-          </button>
+          </motion.button>
         </motion.div>
       </div>
     </section>

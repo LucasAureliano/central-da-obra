@@ -52,11 +52,13 @@ export function ProfilesSection() {
             <motion.div 
               key={index} 
               className="landing-card"
-              style={{ textAlign: 'center', alignItems: 'center' }}
+              style={{ textAlign: 'center', alignItems: 'center', cursor: 'pointer' }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.4, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
             >
               <div style={{ 
                 width: 80, 

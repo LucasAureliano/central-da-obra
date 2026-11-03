@@ -1,4 +1,5 @@
-﻿import { auth } from '../../lib/firebase';
+import { auth } from '../../lib/firebase';
+
 export interface MaterialPrice {
   id: string;
   name: string;
@@ -17,7 +18,7 @@ class MaterialPriceService {
     if (!query) return [];
 
     const lowerQuery = query.toLowerCase().trim();
-    const cacheKey = \\\\;
+    const cacheKey = `${CACHE_KEY_PREFIX}${lowerQuery}`;
     const cachedStr = localStorage.getItem(cacheKey);
 
     if (cachedStr) {
@@ -40,9 +41,9 @@ class MaterialPriceService {
       } catch (e) {
       }
 
-      const response = await fetch(\/api/prices?q=\\, {
+      const response = await fetch(`/api/prices?q=${encodeURIComponent(query)}`, {
         headers: {
-          'Authorization': \Bearer \\
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -54,7 +55,7 @@ class MaterialPriceService {
       const resultsArray = result.data?.[query] || result.data?.[lowerQuery] || [];
 
       const formattedPrices: MaterialPrice[] = resultsArray.map((item: any, index: number) => ({
-        id: \pi_\_\\,
+        id: `api_${index}_${Date.now()}`,
         name: item.name,
         unit: item.unit || 'un',
         price: item.price,
@@ -90,7 +91,7 @@ class MaterialPriceService {
     const missingQueries: string[] = [];
 
     validQueries.forEach(q => {
-      const cacheKey = \\\\;
+      const cacheKey = `${CACHE_KEY_PREFIX}${q.toLowerCase().trim()}`;
       const cachedStr = localStorage.getItem(cacheKey);
       if (cachedStr) {
         try {
@@ -113,9 +114,9 @@ class MaterialPriceService {
         if (user) token = await user.getIdToken();
       } catch (e) {}
 
-      const response = await fetch(\/api/prices?materials=\\, {
+      const response = await fetch(`/api/prices?materials=${encodeURIComponent(missingQueries.join(','))}`, {
         headers: {
-          'Authorization': \Bearer \\
+          'Authorization': `Bearer ${token}`
         }
       });
       
@@ -128,7 +129,7 @@ class MaterialPriceService {
           const sourceArray = data[lowerQ] || data[q];
           if (sourceArray && Array.isArray(sourceArray)) {
             const formattedPrices: MaterialPrice[] = sourceArray.map((item: any, index: number) => ({
-               id: \pi_\_\\,
+               id: `api_${index}_${Date.now()}`,
                name: item.name,
                unit: item.unit || 'un',
                price: item.price,
@@ -140,7 +141,7 @@ class MaterialPriceService {
             results[q] = formattedPrices;
 
             if (formattedPrices.length > 0) {
-               const cacheKey = \\\\;
+               const cacheKey = `${CACHE_KEY_PREFIX}${lowerQ}`;
                localStorage.setItem(cacheKey, JSON.stringify({
                  timestamp: Date.now(),
                  data: formattedPrices

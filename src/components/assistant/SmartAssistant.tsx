@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Sparkles, ArrowRight, MessageSquare, Calculator, BookOpen, ShoppingCart, Lightbulb, Calendar, ClipboardList, Palette, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { takePicture } from '../../utils/nativeCamera';
@@ -222,7 +222,7 @@ export function SmartAssistantInner({ onNavigate }: SmartAssistantProps) {
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
       className="screen-content" 
-      style={{ position: 'relative', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', maxWidth: 900, margin: '0 auto', width: '100%', background: 'transparent' }}
+      style={{ position: 'relative', display: 'flex', flexDirection: 'column', maxWidth: 900, margin: '0 auto', width: '100%', minHeight: '100%', background: 'transparent' }}
     >
       <div style={{ position: 'absolute', top: -100, right: -100, width: 300, height: 300, background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: 100, left: -100, width: 250, height: 250, background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />

@@ -171,15 +171,15 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 24, position: 'relative', zIndex: 10 }}>
           
           {/* Obras / Projetos */}
-          {(roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : limits.maxProjects) < 9999 && (
+          {(roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : (limits.maxProjects ?? limits.maxWorks)) < 9999 && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
                 <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{roleKey === 'owner' || roleKey === 'builder' ? 'Obras Ativas' : 'Projetos'}</span>
-                <span style={{ color: 'var(--text-muted)' }}>{roleKey === 'owner' || roleKey === 'builder' ? usage.worksCount : usage.projectsCount} de {roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : limits.maxProjects}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{roleKey === 'owner' || roleKey === 'builder' ? usage.worksCount : usage.projectsCount} de {roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : (limits.maxProjects ?? limits.maxWorks)}</span>
               </div>
               <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
                 <div 
-                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#3B82F6', width: `${Math.min(100, ((roleKey === 'owner' || roleKey === 'builder' ? usage.worksCount : usage.projectsCount) / (roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : limits.maxProjects)) * 100)}%` }}
+                  style={{ height: '100%', borderRadius: 4, transition: 'all 0.5s', backgroundColor: '#3B82F6', width: `${Math.min(100, ((roleKey === 'owner' || roleKey === 'builder' ? usage.worksCount : usage.projectsCount) / (roleKey === 'owner' || roleKey === 'builder' ? limits.maxWorks : (limits.maxProjects ?? limits.maxWorks))) * 100)}%` }}
                 />
               </div>
             </div>

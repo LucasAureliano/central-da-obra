@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Logo } from './ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,11 +7,28 @@ interface SplashScreenProps {
 }
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
+  const [progress, setProgress] = useState(0);
+
   useEffect(() => {
+    // Smooth progress simulation
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 45);
+
     const timer = setTimeout(() => {
       onComplete();
-    }, 2500); // Exibe por 2.5 segundos para a animação completa
-    return () => clearTimeout(timer);
+    }, 2600);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
   }, [onComplete]);
 
   return (
@@ -19,45 +36,95 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        exit={{ opacity: 0, scale: 1.06, filter: 'blur(12px)' }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
         className="app-container" 
         style={{ 
           alignItems: 'center', 
           justifyContent: 'center', 
           flexDirection: 'column', 
-          gap: 40,
-          background: 'var(--bg-base)',
+          gap: 36,
+          background: 'radial-gradient(circle at 50% 45%, #181a24 0%, #0a0b0e 100%)',
           zIndex: 9999,
           position: 'fixed',
-          inset: 0
+          inset: 0,
+          overflow: 'hidden'
         }}
       >
-        <div style={{ position: 'relative' }}>
-          {/* Ambient Glow */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* Ambient Glow 1 - Deep Orange Aura */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: [0, 0.6, 0.4], scale: [0.8, 1.2, 1] }}
-            transition={{ duration: 2, ease: "easeInOut" }}
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ 
+              opacity: [0, 0.7, 0.45], 
+              scale: [0.7, 1.3, 1.15] 
+            }}
+            transition={{ duration: 2.2, ease: "easeOut" }}
             style={{
               position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: 180,
-              height: 180,
-              transform: 'translate(-50%, -50%)',
-              background: 'radial-gradient(circle, var(--color-primary-alpha) 0%, transparent 70%)',
-              filter: 'blur(20px)',
-              zIndex: 0
+              width: 260,
+              height: 260,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255, 107, 0, 0.35) 0%, rgba(255, 107, 0, 0.08) 50%, transparent 72%)',
+              filter: 'blur(32px)',
+              zIndex: 0,
+              pointerEvents: 'none'
+            }}
+          />
+
+          {/* Ambient Glow 2 - Cyan/Blue Architectural Accent */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ 
+              opacity: [0, 0.45, 0.25], 
+              scale: [0.8, 1.4, 1.25],
+              rotate: [0, 90]
+            }}
+            transition={{ duration: 2.5, ease: "easeInOut" }}
+            style={{
+              position: 'absolute',
+              width: 220,
+              height: 220,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 68%)',
+              filter: 'blur(28px)',
+              zIndex: 0,
+              pointerEvents: 'none'
+            }}
+          />
+
+          {/* Concentric Expanding Shockwave Ring */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ 
+              opacity: [0, 0.6, 0], 
+              scale: [0.7, 1.55, 1.9] 
+            }}
+            transition={{ duration: 1.8, delay: 0.2, ease: "easeOut" }}
+            style={{
+              position: 'absolute',
+              width: 150,
+              height: 150,
+              borderRadius: '50%',
+              border: '1.5px solid rgba(255, 107, 0, 0.5)',
+              boxShadow: '0 0 20px rgba(255, 107, 0, 0.4)',
+              zIndex: 0,
+              pointerEvents: 'none'
             }}
           />
           
+          {/* Main Logo Container with 3D Spring & Floating Motion */}
           <motion.div
-            initial={{ scale: 0.96, opacity: 0 }}
-            animate={{ scale: 1.00, opacity: 1 }}
+            initial={{ scale: 0.85, opacity: 0, y: 15 }}
+            animate={{ 
+              scale: 1, 
+              opacity: 1, 
+              y: [0, -6, 0] 
+            }}
             transition={{ 
-              duration: 0.6, // Entre 500ms e 700ms
-              ease: [0.22, 1, 0.36, 1]
+              scale: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+              opacity: { duration: 0.5 },
+              y: { repeat: Infinity, duration: 2.8, ease: "easeInOut", delay: 0.7 }
             }}
             style={{ transformOrigin: 'center', position: 'relative', zIndex: 1 }}
           >
@@ -65,61 +132,86 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           </motion.div>
         </div>
         
+        {/* Progress & Tagline Section */}
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            width: 120,
+            width: 170,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 12
+            gap: 12,
+            zIndex: 1
           }}
         >
+          {/* Progress Track */}
           <div style={{
             width: '100%',
-            height: 3,
-            borderRadius: 2,
-            backgroundColor: 'var(--border-strong)',
+            height: 4,
+            borderRadius: 999,
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
             overflow: 'hidden',
-            position: 'relative'
+            position: 'relative',
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.4)'
           }}>
-            {/* Shimmer Effect */}
+            {/* Shimmer Light */}
             <motion.div 
               initial={{ x: '-100%' }}
               animate={{ x: '100%' }}
-              transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+              transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
               style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
-                width: '50%',
+                width: '60%',
                 height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255,107,0,0.8), transparent)',
-                zIndex: 2
+                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
+                zIndex: 3
               }}
             />
-            {/* Progress Bar */}
+            {/* Progress Bar Fill with Glowing Tip */}
             <motion.div 
               initial={{ width: '0%' }}
-              animate={{ width: '100%' }}
-              transition={{ duration: 2, ease: "easeInOut" }}
+              animate={{ width: `${progress}%` }}
+              transition={{ ease: "easeOut" }}
               style={{ 
                 height: '100%', 
-                backgroundColor: 'var(--color-primary)',
-                boxShadow: '0 0 10px var(--color-primary)'
+                background: 'linear-gradient(90deg, #FF6B00 0%, #FFA057 100%)',
+                boxShadow: '0 0 12px rgba(255, 107, 0, 0.8)',
+                borderRadius: 999
               }}
             />
           </div>
-          <motion.span 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.4 }}
-            style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase' }}
-          >
-            Carregando
-          </motion.span>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.4 }}
+              style={{ 
+                fontSize: 10, 
+                fontWeight: 700, 
+                color: 'var(--text-muted)', 
+                letterSpacing: 2, 
+                textTransform: 'uppercase' 
+              }}
+            >
+              CentralObra
+            </motion.span>
+            <motion.span 
+              style={{ 
+                fontSize: 11, 
+                fontWeight: 700, 
+                color: 'var(--color-primary)', 
+                fontVariantNumeric: 'tabular-nums' 
+              }}
+            >
+              {progress}%
+            </motion.span>
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>

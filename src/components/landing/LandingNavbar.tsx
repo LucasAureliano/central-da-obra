@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Logo } from '../ui/Logo';
 import { Sun, Moon } from 'lucide-react';
 
@@ -20,48 +21,138 @@ export function LandingNavbar({ theme, onLogin, onRegister, scrolled, onNavigate
     }
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    window.dispatchEvent(new Event('storage'));
+  };
+
   return (
     <nav className={`landing-navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="landing-nav-container">
         <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <a href="/" className="logo-link">
-            <Logo variant="horizontal" theme="dark" />
-          </a>
+          <motion.a 
+            href="/" 
+            className="logo-link"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          >
+            <Logo variant="horizontal" theme={theme} />
+          </motion.a>
           <div className="desktop-only">
-             <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)' }} onClick={() => {
-                const newTheme = theme === 'light' ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                window.dispatchEvent(new Event('storage'));
-             }}>
-               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-             </button>
+             <motion.button 
+               className="btn-icon" 
+               style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)', cursor: 'pointer' }} 
+               onClick={toggleTheme}
+               whileHover={{ scale: 1.1, backgroundColor: 'rgba(255, 107, 0, 0.12)' }}
+               whileTap={{ scale: 0.9, rotate: 180 }}
+               transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+               title="Alternar Tema Claro / Escuro"
+             >
+               <motion.div
+                 key={theme}
+                 initial={{ rotate: -90, opacity: 0 }}
+                 animate={{ rotate: 0, opacity: 1 }}
+                 exit={{ rotate: 90, opacity: 0 }}
+                 transition={{ duration: 0.25 }}
+                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+               >
+                 {theme === 'dark' ? <Sun size={20} color="#FFB800" /> : <Moon size={20} color="#6366F1" />}
+               </motion.div>
+             </motion.button>
           </div>
         </div>
         
         <div className="nav-center mobile-hidden">
-          <a href="/#perfis" onClick={(e) => handleScrollTo(e, 'perfis')} className="landing-nav-link animated-link">Para Quem</a>
-          <a href="/#recursos" onClick={(e) => handleScrollTo(e, 'recursos')} className="landing-nav-link animated-link">Recursos</a>
-          <a href="/calculadoras" className="landing-nav-link animated-link">Calculadoras</a>
-          <a href="/#planos" onClick={(e) => handleScrollTo(e, 'planos')} className="landing-nav-link animated-link">Planos</a>
-          <a href="/#como-funciona" onClick={(e) => handleScrollTo(e, 'como-funciona')} className="landing-nav-link animated-link">Como Funciona</a>
+          <motion.a 
+            href="/#perfis" 
+            onClick={(e) => handleScrollTo(e, 'perfis')} 
+            className="landing-nav-link animated-link"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Para Quem
+          </motion.a>
+          <motion.a 
+            href="/#recursos" 
+            onClick={(e) => handleScrollTo(e, 'recursos')} 
+            className="landing-nav-link animated-link"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Recursos
+          </motion.a>
+          <motion.a 
+            href="/calculadoras" 
+            className="landing-nav-link animated-link"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Calculadoras
+          </motion.a>
+          <motion.a 
+            href="/#planos" 
+            onClick={(e) => handleScrollTo(e, 'planos')} 
+            className="landing-nav-link animated-link"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Planos
+          </motion.a>
+          <motion.a 
+            href="/#como-funciona" 
+            onClick={(e) => handleScrollTo(e, 'como-funciona')} 
+            className="landing-nav-link animated-link"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Como Funciona
+          </motion.a>
         </div>
 
-        <div className="nav-right mobile-hidden">
-          <button onClick={onLogin} className="landing-nav-link" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Entrar</button>
-          <button onClick={onRegister} className="btn-landing-primary btn-3d">Começar Grátis</button>
+        <div className="nav-right mobile-hidden" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <motion.button 
+            onClick={onLogin} 
+            className="landing-nav-link" 
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Entrar
+          </motion.button>
+          <motion.button 
+            onClick={onRegister} 
+            className="btn-landing-primary btn-3d"
+            whileHover={{ scale: 1.04, boxShadow: '0 8px 24px var(--color-primary-glow)' }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          >
+            Começar Grátis
+          </motion.button>
         </div>
         
         <div className="nav-mobile-only" style={{ alignItems: 'center', gap: 12 }}>
-          <button className="btn-icon" style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)' }} onClick={() => {
-             const newTheme = theme === 'light' ? 'dark' : 'light';
-             document.documentElement.setAttribute('data-theme', newTheme);
-             localStorage.setItem('theme', newTheme);
-             window.dispatchEvent(new Event('storage'));
-          }}>
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <button onClick={onLogin} className="btn-landing-primary btn-3d" style={{ height: 40, padding: '0 16px', fontSize: 14 }}>Entrar</button>
+          <motion.button 
+            className="btn-icon" 
+            style={{ width: 40, height: 40, borderRadius: 20, color: 'var(--text-main)', cursor: 'pointer' }} 
+            onClick={toggleTheme}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9, rotate: 180 }}
+            title="Alternar Tema"
+          >
+            {theme === 'dark' ? <Sun size={20} color="#FFB800" /> : <Moon size={20} color="#6366F1" />}
+          </motion.button>
+          <motion.button 
+            onClick={onLogin} 
+            className="btn-landing-primary btn-3d" 
+            style={{ height: 40, padding: '0 16px', fontSize: 14 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Entrar
+          </motion.button>
         </div>
       </div>
     </nav>
