@@ -76,7 +76,7 @@ export function BaseCalculatorLayout({
   const { triggerGuestAlert } = useAuthModal();
   const { activeWork } = useWorks();
   
-  const [prices, setPrices] = useState<Record<string, { price: number, supplier: string, link?: string }>>({});
+  const [prices, setPrices] = useState<Record<string, { price: number, supplier: string, link?: string, tag?: string, distance?: string }>>({});
   const [isFetchingPrices, setIsFetchingPrices] = useState(false);
 
   // Auto-fetch real prices when results change
@@ -84,20 +84,22 @@ export function BaseCalculatorLayout({
     if (results?.materials && results.materials.length > 0) {
       setIsFetchingPrices(true);
       const cleanName = (name: string) => name.replace(/\([^)]*\)/g, '').trim();
-        const materialNames = results.materials.map(m => cleanName(m.name));
+      const materialNames = results.materials.map(m => cleanName(m.name));
       
       materialPriceService.searchMultiple(materialNames).then(pricesData => {
-        const newPrices: Record<string, { price: number, supplier: string, link?: string }> = {};
+        const newPrices: Record<string, { price: number, supplier: string, link?: string, tag?: string, distance?: string }> = {};
         
         results.materials.forEach(mat => {
-           // We use the first (lowest) valid price
-           const matches = pricesData[cleanName(mat.name)] || [];
+           const cleaned = cleanName(mat.name);
+           const matches = pricesData[cleaned] || pricesData[mat.name] || pricesData[cleaned.toLowerCase()] || [];
            if (matches.length > 0) {
              const bestPrice = matches[0];
              newPrices[mat.name] = {
                price: bestPrice.price,
                supplier: bestPrice.supplier,
-               link: bestPrice.link
+               link: bestPrice.link,
+               tag: bestPrice.tag,
+               distance: bestPrice.distance
              };
            }
         });
@@ -388,9 +390,21 @@ export function BaseCalculatorLayout({
                         {priceInfo ? (
                            <>
                              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-primary)' }}>R$ {priceInfo.price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                             <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>em {priceInfo.supplier}</span>
+                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>em {priceInfo.supplier}</span>
+                               {priceInfo.distance && (
+                                 <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', fontWeight: 600 }}>
+                                   {priceInfo.distance}
+                                 </span>
+                               )}
+                               {priceInfo.tag && (
+                                 <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, backgroundColor: 'rgba(16, 185, 129, 0.12)', color: '#10B981', fontWeight: 700 }}>
+                                   {priceInfo.tag}
+                                 </span>
+                               )}
+                             </div>
                              {priceInfo.link && (
-                               <a href={priceInfo.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', fontWeight: 600, marginTop: 4 }}>
+                               <a href={priceInfo.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', fontWeight: 600, marginTop: 2 }}>
                                  Abrir Produto ↗
                                </a>
                              )}
