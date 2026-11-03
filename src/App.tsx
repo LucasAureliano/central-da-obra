@@ -69,6 +69,7 @@ import { GuestRestrictionModal } from './components/GuestRestrictionModal';
 import { TipsWidget } from './components/home/modules/TipsWidget';
 import { AppSettings } from './components/AppSettings';
 import { InteriorDesignStudio } from './components/architect/InteriorDesignStudio';
+import { ArchitecturalTrends } from './components/owner/ArchitecturalTrends';
 import { InteractiveSchedule } from './components/owner/InteractiveSchedule';
 import { TeamManagement } from './components/TeamManagement';
 import { Agenda } from './components/Agenda';
@@ -644,6 +645,7 @@ function App() {
       case 'agenda-completa': return <Agenda key="agenda" />;
       case 'controle-projetos': return <ProjectControl key="projetos" />;
       case 'studio-interiores': return <RequireWorkSelection featureName="Studio de Interiores" onBack={() => handleNavigate('inicio')}><InteriorDesignStudio key="studio-interiores" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
+      case 'tendencias': return <ArchitecturalTrends key="tendencias" onBack={() => handleNavigate('inicio')} />;
       case 'projeto-luminotecnico': return <RequireWorkSelection featureName="Projeto Luminotécnico" onBack={() => handleNavigate('inicio')}><LightingDesignEngine key="luminotecnico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
       case 'projeto-eletrico': return <RequireWorkSelection featureName="Projeto Elétrico" onBack={() => handleNavigate('inicio')}><ElectricalDesignStudio key="eletrico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
       case 'projeto-hidraulico': return <RequireWorkSelection featureName="Projeto Hidráulico" onBack={() => handleNavigate('inicio')}><PlumbingDesignStudio key="hidraulico" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
