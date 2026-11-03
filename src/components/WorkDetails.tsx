@@ -24,12 +24,13 @@ import { LightingDesignEngine } from './architect/LightingDesignEngine';
 interface WorkDetailsProps {
   workId: string;
   onBack: () => void;
+  initialTab?: string;
 }
 
-export function WorkDetails({ workId, onBack }: WorkDetailsProps) {
+export function WorkDetails({ workId, onBack, initialTab }: WorkDetailsProps) {
   const { profile, user } = useAuth();
   const [work, setWork] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'compras' | 'orcamento' | 'diario' | 'documentos' | 'compartilhamento' | 'projetos'>('resumo');
+  const [activeTab, setActiveTab] = useState<'resumo' | 'cronograma' | 'financas' | 'compras' | 'orcamento' | 'diario' | 'documentos' | 'compartilhamento' | 'projetos'>((initialTab as any) || 'resumo');
 
   const getAvailableProjects = () => {
     const role = profile?.role || localStorage.getItem('pendingRole');

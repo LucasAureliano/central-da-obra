@@ -67,12 +67,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 </motion.button>
               )}
               {(activeRole === 'owner' || activeRole === 'builder') && (
-                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'Financeiro' ? 'active' : ''}`} onClick={() => setActiveTab('Financeiro')}>
+                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'financeiro' || activeTab === 'financas' ? 'active' : ''}`} onClick={() => setActiveTab('financeiro')}>
                     <Wallet size={20} /><span>Financeiro</span>
                 </motion.button>
               )}
               {(activeRole === 'builder') && (
-                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'Centro de Operações' ? 'active' : ''}`} onClick={() => setActiveTab('Centro de Operações')}>
+                <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'centro-operacoes' ? 'active' : ''}`} onClick={() => setActiveTab('centro-operacoes')}>
                     <Building2 size={20} /><span>Operações</span>
                 </motion.button>
               )}
@@ -81,7 +81,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                     <ClipboardCheck size={20} /><span>Notas da Obra</span>
                 </motion.button>
               )}
-              <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'Biblioteca & Normas' ? 'active' : ''}`} onClick={() => setActiveTab('Biblioteca & Normas')}>
+              <motion.button whileTap={{ scale: 0.95 }} className={`nav-item-desktop ${activeTab === 'central-tecnica' ? 'active' : ''}`} onClick={() => setActiveTab('central-tecnica')}>
                   <BookOpen size={20} /><span>Biblioteca Téc.</span>
               </motion.button>
             </div>

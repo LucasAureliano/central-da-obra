@@ -148,7 +148,7 @@ export const OperationsCenter: React.FC<{ onNavigate?: (tab: string) => void }> 
         </button>
 
         <button
-          onClick={() => onNavigate && onNavigate('equipes')}
+          onClick={() => onNavigate && onNavigate('equipe')}
           className="glass-panel card-premium-interactive"
           style={{ padding: 14, borderRadius: 16, border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center', cursor: 'pointer', background: 'transparent' }}
         >

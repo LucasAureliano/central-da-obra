@@ -88,7 +88,7 @@ export function TechnicalCentral({ initialArticleId, onNavigate }: TechnicalCent
       <ArticleView 
         article={activeArticle} 
         onBack={() => setActiveArticle(null)}
-        onNavigateToCalc={(calcId) => onNavigate('calculators', calcId)}
+        onNavigateToCalc={(calcId) => onNavigate('calculos', calcId)}
         onNavigateToArticle={(articleId) => {
           const art = TECHNICAL_ARTICLES.find(a => a.id === articleId);
           if (art) setActiveArticle(art);
