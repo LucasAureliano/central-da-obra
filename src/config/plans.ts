@@ -10,6 +10,9 @@ export interface PlanLimits {
   hasAdvancedPDF: boolean;
   hasFunnel: boolean;
   hasPremiumSupport?: boolean;
+  connectVisibility?: 'basic' | 'enhanced' | 'top_priority' | 'exclusive_top1';
+  hasVerifiedBadge?: boolean;
+  hasMarketingCenter?: boolean;
 }
 
 export interface PlanDefinition {
@@ -28,6 +31,9 @@ const DEFAULT_LIMITS: PlanLimits = {
   hasAds: false,
   hasAdvancedPDF: false,
   hasFunnel: false,
+  connectVisibility: 'basic',
+  hasVerifiedBadge: false,
+  hasMarketingCenter: false,
 };
 
 export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
@@ -48,6 +54,7 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         '1 obra ativa',
         'Cálculo de materiais básico',
         'Controle financeiro simples',
+        'Busca no Radar Connect de Profissionais',
         'Com anúncios na plataforma'
       ]
     },
@@ -67,8 +74,9 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
       features: [
         'Até 3 obras ativas',
         'Até 15 orçamentos por mês',
-        'Até 30 clientes',
+        'Até 30 contatos de profissionais',
         'Financeiro e cronograma básico',
+        'Solicitação de orçamentos direta pelo Connect',
         'Suporte por email',
       ]
     },
@@ -88,6 +96,8 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         'Obras ilimitadas',
         'Relatórios avançados e comparativos',
         'PDFs White-label (Sem marca do app)',
+        'Acesso prioritário a profissionais PRO Verificados',
+        'Copilot da Obra com IA e transcrição ilimitada',
         'Armazenamento ampliado de fotos'
       ]
     }
@@ -105,8 +115,12 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxWorks: 2,
         maxClients: 5,
         hasAds: true,
+        connectVisibility: 'basic',
+        hasVerifiedBadge: false,
+        hasMarketingCenter: false,
       },
       features: [
+        'Visibilidade padrão no CentralObra Connect',
         'Até 3 orçamentos por mês',
         'Até 2 projetos/obras',
         'Até 5 clientes',
@@ -124,12 +138,18 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxClients: 30,
         hasAdvancedPDF: false,
         hasFunnel: false,
+        connectVisibility: 'enhanced',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
+        'Selo de Prestador Verificado no Connect',
+        '+2x mais visualizações no Radar de Profissionais',
+        'Central de Marketing (artes para Instagram e WhatsApp)',
         'Até 15 orçamentos por mês',
         'Até 30 clientes',
         'Cadastro de serviços e agenda',
-        'Suporte por email',
+        'Suporte por email'
       ]
     },
     pro: {
@@ -143,12 +163,18 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxClients: 9999,
         hasAdvancedPDF: true,
         hasFunnel: true,
+        connectVisibility: 'top_priority',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
-        'Até 50 orçamentos por mês',
-        'Clientes ilimitados',
-        'Orçamentos White-label (PDF Premium)',
-        'QR Code personalizado no PDF',
+        'Destaque no Topo do Radar Connect da sua Cidade',
+        'Até 10x mais visualizações de perfil por proprietários',
+        'Selo PRO Dourado de Alta Recomendação',
+        'Prioridade máxima ao orçar serviços no app',
+        'Central de Marketing Completa com artes ilimitadas',
+        'Até 50 orçamentos por mês e clientes ilimitados',
+        'Orçamentos White-label (PDF Premium com QR Code)',
         'Funil de vendas e indicadores comerciais'
       ]
     },
@@ -164,13 +190,18 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         hasAdvancedPDF: true,
         hasFunnel: true,
         hasPremiumSupport: true,
+        connectVisibility: 'exclusive_top1',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
+        'Posição TOP 1 Absoluto na sua Região no Connect',
+        'Máxima visibilidade em reformas comerciais e grandes obras',
+        'Selo Prestador Master Verificado',
+        'Central de Marketing VIP (sem marca d\'água)',
         'Orçamentos e clientes ilimitados',
-        'Automações e análise de margem',
-        'Agenda avançada',
-        'Copilot da Obra (IA)',
-        'Orçamentos White-label Premium'
+        'Automações e análise de margem de lucro',
+        'Copilot da Obra com IA e suporte 24/7'
       ]
     }
   },
@@ -185,8 +216,12 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxProjects: 2,
         maxClients: 5,
         hasAds: true,
+        connectVisibility: 'basic',
+        hasVerifiedBadge: false,
+        hasMarketingCenter: false,
       },
       features: [
+        'Perfil básico no CentralObra Connect',
         'Até 2 projetos ativos',
         'Até 5 clientes',
         'Diário técnico e vistorias básicas',
@@ -204,12 +239,17 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxClients: 20,
         hasAdvancedPDF: false,
         hasFunnel: false,
+        connectVisibility: 'enhanced',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
-        'Até 5 projetos ativos',
-        'Até 20 clientes',
-        'Diário técnico e vistorias básicas',
-        'Suporte por email',
+        'Selo de Arquiteto Verificado (CAU)',
+        '+3x mais visualizações no Radar Connect',
+        'Central de Marketing (posts de projetos para redes sociais)',
+        'Até 5 projetos ativos e 20 clientes',
+        'Diário técnico e vistorias com fotos',
+        'Suporte por email'
       ]
     },
     pro: {
@@ -222,12 +262,19 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxProjects: 9999,
         maxClients: 9999,
         hasAdvancedPDF: true,
+        connectVisibility: 'top_priority',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
+        'Destaque Master no Topo do Radar Connect de Arquitetura',
+        'Até 10x mais visualizações por proprietários e construtoras',
+        'Selo PRO Dourado + Vitrine de Projetos 3D em Alta Resolução',
+        'Recomendação prioritária quando proprietários iniciam obras',
+        'Central de Marketing Completa com artes conceituais e cartão digital',
         'Projetos e clientes ilimitados',
-        'Diário técnico completo (fotos ilimitadas)',
-        'Portal do cliente e compartilhamento',
-        'PDFs Premium (White-label & QR Code customizado)'
+        'Portal do Cliente e Diário técnico com fotos ilimitadas',
+        'PDFs Premium White-label com QR Code customizado'
       ]
     }
   },
@@ -242,8 +289,12 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxProjects: 2,
         maxClients: 5,
         hasAds: true,
+        connectVisibility: 'basic',
+        hasVerifiedBadge: false,
+        hasMarketingCenter: false,
       },
       features: [
+        'Perfil básico no CentralObra Connect',
         'Até 2 projetos ativos',
         'Até 5 clientes',
         'Diário técnico básico',
@@ -261,12 +312,17 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxClients: 20,
         hasAdvancedPDF: false,
         hasFunnel: false,
+        connectVisibility: 'enhanced',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
-        'Até 5 projetos ativos',
-        'Até 20 clientes',
-        'Diário técnico básico',
-        'Suporte por email',
+        'Selo de Engenheiro Verificado (CREA)',
+        '+3x mais visualizações no Radar Connect',
+        'Central de Marketing (posts de autoridade técnica e laudos)',
+        'Até 5 projetos ativos e 20 clientes',
+        'Diário técnico e controle básico',
+        'Suporte por email'
       ]
     },
     pro: {
@@ -279,12 +335,19 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxProjects: 9999,
         maxClients: 9999,
         hasAdvancedPDF: true,
+        connectVisibility: 'top_priority',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
+        'Destaque Master no Topo das Buscas de Engenharia da Cidade',
+        'Até 10x mais visualizações de perfil para laudos e projetos estruturais',
+        'Selo PRO Dourado de Autoridade Técnica (CREA)',
+        'Indicação direta para proprietários e construtoras',
+        'Central de Marketing Completa com artes profissionais',
         'Projetos e clientes ilimitados',
-        'Controle documental avançado',
-        'Orçamento técnico profissional',
-        'PDFs Premium (White-label & QR Code customizado)'
+        'Controle documental avançado, laudos técnicos e ART',
+        'PDFs Premium White-label com QR Code customizado'
       ]
     }
   },
@@ -299,8 +362,12 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxWorks: 1,
         maxTeamMembers: 2,
         hasAds: true,
+        connectVisibility: 'basic',
+        hasVerifiedBadge: false,
+        hasMarketingCenter: false,
       },
       features: [
+        'Perfil institucional básico no CentralObra Connect',
         '1 obra ativa',
         'Equipe e compras básicas',
         'Financeiro básico',
@@ -318,12 +385,18 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxTeamMembers: 4,
         hasAdvancedPDF: false,
         hasFunnel: false,
+        connectVisibility: 'enhanced',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
+        'Selo Construtora Verificada no Connect',
+        '+3x mais visualizações no Catálogo de Construtoras',
+        'Central de Marketing (artes de obras em andamento)',
         'Até 2 obras ativas',
         'Equipe de até 4 membros',
         'Financeiro e compras básicas',
-        'Suporte por email',
+        'Suporte por email'
       ]
     },
     pro: {
@@ -337,13 +410,19 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxTeamMembers: 10,
         hasAdvancedPDF: true,
         hasPremiumSupport: true,
+        connectVisibility: 'top_priority',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
-        'Até 5 obras ativas',
-        'Equipes e usuários ampliados (até 10)',
+        'Destaque Corporativo no Radar Connect para Obras e Reformas',
+        'Até 10x mais visualizações por investidores e proprietários',
+        'Selo Construtora Business Verificada',
+        'Recepção prioritária de cotações de grande porte',
+        'Central de Marketing Corporativa com posts para redes sociais',
+        'Até 5 obras ativas e 10 membros de equipe',
         'Gestão financeira e compras avançadas',
-        'Gantt e Centro de Operações',
-        'PDFs Profissionais White-label'
+        'Gantt, Centro de Operações e PDFs Profissionais White-label'
       ]
     },
     business: {
@@ -357,12 +436,18 @@ export const PLANS_CONFIG: Record<UserRole, Record<string, PlanDefinition>> = {
         maxTeamMembers: 9999,
         hasAdvancedPDF: true,
         hasPremiumSupport: true,
+        connectVisibility: 'exclusive_top1',
+        hasVerifiedBadge: true,
+        hasMarketingCenter: true,
       },
       features: [
-        'Obras ilimitadas',
-        'Múltiplas equipes e usuários ilimitados',
-        'API e integrações ERP',
-        'Dashboards personalizados e Orçamentos White-label'
+        'Posição TOP 1 Regional de Construtoras e Empreiteiras',
+        'Canal exclusivo direto com investidores e grandes empreendimentos',
+        'Selo Construtora Enterprise Premium',
+        'Divulgação patrocinada de lançamentos no Connect',
+        'Obras ilimitadas e membros de equipe ilimitados',
+        'Central de Marketing Corporativa VIP',
+        'API, integrações ERP e Dashboards corporativos'
       ]
     }
   }

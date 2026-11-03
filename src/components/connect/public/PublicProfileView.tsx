@@ -77,9 +77,13 @@ export function PublicProfileView({ uid, theme }: { uid: string, theme: string }
           <div style={{ width: 120, height: 120, borderRadius: 60, backgroundColor: 'var(--bg-surface)', border: '4px solid var(--bg-base)', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             <span style={{ fontSize: 40, fontWeight: 800, color: 'var(--text-muted)' }}>{profile.name.charAt(0)}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)' }}>{profile.name}</h1>
-            {profile.isVerified && <ShieldCheck size={20} color="#10B981" />}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <h1 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', margin: 0 }}>{profile.name}</h1>
+            {profile.isVerified && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 10, backgroundColor: 'rgba(245,158,11,0.15)', color: '#F59E0B', fontSize: 12, fontWeight: 800, border: '1px solid rgba(245,158,11,0.3)' }}>
+                <ShieldCheck size={15} /> PRO Verificado
+              </span>
+            )}
           </div>
           <p style={{ fontSize: 16, color: 'var(--color-primary)', fontWeight: 700, marginBottom: 12 }}>{profile.specialty}</p>
           
@@ -88,10 +92,22 @@ export function PublicProfileView({ uid, theme }: { uid: string, theme: string }
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Star size={16} color="#F59E0B" /> {profile.rating > 0 ? profile.rating.toFixed(1) : 'Novo'}</div>
           </div>
 
-          <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 400 }}>
-            <button onClick={() => setShowQuoteModal(true)} className="btn-primary" style={{ flex: 1, padding: 16, borderRadius: 16, fontWeight: 800, fontSize: 16 }}>
+          <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 460 }}>
+            <button onClick={() => setShowQuoteModal(true)} className="btn-primary" style={{ flex: 1, padding: 14, borderRadius: 16, fontWeight: 800, fontSize: 15 }}>
               Solicitar Orçamento
             </button>
+            {profile.phone && (
+              <button 
+                onClick={() => {
+                  const clean = profile.phone?.replace(/\D/g, '') || '';
+                  window.open(`https://api.whatsapp.com/send?phone=55${clean}&text=Olá ${encodeURIComponent(profile.name)}! Vi seu perfil no CentralObra Connect e gostaria de solicitar um orçamento...`, '_blank');
+                }}
+                className="btn-secondary" 
+                style={{ padding: '14px 18px', borderRadius: 16, fontWeight: 800, fontSize: 15, color: '#10B981', borderColor: 'rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', gap: 8 }}
+              >
+                <Phone size={18} /> WhatsApp
+              </button>
+            )}
           </div>
           
           {profile.bio && (

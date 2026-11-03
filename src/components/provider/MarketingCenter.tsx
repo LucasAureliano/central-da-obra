@@ -5,9 +5,10 @@ import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { ArrowLeft, Star, Copy, Sparkles, Image as ImageIcon, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { MarketingCenterSuite } from '../connect/MarketingCenterSuite';
 
 export function MarketingCenter({ onBack }: { onBack: () => void }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [reviews, setReviews] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'reviews' | 'social'>('reviews');
   const [copyText, setCopyText] = useState('');
@@ -121,43 +122,25 @@ export function MarketingCenter({ onBack }: { onBack: () => void }) {
 
         {activeTab === 'social' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="glass-panel" style={{ padding: 24, borderRadius: 24, marginBottom: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Sparkles size={20} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Gerador de Posts com IA</h3>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Crie textos persuasivos para suas redes</p>
-                </div>
-              </div>
-              
-              <button className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, display: 'flex', justifyContent: 'center', gap: 8 }} onClick={generateCopy}>
-                <MessageCircle size={20} /> Gerar Texto Automático
-              </button>
-
-              {copyText && (
-                <div style={{ marginTop: 16, padding: 16, backgroundColor: 'var(--bg-body)', borderRadius: 16, border: '1px solid var(--border-subtle)', position: 'relative' }}>
-                  <p style={{ fontSize: 14, color: 'var(--text-main)', lineHeight: 1.5, marginBottom: 16 }}>{copyText}</p>
-                  <button className="btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 8 }} onClick={() => { navigator.clipboard.writeText(copyText); toast.success('Texto copiado!'); }}>
-                    <Copy size={16} /> Copiar Texto
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="glass-panel" style={{ padding: 24, borderRadius: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ImageIcon size={20} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Seu Portfólio Digital</h3>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Suas fotos públicas (Em breve)</p>
-                </div>
-              </div>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>As fotos marcadas como "Publicável" no Diário de Obras aparecerão na sua página pública.</p>
-            </div>
+            <MarketingCenterSuite 
+              profile={{
+                id: user?.uid || '',
+                name: profile?.name || 'Profissional CentralObra',
+                specialty: profile?.specialty || 'Serviços Especializados',
+                role: profile?.role || 'service',
+                city: (profile as any)?.city || '',
+                state: '',
+                bio: (profile as any)?.bio || '',
+                phone: (profile as any)?.phone || '',
+                email: profile?.email || '',
+                rating: reviews.length > 0 ? parseFloat(averageRating) : 5.0,
+                reviewCount: reviews.length,
+                completedWorksCount: 0,
+                isVerified: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              }}
+            />
           </motion.div>
         )}
       </div>

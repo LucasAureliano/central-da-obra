@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { CheckCircle2, Zap, Building2, Crown, ShieldCheck, X, Sparkles, ChevronRight, FileText, Bot, Activity } from 'lucide-react';
+import { CheckCircle2, Zap, Building2, Crown, ShieldCheck, X, Sparkles, ChevronRight, FileText, Bot, Activity, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useSubscription } from '../contexts/SubscriptionContext';
@@ -37,14 +37,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
   const roleKey = profile?.role || 'owner';
   const rolePlans = PLANS_CONFIG[roleKey];
   
-  const starterPriceObj = isAnnual ? { val: 299.90, label: '/ano' } : { val: 29.90, label: '/mÃªs' };
-  const proPriceObj = isAnnual ? { val: 499.90, label: '/ano' } : { val: 49.90, label: '/mÃªs' };
-  const businessPriceObj = isAnnual ? { val: 799.00, label: '/ano' } : { val: 79.90, label: '/mÃªs' };
-
-  const freePrice = 0;
-  const starterPrice = starterPriceObj.val;
-  const proPrice = proPriceObj.val;
-  const businessPrice = businessPriceObj.val;
+  const starterPriceObj = isAnnual ? { val: 299.90, label: '/ano' } : { val: 29.90, label: '/mês' };
+  const proPriceObj = isAnnual ? { val: 499.90, label: '/ano' } : { val: 49.90, label: '/mês' };
+  const businessPriceObj = isAnnual ? { val: 799.00, label: '/ano' } : { val: 79.90, label: '/mês' };
 
   const handleSubscribe = async (selectedPlan: 'starter' | 'pro' | 'business') => {
     if (!profile) return;
@@ -56,9 +51,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     }
 
     if (Capacitor.isNativePlatform()) {
-      toast.error('Gerencie sua assinatura atravÃ©s da loja de aplicativos (App Store ou Google Play).', {
+      toast.error('Gerencie sua assinatura através da loja de aplicativos (App Store ou Google Play).', {
         duration: 5000,
-        icon: 'ðŸ“±'
+        icon: '📱'
       });
       return;
     }
@@ -98,7 +93,6 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     }
   };
 
-  
   const handleMockPayment = async () => {
     if (!showMockCheckout || !profile) return;
     try {
@@ -123,8 +117,6 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     }
   };
 
-
-
   return (
     <div className="animate-fade-in" style={{ padding: '20px 20px 100px', position: 'relative' }}>
       
@@ -134,23 +126,23 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           <Sparkles size={16} /> Planos e Assinaturas
         </div>
         <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-main)', marginBottom: 12, lineHeight: 1.3, whiteSpace: 'normal', wordBreak: 'break-word' }}>
-          {roleKey === 'service' ? 'CresÃ§a seus serviÃ§os com a' : 
-           roleKey === 'architect' || roleKey === 'engineer' ? 'GestÃ£o avanÃ§ada para seus' : 
+          {roleKey === 'service' ? 'Cresça seus serviços com a' : 
+           roleKey === 'architect' || roleKey === 'engineer' ? 'Gestão e autoridade para seus' : 
            roleKey === 'builder' ? 'Escale sua Construtora com a' : 
-           'Leve sua GestÃ£o para o'} <span style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text', backgroundImage: 'linear-gradient(90deg, #3B82F6, #8B5CF6)' }}>
+           'Leve sua Gestão para o'} <span style={{ color: 'transparent', backgroundClip: 'text', WebkitBackgroundClip: 'text', backgroundImage: 'linear-gradient(90deg, #3B82F6, #8B5CF6)' }}>
              {roleKey === 'service' ? ' CentralObra' : 
-              roleKey === 'architect' || roleKey === 'engineer' ? ' Projetos' : 
+              roleKey === 'architect' || roleKey === 'engineer' ? ' Projetos & Clientes' : 
               roleKey === 'builder' ? ' CentralObra' : 
-              ' PrÃ³ximo NÃ­vel'}
+              ' Próximo Nível'}
            </span>
         </h1>
         <p style={{ fontSize: 16, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          Escolha o plano ideal. O <strong style={{ color: 'var(--color-primary)' }}>Copilot da Obra</strong> com IA e Recursos Premium vÃ£o transformar seus resultados.
+          Escolha o plano ideal para seu momento. Conquiste mais clientes com o <strong style={{ color: 'var(--color-primary)' }}>CentralObra Connect</strong> e acelere sua rotina com o <strong style={{ color: 'var(--color-primary)' }}>Copilot com IA</strong>.
         </p>
       </div>
 
       {/* Uso Atual - Meu Plano */}
-      <div className="glass-panel" style={{ marginBottom: 48, padding: 24, maxWidth: 800, margin: '0 auto 48px', borderRadius: 24, border: '1px solid var(--border-subtle)', position: 'relative', overflow: 'hidden' }}>
+      <div className="glass-panel" style={{ marginBottom: 32, padding: 24, maxWidth: 800, margin: '0 auto 32px', borderRadius: 24, border: '1px solid var(--border-subtle)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, right: 0, width: 120, height: 120, backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: '50%', filter: 'blur(40px)' }} />
         
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, position: 'relative', zIndex: 10 }}>
@@ -185,11 +177,11 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             </div>
           )}
 
-          {/* OrÃ§amentos (Service only) */}
+          {/* Orçamentos (Service only) */}
           {roleKey === 'service' && limits.maxQuotes < 9999 && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 8 }}>
-                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>OrÃ§amentos (MÃªs)</span>
+                <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos (Mês)</span>
                 <span style={{ color: 'var(--text-muted)' }}>{usage.quotesCount} de {limits.maxQuotes}</span>
               </div>
               <div style={{ height: 8, width: '100%', backgroundColor: 'var(--bg-surface)', borderRadius: 4, overflow: 'hidden' }}>
@@ -232,8 +224,46 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
         </div>
       </div>
 
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 32, gap: 12 }}>
+      {/* Destaque Exclusivo CentralObra Connect para Profissionais */}
+      {roleKey !== 'owner' && (
+        <div 
+          className="glass-panel" 
+          style={{
+            maxWidth: 1200, 
+            margin: '0 auto 32px', 
+            padding: '20px 24px', 
+            borderRadius: 20,
+            background: 'linear-gradient(90deg, rgba(59,130,246,0.12), rgba(245,158,11,0.12))',
+            border: '1px solid rgba(59,130,246,0.3)',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            gap: 16, 
+            flexWrap: 'wrap'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(59,130,246,0.2)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <TrendingUp size={22} />
+            </div>
+            <div>
+              <h4 style={{ margin: '0 0 2px 0', fontSize: 15, fontWeight: 800, color: 'var(--text-main)' }}>
+                Mais Clientes e Maior Visibilidade no CentralObra Connect
+              </h4>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Ao assinar os planos <strong>Starter, PRO ou Business</strong>, seu perfil recebe o <strong>Selo Verificado</strong>, sobe para o <strong>topo do radar na sua cidade</strong> e ganha até <strong>10x mais visualizações de proprietários</strong>.
+              </p>
+            </div>
+          </div>
+          <span style={{ fontSize: 12, fontWeight: 800, padding: '6px 14px', borderRadius: 12, backgroundColor: 'rgba(245,158,11,0.15)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.3)', whiteSpace: 'nowrap' }}>
+            ⭐ Radar de Alta Prioridade
+          </span>
+        </div>
+      )}
+
+      {/* Toggle Mensal / Anual */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <span style={{ fontSize: 16, fontWeight: 600, color: !isAnnual ? 'var(--text-main)' : 'var(--text-muted)' }}>Mensal</span>
           <div 
             style={{ width: 64, height: 36, borderRadius: 18, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', position: 'relative', cursor: 'pointer' }}
@@ -245,29 +275,36 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             />
           </div>
           <span style={{ fontSize: 16, fontWeight: 600, color: isAnnual ? 'var(--text-main)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            Anual <span style={{ fontSize: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: 12 }}>2 meses grÃ¡tis</span>
+            Anual <span style={{ fontSize: 12, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: 12, fontWeight: 700 }}>2 meses grátis</span>
           </span>
         </div>
       </div>
 
       {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1200px] mx-auto mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1200px] mx-auto mt-4">
         
         {/* FREE PLAN */}
         <motion.div 
-          whileHover={{ y: -8, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }}
+          whileHover={{ y: -6, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }}
           className="glass-panel" 
           style={{ padding: 32, borderRadius: 24, border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column' }}
         >
-          <div style={{ marginBottom: 24 }}>
+          <div style={{ marginBottom: 20 }}>
             <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{rolePlans.free.name}</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para experimentar e gerenciar necessidades bÃ¡sicas.</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para experimentar e gerenciar necessidades básicas.</p>
           </div>
-          <div style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 28 }}>
             <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ 0</span>
-            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>/para sempre</span>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}> /para sempre</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+
+          {roleKey !== 'owner' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 10, backgroundColor: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, marginBottom: 16 }}>
+              <span>📍 Visibilidade Padrão no Connect</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
             {rolePlans.free.features.map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <CheckCircle2 size={18} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -282,23 +319,30 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
 
         {/* STARTER PLAN */}
         <motion.div 
-          whileHover={{ y: -8, boxShadow: '0 20px 40px -10px rgba(59,130,246,0.15)' }}
+          whileHover={{ y: -6, boxShadow: '0 20px 40px -10px rgba(59,130,246,0.15)' }}
           className="glass-panel" 
           style={{ padding: 32, borderRadius: 24, border: '1px solid rgba(59,130,246,0.3)', display: 'flex', flexDirection: 'column', position: 'relative' }}
         >
           <div style={{ position: 'absolute', top: -12, left: 24, backgroundColor: '#3B82F6', color: '#FFF', padding: '3px 14px', borderRadius: 20, fontSize: 11, fontWeight: 800 }}>
-            NOVO
+            DESTAQUE INICIAL
           </div>
-          <div style={{ marginBottom: 24, marginTop: 8 }}>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{rolePlans.starter?.name || 'BÃ¡sico'}</h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para quem precisa de mais sem pagar pelo Pro.</p>
+          <div style={{ marginBottom: 20, marginTop: 8 }}>
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{rolePlans.starter?.name || 'Básico'}</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para quem quer acelerar e começar a se destacar.</p>
           </div>
-          <div style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 28 }}>
             <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {starterPriceObj.val.toFixed(2).replace('.', ',')}</span>
-            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mÃªs'}</span>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-            {(rolePlans.starter?.features || ['AtÃ© 3 obras ativas', `AtÃ© 15 orÃ§amentos${isAnnual ? '/ano' : '/mÃªs'}`, 'AtÃ© 30 clientes', 'Suporte por email']).map((feature, i) => (
+
+          {roleKey !== 'owner' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 10, backgroundColor: 'rgba(59,130,246,0.1)', color: '#3B82F6', fontSize: 12, fontWeight: 700, marginBottom: 16, border: '1px solid rgba(59,130,246,0.2)' }}>
+              <ShieldCheck size={14} /> +2x Visualizações & Selo Verificado
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
+            {(rolePlans.starter?.features || ['Até 3 obras ativas', `Até 15 orçamentos${isAnnual ? '/ano' : '/mês'}`, 'Até 30 clientes', 'Suporte por email']).map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <CheckCircle2 size={18} color="#3B82F6" style={{ flexShrink: 0, marginTop: 2 }} />
                 <span style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 500 }}>{feature}</span>
@@ -316,27 +360,27 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               onClick={() => handleSubscribe('starter')}
               disabled={loadingCheckout || ['COMP', 'TESTER'].includes(subscription.status)}
             >
-              {loadingCheckout ? 'Processando...' : `Assinar BÃ¡sico`}
+              {loadingCheckout ? 'Processando...' : `Assinar Básico`}
             </button>
           )}
         </motion.div>
 
         {/* PRO PLAN */}
         <motion.div 
-          whileHover={{ y: -8, boxShadow: '0 20px 40px -10px rgba(37,99,235,0.2)' }}
+          whileHover={{ y: -6, boxShadow: '0 20px 40px -10px rgba(37,99,235,0.2)' }}
           className="glass-panel" 
           style={{ padding: 32, borderRadius: 24, border: '2px solid var(--color-primary)', position: 'relative', display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}
         >
-          <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', backgroundColor: 'var(--color-primary)', color: '#FFF', padding: '4px 16px', borderRadius: 20, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}>
+          <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', backgroundColor: 'var(--color-primary)', color: '#FFF', padding: '4px 16px', borderRadius: 20, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 12px rgba(37,99,235,0.3)', whiteSpace: 'nowrap' }}>
             <Sparkles size={14} /> Mais Popular
           </div>
-          <div style={{ marginBottom: 24, marginTop: 8 }}>
+          <div style={{ marginBottom: 20, marginTop: 8 }}>
             <h3 style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
               {rolePlans.pro.name} <Crown size={20} color="#F59E0B" />
             </h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para quem precisa de escala e profissionalismo total.</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para quem precisa de máxima escala, clientes e autoridade total.</p>
           </div>
-          <div style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 24 }}>
             {['COMP', 'TESTER'].includes(subscription.status) ? (
               <div className="flex flex-col gap-1">
                 <span style={{ fontSize: 24, fontWeight: 900, color: 'var(--color-primary)' }}>Acesso Concedido</span>
@@ -344,22 +388,28 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               </div>
             ) : (
               <>
-                <span style={{ fontSize: 48, fontWeight: 900, color: 'var(--text-main)' }}>R$ {proPriceObj.val.toFixed(2).replace('.', ',')}</span>
-                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mÃªs'}</span>
+                <span style={{ fontSize: 44, fontWeight: 900, color: 'var(--text-main)' }}>R$ {proPriceObj.val.toFixed(2).replace('.', ',')}</span>
+                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
               </>
             )}
           </div>
+
+          {roleKey !== 'owner' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 12, backgroundColor: 'rgba(245,158,11,0.12)', color: '#F59E0B', fontSize: 12, fontWeight: 800, marginBottom: 16, border: '1px solid rgba(245,158,11,0.3)' }}>
+              <Crown size={15} /> Topo do Radar Connect & Selo PRO (+10x)
+            </div>
+          )}
           
-          <div style={{ backgroundColor: 'rgba(37, 99, 235, 0.05)', padding: 16, borderRadius: 16, marginBottom: 24, border: '1px solid rgba(37, 99, 235, 0.1)' }}>
-            <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <Bot size={16} /> Inclui o Copilot da Obra (IA)
+          <div style={{ backgroundColor: 'rgba(37, 99, 235, 0.05)', padding: 14, borderRadius: 14, marginBottom: 20, border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <Bot size={15} /> Inclui Copilot da Obra & Central de Marketing
             </h4>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              Interpreta normas, gera cronogramas automaticamente, revisa propostas, e atua como seu assistente especializado 24/7.
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+              IA multimodal que transcreve notas, gera cronogramas, cria artes prontas para redes e alavanca suas vendas.
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
             {rolePlans.pro.features.map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <CheckCircle2 size={18} color="#10B981" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -387,24 +437,31 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
           )}
         </motion.div>
 
-        {/* BUSINESS PLAN - SÃ³ exibe se for builder */}
-        {roleKey === 'builder' && rolePlans.business && businessPrice !== null && (
+        {/* BUSINESS / PLUS PLAN */}
+        {rolePlans.business && businessPriceObj && (
           <motion.div 
-            whileHover={{ y: -8, boxShadow: '0 20px 40px -10px rgba(139,92,246,0.2)' }}
+            whileHover={{ y: -6, boxShadow: '0 20px 40px -10px rgba(139,92,246,0.2)' }}
             className="glass-panel" 
             style={{ padding: 32, borderRadius: 24, border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column' }}
           >
-            <div style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 20 }}>
               <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 {rolePlans.business?.name} <Building2 size={20} color="#8B5CF6" />
               </h3>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para construtoras e grandes operaÃ§Ãµes.</p>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Para construtoras, grandes equipes e operações consolidadas.</p>
             </div>
-            <div style={{ marginBottom: 32 }}>
+            <div style={{ marginBottom: 28 }}>
               <span style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-main)' }}>R$ {businessPriceObj.val.toFixed(2).replace('.', ',')}</span>
-              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mÃªs'}</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isAnnual ? '/ano' : '/mês'}</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+
+            {roleKey !== 'owner' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 12, backgroundColor: 'rgba(139,92,246,0.12)', color: '#8B5CF6', fontSize: 12, fontWeight: 800, marginBottom: 16, border: '1px solid rgba(139,92,246,0.3)' }}>
+                <Building2 size={15} /> Posição TOP 1 Regional no Connect
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
               {rolePlans.business?.features.map((feature, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <CheckCircle2 size={18} color="#8B5CF6" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -420,7 +477,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
 
       </div>
 
-      <div className="glass-panel" style={{ maxWidth: 400, margin: '40px auto 0', padding: '24px', backgroundColor: 'transparent', borderRadius: 16, border: '1px solid var(--border-subtle)' }}>
+      <div className="glass-panel" style={{ maxWidth: 440, margin: '40px auto 0', padding: '24px', backgroundColor: 'transparent', borderRadius: 20, border: '1px solid var(--border-subtle)' }}>
         <h4 className="text-sm font-bold text-[var(--text-main)] mb-2">Possui um Cupom Promocional?</h4>
         <div className="flex gap-2">
           <input 
@@ -434,7 +491,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
             className="btn-secondary py-2 px-4 rounded-lg text-sm font-bold"
             onClick={() => {
               if(!coupon) return;
-              toast.success('Cupom invÃ¡lido ou expirado.');
+              toast.error('Cupom inválido ou expirado.');
             }}
           >
             Aplicar
@@ -445,60 +502,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
       <div style={{ textAlign: 'center', marginTop: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
         <ShieldCheck size={32} color="var(--text-muted)" opacity={0.5} />
         <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 400 }}>
-          Pagamento seguro e transparente. VocÃª pode cancelar sua assinatura premium a qualquer momento, sem taxas adicionais.
+          Pagamento 100% seguro e transparente. Você pode cancelar sua assinatura premium a qualquer momento, sem fidelidade ou taxas adicionais.
         </p>
       </div>
-
-      {preferenceId && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
-          zIndex: 99999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 20
-        }}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="glass-panel hide-scrollbar"
-            style={{
-              width: '100%',
-              maxWidth: 500,
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              borderRadius: 24,
-              padding: 0,
-              backgroundColor: 'var(--bg-panel)',
-              position: 'relative',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-            }}
-          >
-            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-panel)', padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Finalizar Assinatura</h2>
-              <button 
-                onClick={() => setPreferenceId(null)}
-                style={{
-                  background: 'rgba(128,128,128,0.1)',
-                  border: 'none',
-                  width: 32, height: 32,
-                  borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--text-main)', cursor: 'pointer'
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div style={{ padding: 24 }}>
-              
-            </div>
-          </motion.div>
-        </div>
-      )}
 
       {showMockCheckout && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
@@ -510,17 +516,17 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
               <div style={{ width: 64, height: 64, borderRadius: 32, background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                 <Crown size={32} />
               </div>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Ambiente de Testes</h2>
-              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: 14 }}>As chaves do Stripe nÃ£o estÃ£o configuradas. Utilize a simulaÃ§Ã£o.</p>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Ambiente de Demonstração</h2>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: 14 }}>Ative o plano instantaneamente para testar todos os recursos.</p>
             </div>
             <div style={{ padding: '32px 24px 24px', textAlign: 'center', marginTop: -20, background: 'var(--bg-panel)', borderRadius: '24px 24px 0 0' }}>
               <div style={{ marginBottom: 32 }}>
                 <p style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>Plano Selecionado</p>
                 <h3 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '-0.02em', marginBottom: 8 }}>{showMockCheckout.plan}</h3>
-                <p style={{ fontSize: 36, fontWeight: 900, color: 'var(--color-primary)', margin: 0, letterSpacing: '-0.03em' }}>R$ {showMockCheckout.price.toFixed(2).replace('.', ',')}<span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 600 }}>{isAnnual ? '/ano' : '/mÃªs'}</span></p>
+                <p style={{ fontSize: 36, fontWeight: 900, color: 'var(--color-primary)', margin: 0, letterSpacing: '-0.03em' }}>R$ {showMockCheckout.price.toFixed(2).replace('.', ',')}<span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 600 }}>{isAnnual ? '/ano' : '/mês'}</span></p>
               </div>
               <button onClick={handleMockPayment} className="btn-primary" style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                Simular Pagamento <Sparkles size={18} />
+                Ativar Plano Agora <Sparkles size={18} />
               </button>
               <button onClick={() => setShowMockCheckout(null)} className="btn-secondary" style={{ width: '100%', padding: 16, borderRadius: 16, fontWeight: 700, fontSize: 16, marginTop: 12, background: 'transparent' }}>
                 Cancelar
@@ -533,6 +539,3 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ onBack, on
     </div>
   );
 };
-
-
-
