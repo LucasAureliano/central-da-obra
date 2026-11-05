@@ -423,7 +423,7 @@ function App() {
       setActiveTab('relatorios');
       return;
     }
-    if (title === 'Materiais' || title === 'Lista de Materiais' || title === 'Compras') {
+    if (title === 'Materiais' || title === 'Lista de Materiais') {
       setActiveTab('compras');
       return;
     }
@@ -609,7 +609,7 @@ function App() {
       if (profile?.role === 'owner' || (!profile?.role && isGuest)) {
         return <OwnerWorkDetails key="owner-work-details" workId={selectedWorkId} initialTab={initialWorkTab as any} onBack={() => { setSelectedWorkId(null); setInitialWorkTab(undefined); }} />;
       }
-      return <WorkDetails key="work-details" workId={selectedWorkId} initialTab={initialWorkTab} onBack={() => { setSelectedWorkId(null); setInitialWorkTab(undefined); }} />;
+      return <WorkDetails key="work-details" workId={selectedWorkId} onBack={() => { setSelectedWorkId(null); setInitialWorkTab(undefined); }} />;
     }
 
     switch(activeTab) {
@@ -623,15 +623,12 @@ function App() {
         }
         return <Works key="obras" onWorkSelect={(id) => setSelectedWorkId(id)} />;
       case 'assistente': return <SmartAssistant key="assistente" onNavigate={handleNavigate} />;
-      case 'ferramentas': 
-      case 'calculators':
+      case 'ferramentas': return <CalculatorsWizard key="ferramentas" onNavigate={handleNavigate} initialQuery={activeWizardQuery || undefined} />;
       case 'calculos': return <CalculatorsWizard key="calculos" onNavigate={handleNavigate} initialQuery={activeWizardQuery || undefined} />;
       case 'library': return <CalculatorLibrary key="library" onNavigate={handleNavigate} />;
       case 'insights': return <InsightsCentral key="insights" onBack={() => handleNavigate('inicio')} onNavigate={handleNavigate} />;
       case 'central-tecnica': return <TechnicalCentral key="central" onNavigate={handleNavigate} initialArticleId={activeArticleId || undefined} />;
       case 'relatorios': return <Reports key="relatorios" />;
-      case 'materiais':
-      case 'compras-materiais':
       case 'compras': return <Shopping key="compras" />;
       case 'centro-compras':
         if (activeRole === 'builder') {
@@ -645,7 +642,6 @@ function App() {
       case 'portfolio': return <Works key="portfolio" onWorkSelect={(id) => setSelectedWorkId(id)} />;
       case 'recebimentos': return <Finance key="recebimentos" />;
       case 'financas': return <Finance key="financas" />;
-      case 'agenda':
       case 'agenda-completa': return <Agenda key="agenda" />;
       case 'controle-projetos': return <ProjectControl key="projetos" />;
       case 'studio-interiores': return <RequireWorkSelection featureName="Studio de Interiores" onBack={() => handleNavigate('inicio')}><InteriorDesignStudio key="studio-interiores" onBack={() => handleNavigate('inicio')} /></RequireWorkSelection>;
@@ -681,10 +677,6 @@ function App() {
       case 'nova-despesa': return <Finance key="nova-despesa" initialShowAddModal={true} onBack={() => handleNavigate('inicio')} />;
       case 'marketing': return <MarketingCenter key="marketing" onBack={() => handleNavigate('inicio')} />;
       case 'financeiro-profissional': return <ProfessionalFinance key="fin-pro" onBack={() => handleNavigate('inicio')} />;
-      case 'financeiro-corporativo': return <BuilderCorporateFinance key="fin-corp" onBack={() => handleNavigate('inicio')} />;
-      case 'imoveis': return <Works key="imoveis" onWorkSelect={(id) => setSelectedWorkId(id)} />;
-      case 'pendencias-tecnicas': return <TechnicalJournal key="pendencias-tecnicas" />;
-      case 'portal-cliente': return <RequireWorkSelection featureName="Portal do Cliente" onBack={() => handleNavigate('inicio')}><Documents key="portal-cliente" /></RequireWorkSelection>;
       case 'financeiro': 
         if (activeRole === 'builder') {
           return <BuilderCorporateFinance key="financeiro" onBack={() => handleNavigate('inicio')} />;
@@ -692,7 +684,6 @@ function App() {
         return activeRole === 'service' ? <ProfessionalFinance key="financeiro-pro" onBack={() => handleNavigate('inicio')} /> : <Finance key="financeiro" initialShowAddModal={false} onBack={() => handleNavigate('inicio')} />;
       case 'perfil': return <Profile key="perfil" />;
       case 'fornecedores': return <BuilderSuppliers key="fornecedores" onBack={() => handleNavigate('inicio')} />;
-      case 'equipes':
       case 'equipe': 
         if (activeRole === 'builder') return <BuilderTeams key="equipe" onBack={() => handleNavigate('menu')} />;
         return <TeamManagement key="equipe" onBack={() => handleNavigate('menu')} />;

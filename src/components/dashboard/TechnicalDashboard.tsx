@@ -392,7 +392,7 @@ export function TechnicalDashboard({ onNavigate }: DashboardProps) {
                 <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Nenhum evento agendado para os próximos dias.</p>
               </div>
             )}
-            <button className="btn-secondary" style={{ width: '100%', marginTop: 16, justifyContent: 'center', borderRadius: 12 }} onClick={() => onNavigate('agenda-completa')}>
+            <button className="btn-secondary" style={{ width: '100%', marginTop: 16, justifyContent: 'center', borderRadius: 12 }} onClick={() => onNavigate('agenda')}>
               Abrir Agenda Completa
             </button>
           </motion.div>
